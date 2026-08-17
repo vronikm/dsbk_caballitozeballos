@@ -57,7 +57,7 @@ $vistaActual = $vistaActual ?? '';
             <li class="nav-item">
                 <span class="nav-link">
                     <i class="fas fa-user-circle mr-1"></i>
-                    <?php echo htmlspecialchars((string)($_SESSION['nombre'] ?? $_SESSION['usuario'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>
+                    <?php echo htmlspecialchars(ds_nombre_usuario(), ENT_QUOTES, 'UTF-8'); ?>
                 </span>
             </li>
             <li class="nav-item">

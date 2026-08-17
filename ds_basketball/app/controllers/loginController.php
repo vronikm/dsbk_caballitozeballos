@@ -110,7 +110,10 @@
 				'sede'           => $user['sede'],
 				'identificacion' => $user['empleado_identificacion'],
 				'usuario_id'     => $user['usuario_empleadoid'],
-				'nombre'         => $user['empleado_nombre'] ?: $user['usuario_rolid'],
+				/* Sin ficha de empleado se cae al nombre de usuario, NO al id
+				   del rol: eso era lo que hacia antes y por eso la cabecera
+				   saludaba con un "1" a quien no tuviera empleado asociado. */
+				'nombre'         => $user['empleado_nombre'] ?: $user['usuario_usuario'],
 			];
 
 			/* ----------  5. Redirección ---------- */

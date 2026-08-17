@@ -46,6 +46,28 @@ if (!function_exists('usuario_autenticado')) {
         return (int)($_SESSION['usuarioid'] ?? 0);
     }
 
+    /**
+     * Como se nombra al usuario en pantalla.
+     *
+     * Manda el nombre de la persona; si no hay ficha de empleado detras, el
+     * nombre de usuario. Nunca un numero.
+     *
+     * Se comprueba que no sea numerico a proposito: el login guardaba antes
+     * el id del rol cuando faltaba el empleado, asi que las sesiones ya
+     * abiertas siguen arrastrando ese valor. Descartarlo aqui las arregla
+     * sin obligar a nadie a volver a entrar.
+     */
+    function ds_nombre_usuario(): string
+    {
+        $nombre = trim((string)($_SESSION['nombre'] ?? ''));
+
+        if ($nombre !== '' && !is_numeric($nombre)) {
+            return $nombre;
+        }
+
+        return trim((string)($_SESSION['usuario'] ?? ''));
+    }
+
     /*----------  Politica de contrasenas  ----------*/
 
     /**

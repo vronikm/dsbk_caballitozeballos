@@ -19,7 +19,8 @@ $resumen   = $insHub->resumenHoy();
 $actividad = $insHub->actividadReciente();
 $avisos    = $insHub->requiereAtencion();
 
-$nombreUsuario = $_SESSION['nombre'] ?? $_SESSION['usuario'] ?? '';
+/* El nombre de la persona; si no tiene ficha, el nombre de usuario. */
+$nombreUsuario = ds_nombre_usuario();
 $primerNombre  = trim(explode(' ', trim((string)$nombreUsuario))[0] ?? '');
 
 $fotoUsuario = !empty($_SESSION['foto'])

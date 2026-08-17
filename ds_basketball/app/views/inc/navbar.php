@@ -48,7 +48,7 @@
                             echo '<img class="img-circle elevation-2" alt="User Image" src="'.APP_URL.'app/views/dist/img/default.png">';
                         }
                     ?>
-                    <span ><?php echo htmlspecialchars((string)($_SESSION['usuario'] ?? ''), ENT_QUOTES, 'UTF-8');?></span>
+                    <span ><?php echo htmlspecialchars(ds_nombre_usuario(), ENT_QUOTES, 'UTF-8');?></span>
                 </div>
             </a>
             <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right">              

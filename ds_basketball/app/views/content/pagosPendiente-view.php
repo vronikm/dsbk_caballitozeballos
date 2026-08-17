@@ -2,20 +2,31 @@
 	use app\controllers\pagosController;
 	$insAlumno = new pagosController();	
 
-	$pagoid=$insLogin->limpiarCadena($url[1]);
+	/* Esta pantalla se abre desde el listado con el id del pago en la URL.
+	   Sin id la consulta quedaba truncada y la pagina moria mostrando el
+	   SQL; con un id inexistente seguia pintando con $datos todavia como
+	   PDOStatement y reventaba mas abajo. En ambos casos se vuelve al
+	   listado, que es de donde se venia. */
+	$pagoid = isset($url[1]) ? trim((string)$url[1]) : '';
+
+	if ($pagoid === '' || !ctype_digit($pagoid)) {
+		header("Location: " . APP_URL . "pagosList/");
+		exit();
+	}
 
 	$datos=$insAlumno->BuscarPago($pagoid);
-	
+
 	if($datos->rowCount()==1){
-		$datos=$datos->fetch(); 
+		$datos=$datos->fetch();
 
 		if ($datos['pago_archivo']!=""){
 			$imagen = media_url('pago', $datos['pago_archivo']);
 		}else{
 			$imagen = APP_URL.'app/views/dist/img/sinpago.jpg';
-		} 
+		}
 	}else{
-		include "app/views/inc/error_alert.php";
+		header("Location: " . APP_URL . "pagosList/");
+		exit();
 	}
 
 	$fechahoy = date('Y-m-d');

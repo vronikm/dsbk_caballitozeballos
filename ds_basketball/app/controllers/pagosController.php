@@ -1809,14 +1809,19 @@
 		}
 
 		public function BuscarPago($pagoid){
-		
-			$consulta_datos="SELECT R.catalogo_descripcion RUBRO, T.torneo_nombre, P.* 
-					FROM alumno_pago P	
-						INNER JOIN general_tabla_catalogo R ON R.catalogo_valor = P.pago_rubroid
-						LEFT JOIN torneo_torneo T ON T.torneo_id = P.pago_campeonatoid		
-					WHERE P.pago_id = ".$pagoid;	
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			/* El id llega de la URL. Antes se concatenaba tal cual, y
+			   limpiarCadena() no defiende de nada aqui: aplica
+			   htmlspecialchars, que es para HTML, no para SQL. Con un id
+			   vacio la consulta quedaba en "WHERE P.pago_id = " y con texto
+			   se colaba en la clausula. Va como parametro ligado. */
+			$consulta_datos="SELECT R.catalogo_descripcion RUBRO, T.torneo_nombre, P.*
+					FROM alumno_pago P
+						INNER JOIN general_tabla_catalogo R ON R.catalogo_valor = P.pago_rubroid
+						LEFT JOIN torneo_torneo T ON T.torneo_id = P.pago_campeonatoid
+					WHERE P.pago_id = :pago";
+
+			$datos = $this->ejecutarConsulta($consulta_datos, [':pago' => (int)$pagoid]);
 			return $datos;
 		}
 
