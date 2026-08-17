@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/c/wamp64/bin/mysql/mysql8.4.7/bin/mysql.exe -u root -e 'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA='\\\\''digitech_senderodecampeones'\\\\'' AND \\(TABLE_NAME LIKE '\\\\''%horario%'\\\\'' OR TABLE_NAME LIKE '\\\\''%alumno%'\\\\'' OR TABLE_NAME LIKE '\\\\''%inscri%'\\\\''\\);')",
+      "Bash(/c/wamp64/bin/mysql/mysql8.4.7/bin/mysql.exe -u root --default-character-set=utf8mb4 -e ' *)"
+    ]
+  }
+}

@@ -1,0 +1,238 @@
+/* ==========================================================================
+   DigiSports Core — capa visual sobre AdminLTE
+   --------------------------------------------------------------------------
+   No sustituye a AdminLTE: lo reviste con la identidad DigiSports definida
+   en digisports.css (que debe cargarse antes que este archivo).
+   ========================================================================== */
+
+.ds-core {
+    --core-borde:   #e6e9ef;
+    --core-suave:   #f6f8fb;
+    --core-texto:   #1f2937;
+    --core-tenue:   #6b7280;
+
+    font-family: var(--ds-font);
+    color: var(--core-texto);
+}
+
+/* ---------- Barra superior y menú lateral ---------- */
+
+.ds-core__navbar {
+    background: var(--ds-bg) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.ds-core__navbar .nav-link { color: #cbd5e1 !important; }
+.ds-core__navbar .nav-link:hover { color: #fff !important; }
+
+.ds-core__sidebar { background: var(--ds-surface) !important; }
+
+.ds-core__sidebar .brand-link {
+    background: var(--ds-bg);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.ds-core .nav-sidebar .nav-link {
+    border-radius: var(--ds-radius-sm);
+    margin: 2px 8px;
+    color: #cbd5e1;
+}
+
+.ds-core .nav-sidebar .nav-link:hover {
+    background: var(--ds-surface-2);
+    color: #fff;
+}
+
+.ds-core .nav-sidebar .nav-link.active {
+    background: var(--ds-primary) !important;
+    color: #fff !important;
+    box-shadow: 0 6px 18px rgba(255, 121, 0, .28);
+}
+
+.ds-core .nav-sidebar .nav-link i { width: 22px; text-align: center; }
+
+/* ---------- Contenido ---------- */
+
+.ds-core .content-wrapper { background: var(--core-suave); }
+
+.ds-core .content-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
+}
+
+.ds-core .card {
+    border: 1px solid var(--core-borde);
+    border-radius: var(--ds-radius-md);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+}
+
+.ds-core .card-header {
+    border-bottom: 1px solid var(--core-borde);
+    background: #fff;
+    border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
+    padding: 14px 18px;
+}
+
+.ds-core .card-title { font-weight: 700; font-size: 1rem; }
+
+/* ---------- Tarjetas de indicador ---------- */
+
+.ds-core .ds-kpi {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px;
+    background: #fff;
+    border: 1px solid var(--core-borde);
+    border-radius: var(--ds-radius-md);
+    height: 100%;
+}
+
+.ds-core .ds-kpi__icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--ds-radius-sm);
+    font-size: 1.2rem;
+    flex: 0 0 auto;
+}
+
+.ds-core .ds-kpi__valor {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+}
+
+.ds-core .ds-kpi__label { font-size: .8rem; color: var(--core-tenue); }
+
+/* ---------- Tablas ---------- */
+
+.ds-core .table thead th {
+    background: var(--core-suave);
+    border-bottom: 1px solid var(--core-borde) !important;
+    border-top: 0 !important;
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--core-tenue);
+    white-space: nowrap;
+}
+
+.ds-core .table td {
+    vertical-align: middle;
+    border-top: 1px solid var(--core-borde);
+}
+
+.ds-core .table tbody tr:hover { background: var(--core-suave); }
+
+/* ---------- Matriz de permisos ---------- */
+
+.ds-core .tabla-permisos th.accion {
+    text-align: center;
+    width: 92px;
+}
+
+.ds-core .tabla-permisos td.accion { text-align: center; }
+
+.ds-core .tabla-permisos .grupo td {
+    background: var(--core-suave);
+    font-weight: 700;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--core-tenue);
+}
+
+/* Interruptor accesible y compacto para cada acción. */
+.ds-core .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+.ds-core .switch input { opacity: 0; width: 0; height: 0; }
+
+.ds-core .switch span {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #cbd5e1;
+    border-radius: 999px;
+    transition: background .18s;
+}
+
+.ds-core .switch span::before {
+    content: "";
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .18s;
+}
+
+.ds-core .switch input:checked + span { background: var(--ds-primary); }
+.ds-core .switch input:checked + span::before { transform: translateX(18px); }
+.ds-core .switch input:focus-visible + span { outline: 2px solid var(--ds-primary); outline-offset: 2px; }
+.ds-core .switch input:disabled + span { opacity: .45; cursor: not-allowed; }
+
+/* La acción "ver" gobierna al resto: se resalta. */
+.ds-core .switch--ver input:checked + span { background: var(--ds-success); }
+
+/* Fila sin lectura: sus acciones quedan atenuadas. */
+.ds-core tr.sin-lectura td.accion .switch:not(.switch--ver) { opacity: .35; }
+
+/* ---------- Insignias ---------- */
+
+.ds-core .badge-modulo {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: 700;
+    background: var(--core-suave);
+    border: 1px solid var(--core-borde);
+    color: var(--core-tenue);
+    margin-right: 4px;
+}
+
+.ds-core .badge-modulo--basketball { border-color: #ffd0a3; color: #b45309; background: #fff7ed; }
+.ds-core .badge-modulo--core       { border-color: #c7d2fe; color: #3730a3; background: #eef2ff; }
+.ds-core .badge-modulo--arena      { border-color: #a5f3fc; color: #0e7490; background: #ecfeff; }
+.ds-core .badge-modulo--league     { border-color: #ddd6fe; color: #5b21b6; background: #f5f3ff; }
+.ds-core .badge-modulo--insights   { border-color: #bbf7d0; color: #15803d; background: #f0fdf4; }
+
+/* ---------- Botones ---------- */
+
+.ds-core .btn-primary {
+    background: var(--ds-primary);
+    border-color: var(--ds-primary);
+}
+
+.ds-core .btn-primary:hover,
+.ds-core .btn-primary:focus {
+    background: var(--ds-primary-hover);
+    border-color: var(--ds-primary-hover);
+}
+
+.ds-core .btn { border-radius: var(--ds-radius-sm); font-weight: 600; }
+
+/* ---------- Aviso de rol protegido ---------- */
+
+.ds-core .aviso-superadmin {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: var(--ds-radius-sm);
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #9a3412;
+    font-size: .88rem;
+}
+
+@media (max-width: 576px) {
+    .ds-core .tabla-permisos th.accion,
+    .ds-core .tabla-permisos td.accion { width: auto; }
+}

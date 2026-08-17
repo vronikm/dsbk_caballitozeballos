@@ -1,0 +1,304 @@
+/* ─── AF Pedro Larrea — Formulario de Inscripción ─── */
+
+:root {
+    --afpl-primary: #a52121;
+    --afpl-secondary: #d34545;
+    --afpl-accent: #f39c12;
+    --afpl-success: #27ae60;
+    --afpl-bg: #f4f6f8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--afpl-bg);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+/* ─── Header ─── */
+.afpl-header {
+    background: linear-gradient(135deg, var(--afpl-primary), var(--afpl-secondary));
+    color: #fff;
+    padding: 1.5rem 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.afpl-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.afpl-header .sede-badge {
+    background: var(--afpl-accent);
+    color: #fff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.afpl-logo {
+    max-height: 55px;
+    width: auto;
+    border-radius: 50%;
+    background: #fff;
+    padding: 3px;
+}
+
+/* ─── Card principal ─── */
+.afpl-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.afpl-card .card-header {
+    background: var(--afpl-primary);
+    color: #fff;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.05rem;
+    border: none;
+}
+
+.afpl-card .card-header i {
+    margin-right: 8px;
+}
+
+.afpl-card .card-body {
+    padding: 1.5rem;
+}
+
+/* ─── Stepper / Tabs ─── */
+.nav-pills .nav-link {
+    border-radius: 8px;
+    padding: 0.65rem 1.25rem;
+    font-weight: 500;
+    color: var(--afpl-primary);
+    background: #fdeaea;
+    margin-right: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+    background: var(--afpl-primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(165, 33, 33, 0.3);
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+    background: #f9d6d6;
+}
+
+/* ─── Form controls ─── */
+.form-label {
+    font-weight: 500;
+    color: #34495e;
+    font-size: 0.875rem;
+    margin-bottom: 0.3rem;
+}
+
+.form-label .text-danger {
+    font-size: 0.8rem;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1.5px solid #d5dbdf;
+    padding: 0.55rem 0.85rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--afpl-secondary);
+    box-shadow: 0 0 0 3px rgba(211, 69, 69, 0.15);
+}
+
+.form-control.is-invalid {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.form-control.is-valid {
+    border-color: var(--afpl-success);
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+/* ─── Preview de foto ─── */
+.foto-preview-container {
+    width: 150px;
+    height: 180px;
+    border: 2px dashed #bdc3c7;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #fafafa;
+    margin: 0 auto;
+    transition: border-color 0.3s;
+}
+
+.foto-preview-container:hover {
+    border-color: var(--afpl-secondary);
+}
+
+.foto-preview-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.foto-preview-container .placeholder-icon {
+    font-size: 3rem;
+    color: #bdc3c7;
+}
+
+/* ─── Botón de envío ─── */
+.btn-afpl-primary {
+    background: linear-gradient(135deg, var(--afpl-primary), var(--afpl-secondary));
+    border: none;
+    color: #fff;
+    padding: 0.7rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s;
+    box-shadow: 0 3px 10px rgba(165, 33, 33, 0.25);
+}
+
+.btn-afpl-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(165, 33, 33, 0.35);
+    color: #fff;
+}
+
+.btn-afpl-primary:disabled {
+    opacity: 0.65;
+    transform: none;
+    cursor: not-allowed;
+}
+
+/* ─── Expirado / Error ─── */
+.afpl-expired {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.afpl-expired i {
+    font-size: 4rem;
+    color: #e74c3c;
+    margin-bottom: 1rem;
+}
+
+.afpl-expired h2 {
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.afpl-expired p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+/* ─── Success ─── */
+.afpl-success {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.afpl-success i {
+    font-size: 4rem;
+    color: var(--afpl-success);
+    margin-bottom: 1rem;
+}
+
+/* ─── Spinner ─── */
+.afpl-loading {
+    display: none;
+}
+
+.afpl-loading.active {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ─── Timer ─── */
+.afpl-timer {
+    background: rgba(255, 255, 255, 0.18);
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.afpl-timer i {
+    margin-right: 4px;
+}
+
+/* ─── Sección Autorización ─── */
+#seccion-autorizacion .card {
+    transition: box-shadow 0.2s;
+}
+
+#seccion-autorizacion .card:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+#seccion-autorizacion .form-check-input:checked {
+    background-color: var(--afpl-success);
+    border-color: var(--afpl-success);
+}
+
+#seccion-autorizacion .form-check-label {
+    cursor: pointer;
+    user-select: none;
+}
+
+#seccion-autorizacion .bg-light {
+    border: 1px solid #e9ecef;
+}
+
+#seccion-autorizacion .bg-light p:last-child {
+    margin-bottom: 0;
+}
+
+/* ─── Footer ─── */
+.afpl-footer {
+    padding: 1.5rem 0;
+    text-align: center;
+    color: #95a5a6;
+    font-size: 0.8rem;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+    .afpl-header h1 {
+        font-size: 1.15rem;
+    }
+
+    .nav-pills .nav-link {
+        padding: 0.5rem 0.85rem;
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .afpl-card .card-body {
+        padding: 1rem;
+    }
+
+    .btn-afpl-primary {
+        width: 100%;
+    }
+}

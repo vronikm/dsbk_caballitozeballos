@@ -1,0 +1,182 @@
+:root {
+    --azul:    #054017;
+    --amarillo: #ffe001;
+}
+
+/* ---- Barra unificada: filtro + fecha ---- */
+.cumple-filtro {
+    background: linear-gradient(90deg, var(--azul), #6b6d6f);
+    border-radius: 10px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.cumple-filtro .fecha-info {
+    color: #fff;
+    font-size: 0.88rem;
+    font-weight: 500;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cumple-filtro .fecha-info strong { color: var(--amarillo); }
+.cumple-filtro > i { color: var(--amarillo); font-size: 1.15rem; flex-shrink: 0; }
+.cumple-filtro label {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 0;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+.cumple-filtro input[type="date"] {
+    border: 2px solid var(--amarillo);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+    background: #fff;
+    color: var(--azul);
+    font-weight: 600;
+    flex-shrink: 0;
+}
+.cumple-filtro .btn-hoy {
+    background: var(--amarillo);
+    color: var(--azul);
+    border: none;
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: opacity .2s;
+    flex-shrink: 0;
+}
+.cumple-filtro .btn-hoy:hover { opacity: .85; }
+
+/* ---- Badge conteo ---- */
+.cumple-badge {
+    background: var(--amarillo);
+    color: var(--azul);
+    border-radius: 20px;
+    padding: 3px 14px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-left: auto;
+}
+
+/* ---- Fecha label ---- */
+.cumple-fecha-label {
+    color: var(--azul);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+/* ---- Sin resultados ---- */
+.cumple-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #888;
+}
+.cumple-empty i { font-size: 3.5rem; color: #ddd; display: block; margin-bottom: 12px; }
+
+/* ---- Tarjeta de alumno ---- */
+.alumno-card {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 3px 14px rgba(0,42,100,.13);
+    transition: transform .2s, box-shadow .2s;
+    background: #fff;
+    border: none;
+}
+.alumno-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,42,100,.22);
+}
+.alumno-card .card-header-azul {
+    background: var(--azul);
+    padding: 0;
+    text-align: center;
+    position: relative;
+    height: 38px;
+}
+.alumno-card .card-header-azul::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-top: 12px solid var(--azul);
+}
+.alumno-card .foto-wrapper {
+    margin: 0 auto;
+    margin-top: -2px;
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--amarillo);
+    box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    background: #f0f4ff;
+}
+.alumno-card .foto-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.alumno-card .card-body-custom {
+    padding: 14px 16px 16px;
+    text-align: center;
+}
+.alumno-card .alumno-nombre {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--azul);
+    line-height: 0.75;
+    margin-bottom: 4px;
+}
+.alumno-card .alumno-id {
+    font-size: 0.78rem;
+    color: #888;
+    margin-bottom: 6px;
+}
+.alumno-card .edad-badge {
+    display: inline-block;
+    background: var(--azul);
+    color: var(--amarillo);
+    border-radius: 20px;
+    padding: 2px 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.alumno-card .fecha-nacimiento {
+    font-size: 0.78rem;
+    color: #999;
+    margin-bottom: 12px;
+}
+.alumno-card .btn-tarjeta {
+    background: var(--azul);
+    color: var(--amarillo);
+    border: none;
+    border-radius: 7px;
+    padding: 6px 16px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background .2s;
+    display: inline-block;
+}
+.alumno-card .btn-tarjeta:hover {
+    background: #003d8f;
+    color: var(--amarillo);
+    text-decoration: none;
+}
+

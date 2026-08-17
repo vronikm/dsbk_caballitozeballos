@@ -1,0 +1,100 @@
+<?php
+/*
+|--------------------------------------------------------------------------
+| Endpoint AJAX de DigiSports Core
+|--------------------------------------------------------------------------
+| Aplica el mismo guard que el resto del ecosistema: sesion activa, origen
+| valido (anti-CSRF) y acceso al modulo. El permiso por accion lo verifica
+| cada metodo del controlador, porque depende de la operacion concreta.
+*/
+
+require_once __DIR__ . "/../config.php";
+require_once __DIR__ . "/../../autoload.php";
+require_once __DIR__ . "/../../modulos.php";
+require_once __DIR__ . "/../../vistas.php";
+require_once __DIR__ . "/../../inc/session_start.php";
+
+use admin\controllers\coreController;
+
+/*----------  Respuesta uniforme de rechazo  ----------*/
+function core_rechazar(int $codigo, array $alerta): void
+{
+    if (!headers_sent()) {
+        http_response_code($codigo);
+        header('Content-Type: application/json; charset=utf-8');
+    }
+    echo json_encode($alerta, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+/*----------  1. Sesion activa  ----------*/
+if (!usuario_autenticado()) {
+    core_rechazar(401, [
+        'tipo'   => 'redireccionar',
+        'icono'  => 'warning',
+        'titulo' => 'Sesión finalizada',
+        'texto'  => 'Su sesión expiró. Vuelva a ingresar.',
+        'url'    => DS_BASKETBALL_URL . 'login/',
+    ]);
+}
+
+/*----------  2. Origen de la peticion (anti-CSRF)  ----------*/
+if (!origen_es_valido()) {
+    core_rechazar(403, [
+        'tipo'   => 'simple',
+        'icono'  => 'error',
+        'titulo' => 'Solicitud bloqueada',
+        'texto'  => 'La solicitud no proviene del sistema. Recargue la página e inténtelo de nuevo.',
+    ]);
+}
+
+/*----------  3. Acceso al modulo  ----------*/
+if (!usuario_tiene_modulo(DS_MODULO)) {
+    core_rechazar(403, [
+        'tipo'   => 'simple',
+        'icono'  => 'error',
+        'titulo' => 'Acceso denegado',
+        'texto'  => 'Su rol no tiene acceso a la administración del ecosistema.',
+    ]);
+}
+
+/*----------  Despacho  ----------*/
+if (!isset($_POST['modulo_core'])) {
+    core_rechazar(400, [
+        'tipo'   => 'simple',
+        'icono'  => 'error',
+        'titulo' => 'Solicitud incompleta',
+        'texto'  => 'No se indicó la operación a realizar.',
+    ]);
+}
+
+$insCore = new coreController();
+
+/* Cada metodo comprueba por su cuenta la accion que necesita. */
+switch ($_POST['modulo_core']) {
+
+    case 'guardarRol':       echo $insCore->guardarRol();         break;
+    case 'eliminarRol':      echo $insCore->eliminarRol();        break;
+    case 'guardarModulos':   echo $insCore->guardarModulosRol();  break;
+    case 'guardarPermisos':  echo $insCore->guardarPermisos();    break;
+    case 'guardarUsuario':   echo $insCore->guardarUsuario();     break;
+    case 'eliminarUsuario':  echo $insCore->eliminarUsuario();    break;
+    case 'guardarMenu':      echo $insCore->guardarMenu();        break;
+    case 'eliminarMenu':     echo $insCore->eliminarMenu();       break;
+
+    case 'guardarOrganizacion': echo $insCore->guardarOrganizacion(); break;
+
+    case 'guardarSede':      echo $insCore->guardarSede();        break;
+    case 'eliminarSede':     echo $insCore->eliminarSede();       break;
+
+    case 'guardarValorCatalogo':  echo $insCore->guardarValorCatalogo();  break;
+    case 'eliminarValorCatalogo': echo $insCore->eliminarValorCatalogo(); break;
+
+    default:
+        core_rechazar(400, [
+            'tipo'   => 'simple',
+            'icono'  => 'error',
+            'titulo' => 'Operación desconocida',
+            'texto'  => 'La operación solicitada no existe en este módulo.',
+        ]);
+}

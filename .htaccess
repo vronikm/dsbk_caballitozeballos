@@ -1,0 +1,19 @@
+# =====================================================================
+# DigiSports — raiz del ecosistema
+# =====================================================================
+# Solo se sirve el Hub. Cada modulo vive en su carpeta ds_* y tiene su
+# propio .htaccess, por lo que las peticiones a /ds_basketball/... no
+# pasan por aqui.
+
+RewriteEngine On
+Options All -Indexes
+
+# El nucleo es codigo de servidor y no se solicita por URL. Se exceptuan
+# sus recursos visuales (ds_core/assets/) y el modulo de administracion
+# (ds_core/admin/), que si es una aplicacion navegable.
+RewriteRule ^ds_core/(?!assets/|admin/) - [F,L]
+
+# Cualquier otra ruta que no sea un archivo o carpeta real la atiende el Hub.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
