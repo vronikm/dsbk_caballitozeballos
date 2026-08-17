@@ -38,13 +38,17 @@
                  <!--i class="nav-icon far fa-futbol text-info"></i-->
                 <div class="user-panel pb-2">                   
                     <?php
-                        if(is_file("app/views/imagenes/fotos/empleado/".$_SESSION['foto'])){
-                            echo '<img class="img-circle elevation-2" alt="User Image" src="'.media_url('empleado', $_SESSION['foto']).'">';
+                        /* Un usuario sin ficha de empleado no tiene foto: la
+                           clave puede no existir en la sesion. */
+                        $fotoUsuario = (string)($_SESSION['foto'] ?? '');
+
+                        if($fotoUsuario !== '' && is_file("app/views/imagenes/fotos/empleado/".$fotoUsuario)){
+                            echo '<img class="img-circle elevation-2" alt="User Image" src="'.media_url('empleado', $fotoUsuario).'">';
                         }else{
                             echo '<img class="img-circle elevation-2" alt="User Image" src="'.APP_URL.'app/views/dist/img/default.png">';
                         }
-                    ?>       
-                    <span ><?php echo  $_SESSION['usuario'];?></span>                             
+                    ?>
+                    <span ><?php echo htmlspecialchars((string)($_SESSION['usuario'] ?? ''), ENT_QUOTES, 'UTF-8');?></span>
                 </div>
             </a>
             <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right">              

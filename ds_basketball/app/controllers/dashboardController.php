@@ -211,6 +211,133 @@
 			$alumnosInactivos=$this->ejecutarConsulta("SELECT count(*) totalAlumnosInactivos FROM sujeto_alumno WHERE alumno_estado='I'");
 		    return $alumnosInactivos;
 		}
+
+		/*==================================================================
+		  Panel operativo: lo que necesita quien da clase, no quien cobra
+		  ==================================================================
+		  Un profesor no tiene por qué ver recaudación ni morosidad. Lo que
+		  le sirve es saber qué horarios lleva, cuántos alumnos hay en cada
+		  uno y en qué días del mes ya registró la asistencia.
+		*/
+
+		/**
+		 * Horarios que atiende un empleado.
+		 *
+		 * Un horario se reparte en franjas (día + hora + lugar) dentro de
+		 * asistencia_horario_detalle, así que se agrupan para presentar una
+		 * fila por horario con sus días.
+		 */
+		public function horariosDelEmpleado(int $empleadoid){
+			$consulta = "SELECT h.horario_id, h.horario_nombre, h.horario_detalle,
+								h.horario_sedeid, s.sede_nombre,
+								GROUP_CONCAT(DISTINCT d.detalle_dia ORDER BY d.detalle_dia) AS dias,
+								MIN(ho.hora_inicio) AS hora_inicio,
+								MAX(ho.hora_fin)    AS hora_fin,
+								GROUP_CONCAT(DISTINCT l.lugar_nombre ORDER BY l.lugar_nombre SEPARATOR ', ') AS lugares,
+								(SELECT COUNT(*) FROM asistencia_asignahorario a
+								  WHERE a.asignahorario_horarioid = h.horario_id) AS alumnos
+						   FROM asistencia_horario_detalle d
+						   JOIN asistencia_horario h ON h.horario_id = d.detalle_horarioid
+													AND h.horario_estado = 'A'
+						   LEFT JOIN general_sede      s  ON s.sede_id  = h.horario_sedeid
+						   LEFT JOIN asistencia_hora   ho ON ho.hora_id = d.detalle_horaid
+						   LEFT JOIN asistencia_lugar  l  ON l.lugar_id = d.detalle_lugarid
+						  WHERE d.detalle_profesorid = :emp
+						  GROUP BY h.horario_id, h.horario_nombre, h.horario_detalle,
+								   h.horario_sedeid, s.sede_nombre
+						  ORDER BY s.sede_nombre, MIN(ho.hora_inicio), h.horario_nombre";
+
+			return $this->ejecutarConsulta($consulta, [':emp' => $empleadoid])->fetchAll();
+		}
+
+		/**
+		 * Horarios de un conjunto de sedes.
+		 *
+		 * Es el alcance de quien no da clase pero acompaña la operación —un
+		 * asistente de sede—: no tiene horarios propios, pero sí necesita
+		 * ver los de las sedes que atiende.
+		 */
+		public function horariosDeSedes(array $sedes){
+			if (!$sedes) { return []; }
+
+			$marcas = implode(',', array_fill(0, count($sedes), '?'));
+			$consulta = "SELECT h.horario_id, h.horario_nombre, h.horario_detalle,
+								h.horario_sedeid, s.sede_nombre,
+								GROUP_CONCAT(DISTINCT d.detalle_dia ORDER BY d.detalle_dia) AS dias,
+								MIN(ho.hora_inicio) AS hora_inicio,
+								MAX(ho.hora_fin)    AS hora_fin,
+								GROUP_CONCAT(DISTINCT l.lugar_nombre ORDER BY l.lugar_nombre SEPARATOR ', ') AS lugares,
+								GROUP_CONCAT(DISTINCT e.empleado_nombre ORDER BY e.empleado_nombre SEPARATOR ', ') AS profesores,
+								(SELECT COUNT(*) FROM asistencia_asignahorario a
+								  WHERE a.asignahorario_horarioid = h.horario_id) AS alumnos
+						   FROM asistencia_horario h
+						   LEFT JOIN asistencia_horario_detalle d ON d.detalle_horarioid = h.horario_id
+						   LEFT JOIN general_sede      s  ON s.sede_id  = h.horario_sedeid
+						   LEFT JOIN asistencia_hora   ho ON ho.hora_id = d.detalle_horaid
+						   LEFT JOIN asistencia_lugar  l  ON l.lugar_id = d.detalle_lugarid
+						   LEFT JOIN sujeto_empleado   e  ON e.empleado_id = d.detalle_profesorid
+						  WHERE h.horario_estado = 'A' AND h.horario_sedeid IN ($marcas)
+						  GROUP BY h.horario_id, h.horario_nombre, h.horario_detalle,
+								   h.horario_sedeid, s.sede_nombre
+						  ORDER BY s.sede_nombre, MIN(ho.hora_inicio), h.horario_nombre";
+
+			return $this->ejecutarConsulta($consulta, array_values($sedes))->fetchAll();
+		}
+
+		/** Sedes asignadas a un usuario. Vacío = sin restricción por sede. */
+		public function sedesDelUsuario(int $usuarioid){
+			$filas = $this->ejecutarConsulta(
+				"SELECT us.usuariosede_sedeid AS sede_id, s.sede_nombre
+				   FROM seguridad_usuario_sede us
+				   LEFT JOIN general_sede s ON s.sede_id = us.usuariosede_sedeid
+				  WHERE us.usuariosede_usuarioid = :u
+				  ORDER BY s.sede_nombre",
+				[':u' => $usuarioid]
+			)->fetchAll();
+
+			return $filas;
+		}
+
+		/**
+		 * Días del mes en que se registró asistencia, por horario.
+		 *
+		 * La asistencia vive en 31 columnas (asistencia_D01..D31), una por
+		 * día, así que se suman las 31 de una vez en lugar de consultar día
+		 * a día. Devuelve [horario_id => [dia => marcas]].
+		 */
+		public function diasConAsistencia(array $horarios, int $aniomes){
+			if (!$horarios) { return []; }
+
+			$sumas = [];
+			for ($d = 1; $d <= 31; $d++) {
+				$c = str_pad((string)$d, 2, '0', STR_PAD_LEFT);
+				$sumas[] = "SUM(a.asistencia_D$c <> '') AS d$c";
+			}
+
+			$marcas = implode(',', array_fill(0, count($horarios), '?'));
+			$consulta = "SELECT ah.asignahorario_horarioid AS horario, " . implode(', ', $sumas) . "
+						   FROM asistencia_asignahorario ah
+						   JOIN asistencia_asistencia a
+								 ON a.asistencia_alumnoid = ah.asignahorario_alumnoid
+								AND a.asistencia_aniomes  = ?
+						  WHERE ah.asignahorario_horarioid IN ($marcas)
+						  GROUP BY ah.asignahorario_horarioid";
+
+			$parametros = array_merge([$aniomes], array_values($horarios));
+			$filas = $this->ejecutarConsulta($consulta, $parametros)->fetchAll();
+
+			$salida = [];
+			foreach ($filas as $f) {
+				$dias = [];
+				for ($d = 1; $d <= 31; $d++) {
+					$n = (int)$f['d' . str_pad((string)$d, 2, '0', STR_PAD_LEFT)];
+					if ($n > 0) { $dias[$d] = $n; }
+				}
+				$salida[(int)$f['horario']] = $dias;
+			}
+
+			return $salida;
+		}
 	}
 
 		

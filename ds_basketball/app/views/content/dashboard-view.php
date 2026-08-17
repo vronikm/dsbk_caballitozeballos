@@ -2,8 +2,25 @@
 	use app\controllers\dashboardController;
 	$insDashboard = new dashboardController();
 
-	// Sedes dinámicas (una tarjeta por cada registro de general_sede)
-	$sedes = $insDashboard->obtenerSedes()->fetchAll();
+	/*
+	| El dashboard muestra dos cosas distintas según a quién sirve:
+	|
+	|   · Panel operativo: horarios a cargo y días con asistencia tomada.
+	|     Se muestra a quien tiene una ficha de empleado detrás, que es
+	|     quien está en la cancha.
+	|   · Panel gerencial: alumnos, recaudación y mora por sede. Se reserva
+	|     a quien puede ver el balance del mes; un profesor no tiene por qué
+	|     conocer la caja de la escuela.
+	|
+	| La condición del bloque gerencial se apoya en un permiso ya existente
+	| en lugar de mirar el número de rol, para que siga funcionando cuando
+	| se creen roles nuevos.
+	*/
+	$verOperativo = empleado_actual() > 0;
+	$verGerencial = es_superadministrador() || usuario_tiene_permiso('balanceResultados');
+
+	$sedes = [];
+	$totalRepresentantes = $totalAlumnosActivos = $totalAlumnosInactivos = 0;
 
 	// Helper: extrae un valor escalar de un PDOStatement; 0 si no hay fila
 	$valorEscalar = function($stmt, $col){
@@ -14,10 +31,15 @@
 		return 0;
 	};
 
-	// Totales globales del consolidado
-	$totalRepresentantes   = $valorEscalar($insDashboard->obtenerRepresentantes(),   "totalRepresentantes");
-	$totalAlumnosActivos   = $valorEscalar($insDashboard->totalAlumnosActivos(),     "totalAlumnosActivos");
-	$totalAlumnosInactivos = $valorEscalar($insDashboard->totalAlumnosInactivos(),   "totalAlumnosInactivos");
+	if($verGerencial){
+		// Sedes dinámicas (una tarjeta por cada registro de general_sede)
+		$sedes = $insDashboard->obtenerSedes()->fetchAll();
+
+		// Totales globales del consolidado
+		$totalRepresentantes   = $valorEscalar($insDashboard->obtenerRepresentantes(),   "totalRepresentantes");
+		$totalAlumnosActivos   = $valorEscalar($insDashboard->totalAlumnosActivos(),     "totalAlumnosActivos");
+		$totalAlumnosInactivos = $valorEscalar($insDashboard->totalAlumnosInactivos(),   "totalAlumnosInactivos");
+	}
 
 	// Se acumula recorriendo las sedes (ver bucle de tarjetas)
 	$totalPendientes = 0;
@@ -93,8 +115,22 @@
 				<section class="content">
 					
 					<div class="container-fluid">
-					<!-- Small boxes (Stat box) -->
-					<?php if(empty($sedes)): ?>
+
+					<!-- Panel operativo: horarios a cargo y asistencia del mes -->
+					<?php if($verOperativo): ?>
+						<?php require "app/views/inc/dashboard-operativo.php"; ?>
+					<?php endif; ?>
+
+					<?php if(!$verOperativo && !$verGerencial): ?>
+						<div class="alert alert-info">
+							<i class="fas fa-info-circle mr-1"></i>
+							No hay indicadores que mostrar para su rol. Use el menú lateral
+							para ir a las pantallas que tenga asignadas.
+						</div>
+					<?php endif; ?>
+
+					<!-- Panel gerencial: alumnos, recaudación y mora por sede -->
+					<?php if($verGerencial && empty($sedes)): ?>
 						<div class="alert alert-info">No hay sedes registradas. Registre una sede para ver sus indicadores.</div>
 					<?php endif; ?>
 
@@ -183,7 +219,8 @@
 						</div>
 					<?php endforeach; ?>
 
-										<div class="card card-default" style="padding: 0.5rem;">
+					<?php if($verGerencial): ?>
+					<div class="card card-default" style="padding: 0.5rem;">
 					<div class="card-header" style="padding: 0.1rem 0.5rem;">
 						<h3 class="card-title">CONSOLIDADO</h3>
 						<div class="card-tools">
@@ -255,6 +292,7 @@
 						</div>	
 					</div>
 				</div>
+				<?php endif; ?>
 					<!-- /.row -->
 					</div><!-- /.container-fluid -->
 				</section>

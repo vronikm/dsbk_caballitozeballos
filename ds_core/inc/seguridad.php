@@ -26,6 +26,27 @@ if (!function_exists('usuario_autenticado')) {
     }
 
     /**
+     * Empleado vinculado al usuario de la sesion, o 0 si no tiene ninguno.
+     *
+     * Es lo que permite a una pantalla saber "de quien" son los datos: los
+     * horarios de un profesor cuelgan de su empleado_id, no de su usuario.
+     *
+     * Ojo con el nombre de la clave: el login guarda usuario_empleadoid en
+     * $_SESSION['usuario_id'], que suena a id de usuario y no lo es. El id
+     * del usuario esta en $_SESSION['usuarioid'], sin guion bajo.
+     */
+    function empleado_actual(): int
+    {
+        return (int)($_SESSION['usuario_id'] ?? 0);
+    }
+
+    /** Id del usuario de la sesion (seguridad_usuario.usuario_id). */
+    function usuario_actual_id(): int
+    {
+        return (int)($_SESSION['usuarioid'] ?? 0);
+    }
+
+    /**
      * Super Administrador: el UNICO rol que pasa por encima del control de
      * acceso. Cualquier otro rol, incluido el Administrador, se rige por lo
      * que tenga concedido en seguridad_rol_modulo y seguridad_permiso.
