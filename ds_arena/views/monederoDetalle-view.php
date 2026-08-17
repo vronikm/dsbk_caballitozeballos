@@ -53,15 +53,15 @@ require_once __DIR__ . "/inc/layout-top.php";
                 </div>
             </div>
 
-            <div class="card-footer">
-                <a href="<?php echo APP_URL; ?>monederoList/" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-arrow-left mr-1"></i> Volver
-                </a>
+            <div class="card-footer ds-acciones">
+                <?php echo ds_boton('volver', 'Volver', [
+                    'href' => APP_URL . 'monederoList/', 'estilo' => 'secondary']); ?>
                 <?php if ($puedeRetirar && $saldo > 0): ?>
-                    <button type="button" class="btn btn-outline-danger btn-sm float-right"
-                            data-toggle="modal" data-target="#modalEgreso">
-                        <i class="fas fa-hand-holding-usd mr-1"></i> Registrar egreso
-                    </button>
+                    <?php echo ds_boton('quitar', 'Registrar egreso', [
+                        'type'   => 'button',
+                        'estilo' => 'outline-danger',
+                        'data'   => ['toggle' => 'modal', 'target' => '#modalEgreso'],
+                    ]); ?>
                 <?php endif; ?>
             </div>
         </div>

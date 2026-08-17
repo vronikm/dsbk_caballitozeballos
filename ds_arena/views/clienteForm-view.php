@@ -19,7 +19,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 ?>
 
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-lg-9">
         <div class="card">
             <div class="card-header"><h3 class="card-title"><?php echo $tituloVista; ?></h3></div>
 
@@ -74,12 +74,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
                 </div>
 
-                <div class="card-footer d-flex justify-content-between">
-                    <a href="<?php echo APP_URL; ?>clienteList/" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left mr-1"></i> Volver
-                    </a>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Guardar</button>
-                </div>
+                <?php echo ds_acciones_form(APP_URL . 'clienteList/'); ?>
             </form>
         </div>
     </div>

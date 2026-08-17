@@ -184,11 +184,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
                 </div>
 
-                <div class="card-footer text-right">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save mr-1"></i> Guardar configuración
-                    </button>
-                </div>
+                <?php echo ds_acciones_form(APP_URL . 'panel/', ['guardar' => 'Guardar']); ?>
             </div>
         </div>
     </div>

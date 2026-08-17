@@ -1,28 +1,47 @@
 <?php
+/*
+|--------------------------------------------------------------------------
+| Configuracion del formulario publico de inscripcion
+|--------------------------------------------------------------------------
+| Este proyecto llego como copia literal del formulario de otra escuela y
+| conservaba SU configuracion: apuntaba a otra URL, a otra base de datos y
+| firmaba los tokens con otro secreto. Ahora consume el nucleo de
+| DigiSports, de modo que no puede volver a desincronizarse.
+|
+| Vive dentro del proyecto (barcelona/ds_form), no al lado: la URL se
+| deriva de DS_HUB_URL para que no haya dos sitios donde tocarla.
+*/
 
-	const APP_URL="http://localhost/adfpedrolarrea_form/";
-	const APP_NAME="ADFPL_FORM";
-	const APP_SESSION_NAME="ADFPL_FORM_SESSION";
+/*----------  Nucleo del ecosistema  ----------*/
+// Aporta DS_HUB_URL, DS_SESSION_NAME, la zona horaria y las credenciales.
+require_once __DIR__ . "/../../ds_core/config/app.php";
 
-	// Nombre visible de la escuela en el formulario público
-	const ESCUELA_NOMBRE="AF Pedro Larrea";
+/*----------  Identidad de este formulario  ----------*/
+const APP_URL  = DS_HUB_URL . "ds_form/";
+const APP_NAME = "DigiSports - Inscripción";
 
-	/*----------  Enlace de inscripción  ----------*/
-	// Clave para validar los tokens HMAC del enlace de inscripción.
-	// DEBE coincidir con la del proyecto adfpedrolarrea.
-	const TOKEN_SECRET = '6831800a7814e9352ed2755c5ce5e9935c4957ab6c4398ef';
+/* Sesion propia y separada: quien rellena el formulario es un visitante
+   anonimo, no un usuario del sistema. Compartir la cookie con el panel
+   mezclaria dos contextos que no tienen nada que ver. */
+const APP_SESSION_NAME = "DigiSportsInscripcion";
 
-	// Vigencia por defecto del enlace: 72 horas
-	const TOKEN_EXPIRY = 259200;
+/*----------  Enlace de inscripcion  ----------*/
+/* El secreto de firma NO se escribe aqui: se toma del nucleo. Cuando cada
+   proyecto guardaba su propia copia, bastaba con rotar uno para que todos
+   los enlaces emitidos dejaran de validar sin motivo aparente.
+   TOKEN_SECRET y TOKEN_EXPIRY llegan desde ds_core/config. */
 
-	/*----------  Fotos de alumnos  ----------*/
-	// Ruta ABSOLUTA en disco al directorio de fotos del sistema administrativo,
-	// para que la imagen subida en la inscripción se vea desde el panel.
-	// Se declara acá y no se deduce de "../.." porque depende de dónde quede
-	// instalado este proyecto: al lado del principal o dentro de él.
-	//   proyectos hermanos : __DIR__."/../../adfpedrolarrea/app/views/imagenes/fotos/alumno/"
-	//   anidado dentro     : __DIR__."/../../app/views/imagenes/fotos/alumno/"
-	define('DIR_FOTOS_ALUMNO', __DIR__ . "/../../adfpedrolarrea/app/views/imagenes/fotos/alumno/");
+/*----------  Fotos de alumnos  ----------*/
+/* La foto que sube el representante tiene que verse desde el panel, asi
+   que se escribe en la carpeta del modulo de la escuela. */
+define('DIR_FOTOS_ALUMNO', __DIR__ . "/../../ds_basketball/app/views/imagenes/fotos/alumno/");
 
-	/*----------  Zona horaria  ----------*/
-	date_default_timezone_set("America/Guayaquil");
+/*----------  Nombre visible de la escuela  ----------*/
+/* Se lee de la organizacion configurada en Core, no de una constante
+   escrita a mano: es el mismo nombre que encabeza recibos y facturas.
+   Antes decia "AF Pedro Larrea" y era lo primero que veia el
+   representante al abrir el enlace. */
+require_once __DIR__ . "/../../ds_core/inc/seguridad.php";
+require_once __DIR__ . "/../../ds_core/inc/organizacion.php";
+
+define('ESCUELA_NOMBRE', ds_nombre_organizacion() ?: DS_HUB_NAME);

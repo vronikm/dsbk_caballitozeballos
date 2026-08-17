@@ -84,7 +84,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php echo $m['menu_estado'] === 'A' ? 'Activo' : 'Inactivo'; ?>
                             </span>
                         </td>
-                        <td class="text-right" style="white-space:nowrap;">
+                        <td class="ds-tabla-acciones">
                             <?php
                             /* Una vista huérfana (el menú apunta a una ruta que ya no
                                existe en el módulo) se señala aquí, que es donde se corrige. */

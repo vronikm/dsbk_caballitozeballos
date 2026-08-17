@@ -35,8 +35,21 @@
 				$this->showError('El usuario no cumple el formato solicitado.');
 			}
 
-			if (!preg_match('/^[a-zA-Z0-9$@.\-]{7,100}$/', $clave)) {
-				$this->showError('La contraseña no cumple el formato solicitado.');
+			/*
+			| La contrasena NO se valida por formato al entrar.
+			|
+			| Antes se exigia ^[a-zA-Z0-9$@.\-]{7,100}$, lo que provocaba dos
+			| problemas: rechazaba claves perfectamente validas por llevar un
+			| simbolo, y no coincidia con lo que aceptaba Core al crearlas, de
+			| modo que se podia fijar una contrasena con la que despues era
+			| imposible entrar.
+			|
+			| Filtrar aqui tampoco protege de nada: la consulta va con
+			| parametros ligados y la comprobacion es con password_verify().
+			| Solo se acota el tamano para no procesar entradas absurdas.
+			*/
+			if (strlen($clave) > 200) {
+				$this->showError('Usuario o contraseña incorrectos.');
 			}
 
 			/* ----------  2. Consulta preparada  ---------- */

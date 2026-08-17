@@ -461,6 +461,21 @@ class coreController
                 "Ya existe un usuario llamado $usuario.", 'error');
         }
 
+        /* Editar a un Super Administrador equivale a poder entrar como él:
+           bastaría con ponerle otra contraseña. Así que sólo otro Super
+           Administrador puede hacerlo, por mucho permiso de edición que
+           tenga el rol sobre usuarioList. */
+        if ($id > 0) {
+            $actual = $this->usuario($id);
+            if ($actual === null) {
+                return $this->alerta('simple', 'Error', 'El usuario no existe.', 'error');
+            }
+            if ((int)$actual['usuario_rolid'] === self_rol_superadmin() && !es_superadministrador()) {
+                return $this->alerta('simple', 'Usuario protegido',
+                    'Sólo un Super Administrador puede modificar la cuenta de otro Super Administrador.', 'error');
+            }
+        }
+
         if ($id > 0) {
             $campos = "usuario_usuario = :u, usuario_rolid = :r,
                        usuario_empleadoid = :e, usuario_estado = :s,
@@ -471,9 +486,8 @@ class coreController
 
             /* La contrasena solo se toca si se escribio una nueva. */
             if ($clave !== '') {
-                if (mb_strlen($clave) < 8) {
-                    return $this->alerta('simple', 'Contraseña débil',
-                        'La contraseña debe tener al menos 8 caracteres.', 'error');
+                if (!clave_valida($clave, $motivo)) {
+                    return $this->alerta('simple', 'Contraseña no válida', $motivo, 'error');
                 }
                 $campos .= ", usuario_clave = :c, usuario_fechacambioclave = NOW()";
                 $params[':c'] = password_hash($clave, PASSWORD_DEFAULT);
@@ -487,9 +501,8 @@ class coreController
                 : $this->alerta('simple', 'Error', 'No fue posible actualizar el usuario.', 'error');
         }
 
-        if (mb_strlen($clave) < 8) {
-            return $this->alerta('simple', 'Contraseña débil',
-                'La contraseña debe tener al menos 8 caracteres.', 'error');
+        if (!clave_valida($clave, $motivo)) {
+            return $this->alerta('simple', 'Contraseña no válida', $motivo, 'error');
         }
 
         $n = $this->escribir(
@@ -527,16 +540,15 @@ class coreController
             return $this->alerta('simple', 'Error', 'Usuario no encontrado.', 'error');
         }
 
+        /* Un Super Administrador no se da de baja desde aquí.
+           Antes sólo se protegía al último, pero la cuenta con acceso total
+           es la que sostiene el sistema: si hace falta retirarla, primero se
+           le cambia el rol y después se da de baja, de modo que la decisión
+           quede en dos pasos deliberados y no en un clic. */
         if ((int)$datos['usuario_rolid'] === self_rol_superadmin()) {
-            $otros = (int)$this->escalar(
-                "SELECT COUNT(1) FROM seguridad_usuario
-                  WHERE usuario_rolid = :r AND usuario_estado = 'A' AND usuario_id <> :id",
-                [':r' => self_rol_superadmin(), ':id' => $id]
-            );
-            if ($otros === 0) {
-                return $this->alerta('simple', 'Acción no permitida',
-                    'Es el último Super Administrador activo: eliminarlo dejaría el sistema sin acceso total.', 'error');
-            }
+            return $this->alerta('simple', 'Usuario protegido',
+                'Un Super Administrador no se puede dar de baja. Cámbiele antes el rol si necesita retirarlo.',
+                'error');
         }
 
         /* Baja logica: conserva la trazabilidad de lo que hizo el usuario. */

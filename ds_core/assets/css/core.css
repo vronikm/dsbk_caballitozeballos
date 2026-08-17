@@ -219,6 +219,89 @@
 
 .ds-core .btn { border-radius: var(--ds-radius-sm); font-weight: 600; }
 
+/* ==========================================================================
+   Acciones: un solo patron para toda pantalla administrativa
+   --------------------------------------------------------------------------
+   Antes cada vista resolvia el pie a su manera —unas con
+   d-flex justify-content-between, otras con text-right, otras sin pie— y los
+   botones mezclaban btn-sm, btn-xs y el tamano por defecto en la misma
+   pantalla. El resultado: el boton de Guardar cambiaba de sitio y de tamano
+   al pasar de una vista a otra.
+
+   La regla es una sola: las acciones van SIEMPRE a la derecha, en el mismo
+   orden (salir primero, confirmar al final) y con el mismo tamano.
+   ========================================================================== */
+
+/* Pie de formulario. La accion principal queda a la derecha del todo, que es
+   donde la vista termina de leerse. */
+.ds-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .5rem;
+}
+
+/* Un texto informativo a la izquierda no debe empujar los botones. */
+.ds-acciones__nota {
+    margin: 0 auto 0 0;
+    font-size: .85rem;
+    color: var(--core-tenue);
+}
+
+/* Todos los botones de accion miden lo mismo y no se estrechan segun su
+   texto: "Volver" y "Guardar" acaban con el mismo ancho. */
+.ds-acciones .btn {
+    min-width: 7.5rem;
+    justify-content: center;
+}
+
+/* Acciones dentro de una tabla.
+   Se aplica sobre la propia celda y NO cambia su modo de maquetacion: una
+   celda de tabla convertida en flex pierde la alineacion vertical con el
+   resto de la fila. Basta con alinear a la derecha y uniformar el boton. */
+td.ds-tabla-acciones {
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Los botones de fila son iconos: mismo ancho aunque el icono sea mas
+   estrecho, para que las columnas de acciones queden a plomo. */
+td.ds-tabla-acciones .btn {
+    min-width: 2.1rem;
+    padding: .25rem .5rem;
+    line-height: 1.5;
+    vertical-align: middle;
+}
+
+td.ds-tabla-acciones .btn + .btn,
+td.ds-tabla-acciones form + .btn,
+td.ds-tabla-acciones .btn + form,
+td.ds-tabla-acciones form + form { margin-left: .25rem; }
+
+td.ds-tabla-acciones form {
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle;
+}
+
+/* Hueco del ancho de un boton, para que las filas sin una accion no
+   desplacen las de al lado. */
+td.ds-tabla-acciones .ds-hueco {
+    display: inline-block;
+    min-width: 2.1rem;
+    text-align: center;
+    vertical-align: middle;
+    color: var(--core-tenue);
+}
+
+/* En movil las acciones ocupan el ancho y siguen en el mismo orden. */
+@media (max-width: 576px) {
+    .ds-acciones { flex-direction: column-reverse; align-items: stretch; }
+    .ds-acciones .btn { width: 100%; }
+    .ds-acciones__nota { margin: 0 0 .5rem 0; text-align: center; }
+}
+
 /* ---------- Aviso de rol protegido ---------- */
 
 .ds-core .aviso-superadmin {

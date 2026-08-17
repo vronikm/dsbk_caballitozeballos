@@ -68,13 +68,25 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php echo $u['usuario_estado'] === 'A' ? 'Activo' : 'Inactivo'; ?>
                             </span>
                         </td>
-                        <td class="text-right" style="white-space:nowrap;">
-                            <?php if ($puedeEditar): ?>
+                        <td class="ds-tabla-acciones">
+                            <?php
+                            /* La cuenta con acceso total no se da de baja, y
+                               sólo otro Super Administrador puede tocarla:
+                               cambiarle la clave equivaldría a entrar como él. */
+                            $editable = $puedeEditar && (!$esSuper || es_superadministrador());
+                            $bajable  = $puedeEliminar && !$esYo && !$esSuper;
+                            ?>
+
+                            <?php if ($editable): ?>
                                 <a href="<?php echo APP_URL; ?>usuarioForm/?id=<?php echo (int)$u['usuario_id']; ?>"
                                    class="btn btn-sm btn-outline-secondary" title="Editar"><i class="fas fa-pen"></i></a>
                             <?php endif; ?>
 
-                            <?php if ($puedeEliminar && !$esYo): ?>
+                            <?php if ($esSuper): ?>
+                                <?php echo ds_hueco('La cuenta con acceso total no se puede dar de baja'); ?>
+                            <?php endif; ?>
+
+                            <?php if ($bajable): ?>
                                 <form class="FormularioAjax d-inline" method="POST"
                                       action="<?php echo APP_URL; ?>ajax/coreAjax.php"
                                       data-confirmar="El usuario quedará dado de baja y no podrá iniciar sesión.">

@@ -92,7 +92,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         <?php echo $v['catalogo_estado'] === 'A' ? 'Activo' : 'Inactivo'; ?>
                                     </span>
                                 </td>
-                                <td class="text-right" style="white-space:nowrap;">
+                                <td class="ds-tabla-acciones">
                                     <?php if ($puedeEditar): ?>
                                         <button type="button" class="btn btn-sm btn-outline-secondary" title="Editar"
                                                 data-toggle="modal" data-target="#modalValor"

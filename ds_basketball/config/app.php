@@ -24,8 +24,11 @@ const DS_MODULO = "basketball";
 const APP_SESSION_NAME = DS_SESSION_NAME;
 
 /*----------  Enlace de inscripción  ----------*/
-// URL del formulario público al que apuntan los enlaces generados
-const FORM_URL = "http://localhost/barcelona_form/";
+// URL del formulario público al que apuntan los enlaces generados.
+// Se deriva de la raíz del ecosistema porque el formulario vive DENTRO del
+// proyecto (barcelona/ds_form). Antes apuntaba a "barcelona_form/", una
+// ruta que no existe: todos los enlaces emitidos daban 404.
+const FORM_URL = DS_HUB_URL . "ds_form/";
 
 // Vigencia por defecto del enlace: 72 horas
 const TOKEN_EXPIRY = 259200;

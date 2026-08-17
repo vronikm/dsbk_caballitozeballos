@@ -160,7 +160,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php echo $estados[$r['reserva_estado']] ?? $r['reserva_estado']; ?>
                             </span>
                         </td>
-                        <td class="text-right" style="white-space:nowrap;">
+                        <td class="ds-tabla-acciones">
                             <a href="<?php echo APP_URL; ?>reservaDetalle/?id=<?php echo (int)$r['reserva_id']; ?>"
                                class="btn btn-sm <?php echo $saldo > 0 ? 'btn-primary' : 'btn-outline-secondary'; ?>"
                                title="Abonos">

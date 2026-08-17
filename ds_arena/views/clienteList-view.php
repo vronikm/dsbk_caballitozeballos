@@ -93,7 +93,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php echo $c['cliente_estado'] === 'A' ? 'Activo' : 'Inactivo'; ?>
                             </span>
                         </td>
-                        <td class="text-right" style="white-space:nowrap;">
+                        <td class="ds-tabla-acciones">
                             <?php if ($puedeEditar): ?>
                                 <a href="<?php echo APP_URL; ?>clienteForm/?id=<?php echo (int)$c['cliente_id']; ?>"
                                    class="btn btn-sm btn-outline-secondary" title="Editar"><i class="fas fa-pen"></i></a>

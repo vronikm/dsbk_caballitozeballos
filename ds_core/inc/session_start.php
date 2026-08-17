@@ -33,3 +33,7 @@
     /* Nombre legal y logo de la organización: los consumen los PDF,
        recibos y reportes de todos los módulos. */
     require_once __DIR__ . "/organizacion.php";
+
+    /* Botones, iconos y pies de formulario del ecosistema: el estándar de
+       interfaz vive en funciones para que las vistas no puedan desviarse. */
+    require_once __DIR__ . "/ui.php";

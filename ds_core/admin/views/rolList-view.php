@@ -70,7 +70,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php echo $r['rol_estado'] === 'A' ? 'Activo' : 'Inactivo'; ?>
                             </span>
                         </td>
-                        <td class="text-right" style="white-space:nowrap;">
+                        <td class="ds-tabla-acciones">
                             <a href="<?php echo APP_URL; ?>permisoRol/?rol=<?php echo (int)$r['rol_id']; ?>"
                                class="btn btn-sm btn-outline-primary" title="Permisos"><i class="fas fa-key"></i></a>
 

@@ -181,9 +181,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
                 </div>
 
-                <div class="card-footer text-right">
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Guardar</button>
-                </div>
+                <?php echo ds_acciones_form(APP_URL . 'panel/'); ?>
             </div>
         </form>
     </div>
@@ -229,8 +227,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </small>
                     </div>
                 </div>
-                <div class="card-footer text-right">
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload mr-1"></i> Cargar</button>
+                <div class="card-footer ds-acciones">
+                    <?php echo ds_boton('subir', 'Cargar', ['estilo' => 'primary', 'type' => 'submit']); ?>
                 </div>
             </div>
         </form>

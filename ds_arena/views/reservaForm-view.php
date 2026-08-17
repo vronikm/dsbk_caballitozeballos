@@ -146,12 +146,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <?php endif; ?>
                 </div>
 
-                <div class="card-footer d-flex justify-content-between">
-                    <a href="<?php echo APP_URL; ?>reservaList/" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left mr-1"></i> Volver
-                    </a>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Guardar</button>
-                </div>
+                <?php echo ds_acciones_form(APP_URL . 'reservaList/'); ?>
             </form>
         </div>
     </div>

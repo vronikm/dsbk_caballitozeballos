@@ -1,19 +1,22 @@
 <?php
-
 /* ============================================================
-   BASE DE DATOS — Formulario público de inscripción
+   BASE DE DATOS — Formulario publico de inscripcion
    ------------------------------------------------------------
-   Suba este contenido como config/server.php.
-   Es la MISMA base que usa el sistema administrativo.
+   PLANTILLA. Este archivo ya NO declara credenciales.
 
-   Si el formulario está en un servidor distinto al de la base,
-   DB_SERVER no puede ser "localhost": debe ser el host o IP del
-   servidor MySQL, y ese servidor debe permitir conexiones remotas
-   para este usuario. Eso se habilita en el panel del hosting
-   (normalmente "Remote MySQL" / "Acceso remoto a bases de datos").
+   La version anterior traia usuario, contrasena y base de datos de
+   PRODUCCION de otra escuela. Estaban en texto plano dentro del
+   proyecto y no las usaba nadie: solo servian para filtrarlas.
+
+   El formulario usa la MISMA base que el sistema administrativo, y esa
+   configuracion vive en un unico sitio:
+
+       ds_core/config/secrets.php     (fuera del control de versiones)
+
+   Si el formulario se despliega en un servidor distinto al de la base,
+   DB_SERVER no puede ser "localhost": debe ser el host o IP del servidor
+   MySQL, y ese servidor debe permitir conexiones remotas para el usuario
+   (en el panel del hosting suele llamarse "Remote MySQL").
    ============================================================ */
 
-	const DB_SERVER="localhost";
-	const DB_NAME="digitech_adfpl";
-	const DB_USER="digitech";
-	const DB_PASS='d1git3cH.';
+require_once __DIR__ . "/../../ds_core/config/app.php";

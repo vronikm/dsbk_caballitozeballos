@@ -82,7 +82,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 </small>
                             <?php endif; ?>
                         </td>
-                        <td class="text-right" style="white-space:nowrap;">
+                        <td class="ds-tabla-acciones">
                             <?php if ($puedeEditar): ?>
                                 <a href="<?php echo APP_URL; ?>sedeForm/?id=<?php echo (int)$s['sede_id']; ?>"
                                    class="btn btn-sm btn-outline-secondary" title="Editar"><i class="fas fa-pen"></i></a>

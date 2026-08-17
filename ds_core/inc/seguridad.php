@@ -46,6 +46,69 @@ if (!function_exists('usuario_autenticado')) {
         return (int)($_SESSION['usuarioid'] ?? 0);
     }
 
+    /*----------  Politica de contrasenas  ----------*/
+
+    /**
+     * Longitud minima al FIJAR una contrasena.
+     *
+     * Solo se exige al establecerla, nunca al iniciar sesion: comprobar el
+     * minimo en el login dejaria fuera a quien tenga una clave anterior mas
+     * corta, aunque la escriba correctamente.
+     */
+    function clave_longitud_minima(): int
+    {
+        return 8;
+    }
+
+    /**
+     * Limite real de bcrypt: password_hash() ignora en silencio lo que pase
+     * de 72 bytes, asi que dos claves largas que difieran solo al final se
+     * volverian equivalentes. Mejor rechazarlo que aceptarlo a medias.
+     */
+    function clave_longitud_maxima(): int
+    {
+        return 72;
+    }
+
+    /**
+     * Valida una contrasena que se va a guardar.
+     *
+     * No se restringen los caracteres a proposito. Limitarlos no aporta
+     * seguridad —la consulta va con parametros ligados y la comparacion es
+     * con password_verify()— y si empobrece las claves. Lo unico que se
+     * prohibe es el byte nulo, que trunca la cadena en C.
+     *
+     * $motivo recibe el texto que se le puede mostrar al usuario.
+     */
+    function clave_valida(string $clave, ?string &$motivo = null): bool
+    {
+        $minimo = clave_longitud_minima();
+        $maximo = clave_longitud_maxima();
+
+        if (strlen($clave) < $minimo) {
+            $motivo = "La contraseña debe tener al menos {$minimo} caracteres.";
+            return false;
+        }
+        if (strlen($clave) > $maximo) {
+            $motivo = "La contraseña no puede superar {$maximo} caracteres.";
+            return false;
+        }
+        if (strpos($clave, "\0") !== false) {
+            $motivo = 'La contraseña contiene un carácter no admitido.';
+            return false;
+        }
+
+        $motivo = '';
+        return true;
+    }
+
+    /** Texto de ayuda, para que las pantallas no lo escriban cada una. */
+    function clave_regla_texto(): string
+    {
+        return 'Mínimo ' . clave_longitud_minima() . ' caracteres. Se admite cualquier '
+             . 'carácter, incluidos espacios y símbolos.';
+    }
+
     /**
      * Super Administrador: el UNICO rol que pasa por encima del control de
      * acceso. Cualquier otro rol, incluido el Administrador, se rige por lo

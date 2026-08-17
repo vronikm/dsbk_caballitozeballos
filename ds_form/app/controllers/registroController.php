@@ -21,9 +21,12 @@ class registroController extends mainModel
      */
     private function directorioFotos(): string
     {
+        /* El respaldo apuntaba a la carpeta de otra escuela: si la constante
+           faltaba, las fotos de menores acababan en un proyecto ajeno sin
+           que nadie lo notara. Ahora cae dentro del propio ecosistema. */
         return defined('DIR_FOTOS_ALUMNO')
             ? DIR_FOTOS_ALUMNO
-            : __DIR__ . "/../../../adfpedrolarrea/app/views/imagenes/fotos/alumno/";
+            : __DIR__ . "/../../../ds_basketball/app/views/imagenes/fotos/alumno/";
     }
 
     /**
@@ -288,7 +291,11 @@ class registroController extends mainModel
                 ['campo_nombre' => 'alumno_estado',             'campo_marcador' => ':Estado',         'campo_valor' => $alumno_estado],
                 ['campo_nombre' => 'alumno_imagen',             'campo_marcador' => ':Foto',           'campo_valor' => $foto],
                 ['campo_nombre' => 'alumno_numcamiseta',        'campo_marcador' => ':Camiseta',       'campo_valor' => 0],
-                ['campo_nombre' => 'alumno_observacion',        'campo_marcador' => ':Observacion',    'campo_valor' => 'Inscripción en línea'],
+                /* alumno_observacion no existe en el esquema de este
+                   proyecto: venia de la escuela de la que se copio el
+                   formulario y habria hecho fallar la insercion entera.
+                   El origen queda registrado igualmente en
+                   alumno_consentimiento.consent_origen. */
             ];
 
             $resultado = $this->guardarDatos('sujeto_alumno', $alumno_reg);

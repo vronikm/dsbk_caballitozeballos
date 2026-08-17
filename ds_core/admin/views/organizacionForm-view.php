@@ -175,15 +175,12 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
                 </div>
 
-                <?php if ($puedeEdit): ?>
-                    <div class="card-footer text-right">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Guardar</button>
-                    </div>
-                <?php else: ?>
-                    <div class="card-footer text-muted small">
-                        <i class="fas fa-lock mr-1"></i> Su rol puede consultar estos datos pero no modificarlos.
-                    </div>
-                <?php endif; ?>
+                <?php echo ds_acciones_form(APP_URL . 'panel/', [
+                    'soloLectura' => !$puedeEdit,
+                    'nota'        => $puedeEdit ? ''
+                        : '<i class="' . ds_icono('bloqueado') . ' mr-1"></i> '
+                        . 'Su rol puede consultar estos datos pero no modificarlos.',
+                ]); ?>
             </form>
         </div>
 

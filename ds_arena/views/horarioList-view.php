@@ -105,7 +105,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                                   data-confirmar="Se retirará esa franja de disponibilidad.">
                                                 <input type="hidden" name="modulo_arena" value="eliminarHorario">
                                                 <input type="hidden" name="horario_id" value="<?php echo (int)$h['horario_id']; ?>">
-                                                <button type="submit" class="btn btn-xs btn-outline-danger" title="Quitar">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                             </form>

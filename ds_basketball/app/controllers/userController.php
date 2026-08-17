@@ -1082,10 +1082,31 @@
 
 		public function actualizarClaveUsuarioControlador(){			
 			
-			$usuarioid = $this->limpiarCadena($_POST['usuario_id']);
-			$clave_actual = $this->limpiarCadena($_POST['usuario_clave']);
-			$clave_nueva = $this->limpiarCadena($_POST['usuario_clave_nueva']);
-			$clave_confirmar = $this->limpiarCadena($_POST['usuario_clave_confirmar']);
+			/*
+			| Las contrasenas NO pasan por limpiarCadena().
+			|
+			| Ese metodo aplica htmlspecialchars(), asi que una clave con &,
+			| <, >, " o ' se cifraba transformada: se guardaba el hash de
+			| "Pa&amp;ss" en lugar del de "Pa&ss". El login no limpia nada,
+			| de modo que la comparacion fallaba siempre y el usuario quedaba
+			| fuera con la contrasena que acababa de elegir.
+			|
+			| Una contrasena no se sanea: se compara y se cifra tal cual.
+			*/
+			$usuarioid = (int)($_POST['usuario_id'] ?? 0);
+			$clave_actual    = (string)($_POST['usuario_clave'] ?? '');
+			$clave_nueva     = (string)($_POST['usuario_clave_nueva'] ?? '');
+			$clave_confirmar = (string)($_POST['usuario_clave_confirmar'] ?? '');
+
+			/* Nadie cambia la clave de otro desde aqui: esto es autoservicio. */
+			if ($usuarioid !== usuario_actual_id()) {
+				return json_encode([
+					"tipo"   => "simple",
+					"titulo" => "Acción no permitida",
+					"texto"  => "Sólo puede cambiar la contraseña de su propia cuenta.",
+					"icono"  => "error"
+				]);
+			}
 
 			# Verificando campos obligatorios #
 		    if($usuarioid=="" || $clave_actual=="" || $clave_nueva=="" || $clave_confirmar==""){
@@ -1110,19 +1131,22 @@
 				return json_encode($alerta);
 			}
 
-			# Verificando formato de claves #
-			if($this->verificarDatos("[a-zA-Z0-9$@.-]{7,100}",$clave_nueva) || $this->verificarDatos("[a-zA-Z0-9$@.-]{7,100}",$clave_confirmar)){
+			# Verificando la politica de contrasenas del nucleo #
+			if(!clave_valida($clave_nueva, $motivo)){
 				$alerta=[
 					"tipo"=>"simple",
-					"titulo"=>"Error",
-					"texto"=>"Las contraseñas no tienen el formato solicitado (7 caracteres mínimo, sin espacios)",
+					"titulo"=>"Contraseña no válida",
+					"texto"=>$motivo,
 					"icono"=>"error"
 				];
 				return json_encode($alerta);
 			}
 
 			#Verificar si la clave actual es correcta #
-			$datos = $this->ejecutarConsulta("SELECT usuario_clave FROM seguridad_usuario WHERE usuario_id = '$usuarioid'");
+			$datos = $this->ejecutarConsulta(
+				"SELECT usuario_clave FROM seguridad_usuario WHERE usuario_id = :id",
+				[':id' => $usuarioid]
+			);
 			if($datos->rowCount()<=0){
 				$alerta=[
 					"tipo"=>"simple",

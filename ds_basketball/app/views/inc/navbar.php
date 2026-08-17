@@ -89,11 +89,18 @@
                     </div>
                     <div class="form-group">
                         <label for="usuario_clave_nueva">Nueva Contraseña</label>
-                        <input type="password" class="form-control" id="usuario_clave_nueva" name="usuario_clave_nueva" required utocomplete="off">	
+                        <input type="password" class="form-control" id="usuario_clave_nueva" name="usuario_clave_nueva"
+                               minlength="<?php echo clave_longitud_minima(); ?>"
+                               maxlength="<?php echo clave_longitud_maxima(); ?>"
+                               required autocomplete="new-password">
+                        <small class="text-muted"><?php echo clave_regla_texto(); ?></small>
                     </div>
                     <div class="form-group">
                         <label for="usuario_clave_confirmar">Confirmar Nueva Contraseña</label>
-                        <input type="password" class="form-control" id="usuario_clave_confirmar" name="usuario_clave_confirmar" required utocomplete="off">	
+                        <input type="password" class="form-control" id="usuario_clave_confirmar" name="usuario_clave_confirmar"
+                               minlength="<?php echo clave_longitud_minima(); ?>"
+                               maxlength="<?php echo clave_longitud_maxima(); ?>"
+                               required autocomplete="new-password">
                     </div>
                 </div>
                 <div class="modal-footer justify-content-between">

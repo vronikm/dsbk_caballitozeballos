@@ -150,14 +150,12 @@ require_once __DIR__ . "/inc/layout-top.php";
                 </div>
             </div>
 
-            <div class="card-footer">
-                <a href="<?php echo APP_URL; ?>reservaList/" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-arrow-left mr-1"></i> Volver a reservas
-                </a>
-                <a href="<?php echo APP_URL; ?>monederoDetalle/?cliente=<?php echo (int)$reserva['reserva_clienteid']; ?>"
-                   class="btn btn-outline-secondary btn-sm float-right">
-                    <i class="fas fa-wallet mr-1"></i> Monedero: $<?php echo number_format($saldoMonedero, 2); ?>
-                </a>
+            <div class="card-footer ds-acciones">
+                <?php echo ds_boton('volver', 'Volver a reservas', [
+                    'href' => APP_URL . 'reservaList/', 'estilo' => 'secondary']); ?>
+                <?php echo ds_boton('detalle', 'Monedero: $' . number_format($saldoMonedero, 2), [
+                    'href'   => APP_URL . 'monederoDetalle/?cliente=' . (int)$reserva['reserva_clienteid'],
+                    'estilo' => 'outline-secondary']); ?>
             </div>
         </div>
     </div>

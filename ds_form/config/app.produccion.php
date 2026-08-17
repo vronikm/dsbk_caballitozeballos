@@ -1,41 +1,41 @@
 <?php
-
 /* ============================================================
-   CONFIGURACIÓN DE PRODUCCIÓN — Formulario público de inscripción
+   CONFIGURACION DE PRODUCCION — Formulario publico de inscripcion
    ------------------------------------------------------------
-   Suba este contenido como config/app.php en
-   https://adfpedrolarreainscripcion.digitech.com.ec/
+   PLANTILLA. Copie su contenido a config/app.php en el servidor y
+   ajuste unicamente la raiz del ecosistema.
+
+   Este archivo NO contiene secretos a proposito. La version anterior
+   traia el TOKEN_SECRET y el dominio de produccion de otra escuela,
+   heredados al copiar el formulario: cualquiera con acceso al
+   repositorio podia firmar enlaces validos de aquel sistema.
+
+   Los secretos viven en ds_core/config/secrets.php, fuera del control
+   de versiones, y llegan aqui a traves de ds_core/config/app.php.
    ============================================================ */
 
-	const APP_URL="https://adfpedrolarreainscripcion.digitech.com.ec/";
-	const APP_NAME="ADFPL_FORM";
-	const APP_SESSION_NAME="ADFPL_FORM_SESSION";
+/*----------  Nucleo del ecosistema  ----------*/
+/* En produccion basta con que DS_HUB_URL apunte al dominio real; de ahi
+   se derivan la URL de este formulario y la de cada modulo. */
+require_once __DIR__ . "/../../ds_core/config/app.php";
 
-	// Nombre visible de la escuela en el formulario y en los textos LOPDP
-	const ESCUELA_NOMBRE="AF Pedro Larrea";
+/*----------  Identidad de este formulario  ----------*/
+const APP_URL  = DS_HUB_URL . "ds_form/";
+const APP_NAME = "DigiSports - Inscripción";
 
-	/*----------  Enlace de inscripción  ----------*/
-	// DEBE ser idéntica a la de adfpedrolarrea.digifutbol.com
-	const TOKEN_SECRET = '0f7ea01e1b1db9f911768b4fe0265590a6eb6196e89d36cd';
+const APP_SESSION_NAME = "DigiSportsInscripcion";
 
-	// Vigencia por defecto del enlace: 72 horas
-	const TOKEN_EXPIRY = 259200;
+/*----------  Fotos de alumnos  ----------*/
+/* Ruta ABSOLUTA en disco a la carpeta de fotos del modulo de la escuela.
+   Si el formulario y el panel comparten alojamiento, la ruta relativa de
+   abajo sirve tal cual. Si estan en servidores distintos no hay carpeta
+   compartida posible y habra que sincronizarlas por otro medio. */
+define('DIR_FOTOS_ALUMNO', __DIR__ . "/../../ds_basketball/app/views/imagenes/fotos/alumno/");
 
-	/*----------  Fotos de alumnos  ----------*/
-	/*  Ruta ABSOLUTA en disco al directorio de fotos del sistema administrativo.
-	 *
-	 *  Los dos proyectos están en dominios distintos, así que esta ruta depende
-	 *  de cómo estén ubicados en el servidor. Ejecute diagnostico.php para que
-	 *  le diga si la ruta configurada existe y es escribible.
-	 *
-	 *  Casos típicos en hosting compartido (misma cuenta):
-	 *    /home/USUARIO/public_html/adfpedrolarrea/app/views/imagenes/fotos/alumno/
-	 *    /home/USUARIO/adfpedrolarrea.digifutbol.com/app/views/imagenes/fotos/alumno/
-	 *
-	 *  Si los dominios están en SERVIDORES distintos no hay ruta compartida
-	 *  posible: deje la constante comentada y lea la nota de diagnostico.php.
-	 */
-	define('DIR_FOTOS_ALUMNO', '/home/digitech/adfpedrolarrea/app/views/imagenes/fotos/alumno/');
+/*----------  Nombre visible de la escuela  ----------*/
+/* Se toma de la organizacion configurada en Core, para que coincida con
+   el que aparece en recibos y reportes. */
+require_once __DIR__ . "/../../ds_core/inc/seguridad.php";
+require_once __DIR__ . "/../../ds_core/inc/organizacion.php";
 
-	/*----------  Zona horaria  ----------*/
-	date_default_timezone_set("America/Guayaquil");
+define('ESCUELA_NOMBRE', ds_nombre_organizacion() ?: DS_HUB_NAME);
