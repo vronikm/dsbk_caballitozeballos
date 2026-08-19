@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 19-08-2026 a las 17:08:48
+-- Tiempo de generación: 19-08-2026 a las 22:21:53
 -- Versión del servidor: 8.4.7
 -- Versión de PHP: 8.3.28
 
@@ -3739,6 +3739,30 @@ INSERT INTO `dsa_tipo_piso` (`piso_id`, `piso_nombre`, `piso_detalle`, `piso_est
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `dsl_abono`
+--
+
+DROP TABLE IF EXISTS `dsl_abono`;
+CREATE TABLE IF NOT EXISTS `dsl_abono` (
+  `abono_id` int NOT NULL AUTO_INCREMENT,
+  `abono_obligacionid` int NOT NULL,
+  `abono_fecha` date NOT NULL,
+  `abono_valor` decimal(10,2) NOT NULL,
+  `abono_forma` char(2) NOT NULL DEFAULT '01',
+  `abono_referencia` varchar(60) NOT NULL DEFAULT '',
+  `abono_observacion` varchar(250) NOT NULL DEFAULT '',
+  `abono_anulado` char(1) NOT NULL DEFAULT 'N',
+  `abono_motivoanula` varchar(250) NOT NULL DEFAULT '',
+  `abono_usuarioid` int DEFAULT NULL,
+  `abono_fecharegistro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`abono_id`),
+  KEY `ix_dsla_obligacion` (`abono_obligacionid`,`abono_anulado`),
+  KEY `ix_dsla_fecha` (`abono_fecha`)
+) ;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `dsl_auditoria`
 --
 
@@ -3759,7 +3783,7 @@ CREATE TABLE IF NOT EXISTS `dsl_auditoria` (
   KEY `ix_dsl_audit_ent` (`audit_entidad`,`audit_entidadid`,`audit_fecha`),
   KEY `ix_dsl_audit_user` (`audit_usuarioid`,`audit_fecha`),
   KEY `ix_dsl_audit_fecha` (`audit_fecha`)
-) ENGINE=InnoDB AUTO_INCREMENT=294 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=693 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `dsl_auditoria`
@@ -3774,7 +3798,38 @@ INSERT INTO `dsl_auditoria` (`audit_id`, `audit_entidad`, `audit_entidadid`, `au
 (106, 'inscripcion', 167, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"estado\": \"ENVIADA\"}', '{\"estado\": \"APROBADA\"}', '', '2026-08-19 15:46:18'),
 (107, 'inscripcion', 167, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"estado\": \"APROBADA\"}', '{\"estado\": \"HABILITADA\"}', '', '2026-08-19 15:46:22'),
 (153, 'persona', 11, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"nombres\": \"Maty\", \"apellidos\": \"Pinzon\", \"identificacion\": \"1104015282\"}', '', '2026-08-19 16:20:18'),
-(154, 'plantilla', 1, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"habilitado\": \"N\"}', '{\"habilitado\": \"S\"}', '', '2026-08-19 16:20:48');
+(154, 'plantilla', 1, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"habilitado\": \"N\"}', '{\"habilitado\": \"S\"}', '', '2026-08-19 16:20:48'),
+(662, 'temporada', 105, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"desde\": \"2026-01-01\", \"hasta\": \"2026-12-31\", \"nombre\": \"QC217937\"}', '', '2026-08-19 21:00:19'),
+(663, 'torneo', 101, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"nombre\": \"QC217937\", \"temporada\": 105}', '', '2026-08-19 21:00:20'),
+(664, 'categoria', 101, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"corte\": \"\", \"genero\": \"X\", \"nombre\": \"QC217937\"}', '', '2026-08-19 21:00:21'),
+(665, 'equipo', 511, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"corto\": \"QC\", \"escudo\": \"\", \"nombre\": \"QC217937 Club\"}', '', '2026-08-19 21:00:22'),
+(666, 'inscripcion', 524, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"valor\": 0, \"equipo\": 511, \"categoria\": 101}', '', '2026-08-19 21:00:23'),
+(667, 'inscripcion', 524, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"estado\": \"BORRADOR\"}', '{\"estado\": \"ENVIADA\"}', '', '2026-08-19 21:00:23'),
+(668, 'inscripcion', 524, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"estado\": \"ENVIADA\"}', '{\"estado\": \"APROBADA\"}', '', '2026-08-19 21:00:23'),
+(669, 'inscripcion', 524, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"estado\": \"APROBADA\"}', '{\"estado\": \"HABILITADA\"}', '', '2026-08-19 21:00:24'),
+(670, 'persona', 76, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"nombres\": \"Ana\", \"apellidos\": \"Rivas\", \"identificacion\": \"QC21793701\"}', '', '2026-08-19 21:00:24'),
+(671, 'persona', 77, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"nombres\": \"Luis\", \"apellidos\": \"Ortega\", \"identificacion\": \"QC21793702\"}', '', '2026-08-19 21:00:24'),
+(672, 'plantilla', 62, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"habilitado\": \"N\"}', '{\"habilitado\": \"S\"}', '', '2026-08-19 21:00:25'),
+(673, 'plantilla', 63, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"habilitado\": \"N\"}', '{\"habilitado\": \"S\"}', '', '2026-08-19 21:00:25'),
+(674, 'torneo', 101, 'editar', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"publico\": \"N\"}', '{\"slug\": \"qc217937-101\", \"publico\": \"S\"}', 'Publicado en el portal', '2026-08-19 21:00:26'),
+(675, 'torneo', 101, 'editar', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"publico\": \"S\"}', '{\"slug\": \"qc217937-101\", \"publico\": \"N\"}', 'Retirado del portal', '2026-08-19 21:00:28'),
+(676, 'temporada', 106, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"desde\": \"2026-01-01\", \"hasta\": \"2026-12-31\", \"nombre\": \"QC258994\"}', '', '2026-08-19 21:01:00'),
+(677, 'torneo', 102, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"nombre\": \"QC258994\", \"temporada\": 106}', '', '2026-08-19 21:01:00'),
+(678, 'categoria', 102, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"corte\": \"\", \"genero\": \"X\", \"nombre\": \"QC258994\"}', '', '2026-08-19 21:01:01'),
+(679, 'equipo', 512, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"corto\": \"QC\", \"escudo\": \"\", \"nombre\": \"QC258994 Club\"}', '', '2026-08-19 21:01:02'),
+(680, 'inscripcion', 525, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"valor\": 0, \"equipo\": 512, \"categoria\": 102}', '', '2026-08-19 21:01:03'),
+(681, 'inscripcion', 525, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"estado\": \"BORRADOR\"}', '{\"estado\": \"ENVIADA\"}', '', '2026-08-19 21:01:04'),
+(682, 'inscripcion', 525, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"estado\": \"ENVIADA\"}', '{\"estado\": \"APROBADA\"}', '', '2026-08-19 21:01:04'),
+(683, 'inscripcion', 525, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"estado\": \"APROBADA\"}', '{\"estado\": \"HABILITADA\"}', '', '2026-08-19 21:01:04'),
+(684, 'persona', 78, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"nombres\": \"Ana\", \"apellidos\": \"Rivas\", \"identificacion\": \"QC25899401\"}', '', '2026-08-19 21:01:04'),
+(685, 'persona', 79, 'crear', 1, 'AdminBCC', 0x00000000000000000000000000000001, NULL, '{\"nombres\": \"Luis\", \"apellidos\": \"Ortega\", \"identificacion\": \"QC25899402\"}', '', '2026-08-19 21:01:05'),
+(686, 'plantilla', 64, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"habilitado\": \"N\"}', '{\"habilitado\": \"S\"}', '', '2026-08-19 21:01:05'),
+(687, 'plantilla', 65, 'estado', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"habilitado\": \"N\"}', '{\"habilitado\": \"S\"}', '', '2026-08-19 21:01:05'),
+(688, 'torneo', 102, 'editar', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"publico\": \"N\"}', '{\"slug\": \"qc258994-102\", \"publico\": \"S\"}', 'Publicado en el portal', '2026-08-19 21:01:06'),
+(689, 'persona', 79, 'editar', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"publicarfoto\": \"N\"}', '{\"publicarfoto\": \"S\"}', 'Autorización de imagen registrada', '2026-08-19 21:01:07'),
+(690, 'persona', 79, 'editar', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"publicarfoto\": \"S\"}', '{\"publicarfoto\": \"N\"}', 'Autorización de imagen retirada', '2026-08-19 21:01:07'),
+(691, 'persona', 79, 'editar', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"publicarfoto\": \"N\"}', '{\"publicarfoto\": \"S\"}', 'Autorización de imagen registrada', '2026-08-19 21:01:08'),
+(692, 'torneo', 102, 'editar', 1, 'AdminBCC', 0x00000000000000000000000000000001, '{\"publico\": \"S\"}', '{\"slug\": \"qc258994-102\", \"publico\": \"N\"}', 'Retirado del portal', '2026-08-19 21:01:08');
 
 -- --------------------------------------------------------
 
@@ -3809,7 +3864,43 @@ CREATE TABLE IF NOT EXISTS `dsl_categoria` (
 --
 
 INSERT INTO `dsl_categoria` (`categoria_id`, `categoria_torneoid`, `categoria_nombre`, `categoria_genero`, `categoria_edadmin`, `categoria_edadmax`, `categoria_fechacorte`, `categoria_maxplantilla`, `categoria_minhabilitados`, `categoria_ptsvictoria`, `categoria_ptsderrota`, `categoria_ptswalkover`, `categoria_desempate`, `categoria_estado`, `categoria_fecharegistro`) VALUES
-(29, 16, 'Sub 14 Masculino', 'M', 12, 14, '2026-08-19', 15, 5, 2, 1, 0, 'DIRECTO,DIFDIR,DIF,PF', 'A', '2026-08-19 15:43:59');
+(29, 16, 'Sub 14 Masculino', 'M', 12, 14, '2026-08-19', 15, 5, 2, 1, 0, 'DIRECTO,DIFDIR,DIF,PF', 'A', '2026-08-19 15:43:59'),
+(101, 101, 'QC217937', 'X', NULL, NULL, NULL, 15, 5, 2, 1, 0, 'DIRECTO,DIFDIR,DIF,PF', 'A', '2026-08-19 21:00:21'),
+(102, 102, 'QC258994', 'X', NULL, NULL, NULL, 15, 5, 2, 1, 0, 'DIRECTO,DIFDIR,DIF,PF', 'A', '2026-08-19 21:01:01');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `dsl_concepto`
+--
+
+DROP TABLE IF EXISTS `dsl_concepto`;
+CREATE TABLE IF NOT EXISTS `dsl_concepto` (
+  `concepto_id` int NOT NULL AUTO_INCREMENT,
+  `concepto_codigo` varchar(20) NOT NULL,
+  `concepto_nombre` varchar(80) NOT NULL,
+  `concepto_ambito` varchar(20) NOT NULL DEFAULT 'INSCRIPCION',
+  `concepto_valor` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `concepto_ivacodigo` char(1) NOT NULL DEFAULT '0',
+  `concepto_activo` char(1) NOT NULL DEFAULT 'S',
+  `concepto_orden` smallint NOT NULL DEFAULT '0',
+  PRIMARY KEY (`concepto_id`),
+  UNIQUE KEY `uk_dslc_codigo` (`concepto_codigo`),
+  KEY `ix_dslc_ambito` (`concepto_ambito`,`concepto_activo`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `dsl_concepto`
+--
+
+INSERT INTO `dsl_concepto` (`concepto_id`, `concepto_codigo`, `concepto_nombre`, `concepto_ambito`, `concepto_valor`, `concepto_ivacodigo`, `concepto_activo`, `concepto_orden`) VALUES
+(1, 'INSC_EQUIPO', 'Inscripción de equipo', 'INSCRIPCION', 0.00, '0', 'S', 10),
+(2, 'INSC_JUGADOR', 'Inscripción de jugador', 'PERSONA', 0.00, '0', 'S', 20),
+(3, 'CARNE', 'Carné de jugador', 'PERSONA', 0.00, '0', 'S', 30),
+(4, 'ARBITRAJE', 'Arbitraje', 'PARTIDO', 0.00, '0', 'S', 40),
+(5, 'ESCENARIO', 'Uso de escenario', 'PARTIDO', 0.00, '0', 'S', 50),
+(6, 'MULTA', 'Multa', 'EQUIPO', 0.00, '0', 'S', 60),
+(7, 'OTRO', 'Otro concepto', 'EQUIPO', 0.00, '0', 'S', 90);
 
 -- --------------------------------------------------------
 
@@ -3831,7 +3922,7 @@ CREATE TABLE IF NOT EXISTS `dsl_designacion` (
   UNIQUE KEY `uk_dsld_usuario` (`designacion_partidoid`,`designacion_usuarioid`,`designacion_funcion`),
   KEY `ix_dsld_usuario` (`designacion_usuarioid`,`designacion_estado`),
   KEY `ix_dsld_persona` (`designacion_personaid`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -3855,14 +3946,16 @@ CREATE TABLE IF NOT EXISTS `dsl_equipo` (
   PRIMARY KEY (`equipo_id`),
   UNIQUE KEY `uk_dsle_nombre` (`equipo_escuelaid`,`equipo_nombre`),
   KEY `ix_dsle_estado` (`equipo_estado`)
-) ENGINE=InnoDB AUTO_INCREMENT=387 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=513 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `dsl_equipo`
 --
 
 INSERT INTO `dsl_equipo` (`equipo_id`, `equipo_escuelaid`, `equipo_nombre`, `equipo_corto`, `equipo_escudo`, `equipo_sedeid`, `equipo_contacto`, `equipo_telefono`, `equipo_email`, `equipo_estado`, `equipo_fecharegistro`) VALUES
-(159, 0, 'Fundación Caballito Ceballos sub 14', '', 'escudo_20260819110054_1f1940.png', NULL, 'Profe Carlos Ceballos', '0993120984', 'fbpinzon@gmail.com', 'A', '2026-08-19 15:45:18');
+(159, 0, 'Fundación Caballito Ceballos sub 14', '', 'escudo_20260819110054_1f1940.png', NULL, 'Profe Carlos Ceballos', '0993120984', 'fbpinzon@gmail.com', 'A', '2026-08-19 15:45:18'),
+(511, 0, 'QC217937 Club', 'QC', NULL, NULL, '', '', '', 'A', '2026-08-19 21:00:22'),
+(512, 0, 'QC258994 Club', 'QC', NULL, NULL, '', '', '', 'A', '2026-08-19 21:01:02');
 
 -- --------------------------------------------------------
 
@@ -4121,14 +4214,16 @@ CREATE TABLE IF NOT EXISTS `dsl_fase` (
   `fase_estado` char(1) NOT NULL DEFAULT 'A',
   PRIMARY KEY (`fase_id`),
   UNIQUE KEY `uk_dslf_orden` (`fase_categoriaid`,`fase_orden`)
-) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `dsl_fase`
 --
 
 INSERT INTO `dsl_fase` (`fase_id`, `fase_categoriaid`, `fase_orden`, `fase_nombre`, `fase_tipo`, `fase_idavuelta`, `fase_clasifican`, `fase_estado`) VALUES
-(29, 29, 1, 'Fase de grupos', 'G', 'N', 0, 'A');
+(29, 29, 1, 'Fase de grupos', 'G', 'N', 0, 'A'),
+(111, 101, 1, 'Fase de grupos', 'G', 'N', 0, 'A'),
+(112, 102, 1, 'Fase de grupos', 'G', 'N', 0, 'A');
 
 -- --------------------------------------------------------
 
@@ -4144,7 +4239,7 @@ CREATE TABLE IF NOT EXISTS `dsl_grupo` (
   `grupo_orden` smallint NOT NULL DEFAULT '1',
   PRIMARY KEY (`grupo_id`),
   UNIQUE KEY `uk_dslg_nombre` (`grupo_faseid`,`grupo_nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -4161,7 +4256,7 @@ CREATE TABLE IF NOT EXISTS `dsl_grupo_equipo` (
   PRIMARY KEY (`ge_id`),
   UNIQUE KEY `uk_dslge` (`ge_grupoid`,`ge_inscripcionid`),
   KEY `ix_dslge_ins` (`ge_inscripcionid`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -4187,14 +4282,16 @@ CREATE TABLE IF NOT EXISTS `dsl_inscripcion` (
   UNIQUE KEY `uk_dsli_equipo` (`inscripcion_equipoid`,`inscripcion_categoriaid`),
   KEY `ix_dsli_categoria` (`inscripcion_categoriaid`,`inscripcion_estadoid`),
   KEY `fk_dsli_estado` (`inscripcion_estadoid`,`inscripcion_estadoentidad`)
-) ENGINE=InnoDB AUTO_INCREMENT=398 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=526 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `dsl_inscripcion`
 --
 
 INSERT INTO `dsl_inscripcion` (`inscripcion_id`, `inscripcion_equipoid`, `inscripcion_categoriaid`, `inscripcion_estadoid`, `inscripcion_fecha`, `inscripcion_valor`, `inscripcion_descuento`, `inscripcion_recargo`, `inscripcion_observacion`, `inscripcion_usuarioid`, `inscripcion_fecharegistro`) VALUES
-(167, 159, 29, 13, '2026-08-19', 0.00, 0.00, 0.00, '', 1, '2026-08-19 15:45:55');
+(167, 159, 29, 13, '2026-08-19', 0.00, 0.00, 0.00, '', 1, '2026-08-19 15:45:55'),
+(524, 511, 101, 13, '2026-08-19', 0.00, 0.00, 0.00, '', 1, '2026-08-19 21:00:23'),
+(525, 512, 102, 13, '2026-08-19', 0.00, 0.00, 0.00, '', 1, '2026-08-19 21:01:03');
 
 -- --------------------------------------------------------
 
@@ -4212,7 +4309,41 @@ CREATE TABLE IF NOT EXISTS `dsl_jornada` (
   `jornada_hasta` date DEFAULT NULL,
   PRIMARY KEY (`jornada_id`),
   UNIQUE KEY `uk_dslj_numero` (`jornada_faseid`,`jornada_numero`)
-) ENGINE=InnoDB AUTO_INCREMENT=178 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=228 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `dsl_obligacion`
+--
+
+DROP TABLE IF EXISTS `dsl_obligacion`;
+CREATE TABLE IF NOT EXISTS `dsl_obligacion` (
+  `obligacion_id` int NOT NULL AUTO_INCREMENT,
+  `obligacion_conceptoid` int NOT NULL,
+  `obligacion_origentipo` varchar(20) NOT NULL,
+  `obligacion_origenid` int NOT NULL,
+  `obligacion_equipoid` int DEFAULT NULL,
+  `obligacion_personaid` int DEFAULT NULL,
+  `obligacion_deudor` varchar(150) NOT NULL DEFAULT '',
+  `obligacion_detalle` varchar(250) NOT NULL DEFAULT '',
+  `obligacion_fecha` date NOT NULL,
+  `obligacion_vence` date DEFAULT NULL,
+  `obligacion_valor` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `obligacion_descuento` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `obligacion_recargo` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `obligacion_estado` varchar(12) NOT NULL DEFAULT 'PENDIENTE',
+  `obligacion_facturaid` int DEFAULT NULL,
+  `obligacion_usuarioid` int DEFAULT NULL,
+  `obligacion_fecharegistro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`obligacion_id`),
+  KEY `ix_dslo_origen` (`obligacion_origentipo`,`obligacion_origenid`),
+  KEY `ix_dslo_estado` (`obligacion_estado`,`obligacion_vence`),
+  KEY `ix_dslo_equipo` (`obligacion_equipoid`),
+  KEY `ix_dslo_factura` (`obligacion_facturaid`),
+  KEY `fk_dslo_concepto` (`obligacion_conceptoid`),
+  KEY `fk_dslo_persona` (`obligacion_personaid`)
+) ;
 
 -- --------------------------------------------------------
 
@@ -4275,7 +4406,7 @@ CREATE TABLE IF NOT EXISTS `dsl_partido_stat` (
   KEY `ix_dslps_acta` (`stat_partidoid`,`stat_personaid`),
   KEY `ix_dslps_equipo` (`stat_inscripcionid`,`stat_tipoid`),
   KEY `fk_dslps_persona` (`stat_personaid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=315 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -4295,20 +4426,27 @@ CREATE TABLE IF NOT EXISTS `dsl_persona` (
   `persona_genero` char(1) NOT NULL DEFAULT 'X',
   `persona_nacionalidad` varchar(3) DEFAULT NULL,
   `persona_foto` varchar(300) DEFAULT NULL,
+  `persona_publicarfoto` char(1) NOT NULL DEFAULT 'N',
+  `persona_consentfecha` datetime DEFAULT NULL,
+  `persona_consentusuario` int DEFAULT NULL,
   `persona_estado` char(1) NOT NULL DEFAULT 'A',
   `persona_fecharegistro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`persona_id`),
   UNIQUE KEY `uk_dslp_identificacion` (`persona_identificacion`),
   KEY `ix_dslp_alumno` (`persona_alumnoid`),
   KEY `ix_dslp_apellidos` (`persona_apellidos`,`persona_nombres`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `dsl_persona`
 --
 
-INSERT INTO `dsl_persona` (`persona_id`, `persona_alumnoid`, `persona_tipoid`, `persona_identificacion`, `persona_nombres`, `persona_apellidos`, `persona_fechanac`, `persona_genero`, `persona_nacionalidad`, `persona_foto`, `persona_estado`, `persona_fecharegistro`) VALUES
-(11, NULL, 'CED', '1104015282', 'Maty', 'Pinzon', '2014-02-20', 'M', NULL, NULL, 'A', '2026-08-19 16:20:18');
+INSERT INTO `dsl_persona` (`persona_id`, `persona_alumnoid`, `persona_tipoid`, `persona_identificacion`, `persona_nombres`, `persona_apellidos`, `persona_fechanac`, `persona_genero`, `persona_nacionalidad`, `persona_foto`, `persona_publicarfoto`, `persona_consentfecha`, `persona_consentusuario`, `persona_estado`, `persona_fecharegistro`) VALUES
+(11, NULL, 'CED', '1104015282', 'Maty', 'Pinzon', '2014-02-20', 'M', NULL, NULL, 'N', NULL, NULL, 'A', '2026-08-19 16:20:18'),
+(76, NULL, 'CED', 'QC21793701', 'Ana', 'Rivas', '2011-05-10', 'F', NULL, NULL, 'N', NULL, NULL, 'A', '2026-08-19 21:00:24'),
+(77, NULL, 'CED', 'QC21793702', 'Luis', 'Ortega', '2011-08-22', 'M', NULL, 'persona_20260819160024_da49cf.png', 'N', NULL, NULL, 'A', '2026-08-19 21:00:24'),
+(78, NULL, 'CED', 'QC25899401', 'Ana', 'Rivas', '2011-05-10', 'F', NULL, NULL, 'N', NULL, NULL, 'A', '2026-08-19 21:01:04'),
+(79, NULL, 'CED', 'QC25899402', 'Luis', 'Ortega', '2011-08-22', 'M', NULL, 'persona_20260819160105_bcf81e.png', 'S', '2026-08-19 16:01:08', 1, 'A', '2026-08-19 21:01:05');
 
 -- --------------------------------------------------------
 
@@ -4342,7 +4480,11 @@ CREATE TABLE IF NOT EXISTS `dsl_plantilla` (
 --
 
 INSERT INTO `dsl_plantilla` (`plantilla_id`, `plantilla_inscripcionid`, `plantilla_personaid`, `plantilla_rol`, `plantilla_dorsal`, `plantilla_alta`, `plantilla_baja`, `plantilla_habilitado`, `plantilla_motivo`, `plantilla_usuarioid`, `plantilla_fecharegistro`) VALUES
-(1, 167, 11, 'J', 15, '2026-08-19', NULL, 'S', '', 1, '2026-08-19 16:20:18');
+(1, 167, 11, 'J', 15, '2026-08-19', NULL, 'S', '', 1, '2026-08-19 16:20:18'),
+(62, 524, 76, 'J', 4, '2026-08-19', NULL, 'S', '', 1, '2026-08-19 21:00:24'),
+(63, 524, 77, 'J', 9, '2026-08-19', NULL, 'S', '', 1, '2026-08-19 21:00:24'),
+(64, 525, 78, 'J', 4, '2026-08-19', NULL, 'S', '', 1, '2026-08-19 21:01:04'),
+(65, 525, 79, 'J', 9, '2026-08-19', NULL, 'S', '', 1, '2026-08-19 21:01:05');
 
 -- --------------------------------------------------------
 
@@ -4389,7 +4531,7 @@ CREATE TABLE IF NOT EXISTS `dsl_sorteo` (
   `sorteo_fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`sorteo_id`),
   KEY `ix_dsls_fase` (`sorteo_faseid`,`sorteo_fecha`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -4408,7 +4550,7 @@ CREATE TABLE IF NOT EXISTS `dsl_sorteo_bombo` (
   UNIQUE KEY `uk_dslsb` (`bombo_sorteoid`,`bombo_inscripcionid`),
   KEY `ix_dslsb_bombo` (`bombo_sorteoid`,`bombo_numero`,`bombo_orden`),
   KEY `fk_dslsb_inscripcion` (`bombo_inscripcionid`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -4446,7 +4588,7 @@ CREATE TABLE IF NOT EXISTS `dsl_sorteo_resultado` (
   UNIQUE KEY `uk_dslsres` (`resultado_sorteoid`,`resultado_inscripcionid`),
   KEY `ix_dslsres_grupo` (`resultado_sorteoid`,`resultado_grupoid`,`resultado_posicion`),
   KEY `fk_dslsres_inscripcion` (`resultado_inscripcionid`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -4467,14 +4609,16 @@ CREATE TABLE IF NOT EXISTS `dsl_temporada` (
   PRIMARY KEY (`temporada_id`),
   UNIQUE KEY `uk_dslt_nombre` (`temporada_escuelaid`,`temporada_nombre`),
   KEY `ix_dslt_fechas` (`temporada_desde`,`temporada_hasta`)
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `dsl_temporada`
 --
 
 INSERT INTO `dsl_temporada` (`temporada_id`, `temporada_escuelaid`, `temporada_nombre`, `temporada_desde`, `temporada_hasta`, `temporada_estado`, `temporada_usuarioid`, `temporada_fecharegistro`) VALUES
-(18, 0, 'Tmporada 2026', '2026-09-01', '2026-12-09', 'A', 1, '2026-08-19 15:28:07');
+(18, 0, 'Tmporada 2026', '2026-09-01', '2026-12-09', 'A', 1, '2026-08-19 15:28:07'),
+(105, 0, 'QC217937', '2026-01-01', '2026-12-31', 'A', 1, '2026-08-19 21:00:19'),
+(106, 0, 'QC258994', '2026-01-01', '2026-12-31', 'A', 1, '2026-08-19 21:01:00');
 
 -- --------------------------------------------------------
 
@@ -4492,19 +4636,24 @@ CREATE TABLE IF NOT EXISTS `dsl_torneo` (
   `torneo_desde` date DEFAULT NULL,
   `torneo_hasta` date DEFAULT NULL,
   `torneo_estado` char(1) NOT NULL DEFAULT 'A',
+  `torneo_publico` char(1) NOT NULL DEFAULT 'N',
+  `torneo_slug` varchar(80) DEFAULT NULL,
   `torneo_usuarioid` int DEFAULT NULL,
   `torneo_fecharegistro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`torneo_id`),
   UNIQUE KEY `uk_dslto_nombre` (`torneo_temporadaid`,`torneo_nombre`),
+  UNIQUE KEY `uk_dslto_slug` (`torneo_slug`),
   KEY `ix_dslto_estado` (`torneo_estado`)
-) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `dsl_torneo`
 --
 
-INSERT INTO `dsl_torneo` (`torneo_id`, `torneo_temporadaid`, `torneo_nombre`, `torneo_deporte`, `torneo_sedeid`, `torneo_desde`, `torneo_hasta`, `torneo_estado`, `torneo_usuarioid`, `torneo_fecharegistro`) VALUES
-(16, 18, 'Torneo Rey de copas', 'baloncesto', NULL, NULL, NULL, 'A', 1, '2026-08-19 15:28:33');
+INSERT INTO `dsl_torneo` (`torneo_id`, `torneo_temporadaid`, `torneo_nombre`, `torneo_deporte`, `torneo_sedeid`, `torneo_desde`, `torneo_hasta`, `torneo_estado`, `torneo_publico`, `torneo_slug`, `torneo_usuarioid`, `torneo_fecharegistro`) VALUES
+(16, 18, 'Torneo Rey de copas', 'baloncesto', NULL, NULL, NULL, 'A', 'N', 'torneo-rey-de-copas-16', 1, '2026-08-19 15:28:33'),
+(101, 105, 'QC217937', 'baloncesto', NULL, NULL, NULL, 'A', 'N', 'qc217937-101', 1, '2026-08-19 21:00:20'),
+(102, 106, 'QC258994', 'baloncesto', NULL, NULL, NULL, 'A', 'N', 'qc258994-102', 1, '2026-08-19 21:01:00');
 
 -- --------------------------------------------------------
 
@@ -4859,7 +5008,7 @@ CREATE TABLE IF NOT EXISTS `facturas_electronicas_punto_emision` (
 INSERT INTO `facturas_electronicas_punto_emision` (`punto_id`, `punto_modulo`, `punto_establecimiento`, `punto_codigo`, `punto_secuencialinicio`, `punto_descripcion`, `punto_estado`, `punto_usuarioid`, `punto_fecharegistro`, `punto_fechacambio`) VALUES
 (1, 'basketball', '001', '001', 17, 'Escuela — pensiones y matrículas', 'A', NULL, '2026-08-19 13:35:42', '2026-08-19 14:20:18'),
 (2, 'arena', '002', '002', 1, 'Arena — alquiler de instalaciones', 'I', 1, '2026-08-19 13:35:42', '2026-08-19 15:08:43'),
-(3, 'league', '003', '003', 1, 'League — inscripciones, arbitraje y multas', 'I', 1, '2026-08-19 13:35:42', '2026-08-19 16:49:29');
+(3, 'league', '003', '003', 1, 'League — inscripciones, arbitraje y multas', 'I', 1, '2026-08-19 13:35:42', '2026-08-19 19:23:14');
 
 -- --------------------------------------------------------
 
@@ -4878,14 +5027,14 @@ CREATE TABLE IF NOT EXISTS `facturas_electronicas_secuenciales` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_fe_secuencial` (`tipo_comprobante`,`establecimiento`,`punto_emision`)
-) ENGINE=InnoDB AUTO_INCREMENT=177 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=203 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `facturas_electronicas_secuenciales`
 --
 
 INSERT INTO `facturas_electronicas_secuenciales` (`id`, `tipo_comprobante`, `establecimiento`, `punto_emision`, `secuencial_actual`, `created_at`, `updated_at`) VALUES
-(7, '01', '001', '001', 17, '2026-07-28 19:04:10', '2026-08-19 16:49:30');
+(7, '01', '001', '001', 17, '2026-07-28 19:04:10', '2026-08-19 19:23:14');
 
 -- --------------------------------------------------------
 
@@ -5138,7 +5287,7 @@ CREATE TABLE IF NOT EXISTS `seguridad_intento_acceso` (
   KEY `idx_intento_usuario` (`intento_usuario`,`intento_fecha`),
   KEY `idx_intento_ip` (`intento_ip`,`intento_fecha`),
   KEY `idx_intento_fecha` (`intento_fecha`)
-) ENGINE=InnoDB AUTO_INCREMENT=677 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=678 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `seguridad_intento_acceso`
@@ -5146,7 +5295,8 @@ CREATE TABLE IF NOT EXISTS `seguridad_intento_acceso` (
 
 INSERT INTO `seguridad_intento_acceso` (`intento_id`, `intento_usuario`, `intento_ip`, `intento_exito`, `intento_fecha`) VALUES
 (675, 'AdminBCC', 0x00000000000000000000000000000001, 1, '2026-08-18 20:58:08'),
-(676, 'AdminBCC', 0x00000000000000000000000000000001, 1, '2026-08-18 22:48:59');
+(676, 'AdminBCC', 0x00000000000000000000000000000001, 1, '2026-08-18 22:48:59'),
+(677, 'AdminBCC', 0x00000000000000000000000000000001, 1, '2026-08-19 16:38:36');
 
 -- --------------------------------------------------------
 
@@ -5168,7 +5318,7 @@ CREATE TABLE IF NOT EXISTS `seguridad_menu` (
   PRIMARY KEY (`menu_id`),
   KEY `menu_padre` (`menu_padreid`),
   KEY `idx_menu_modulo` (`menu_modulo`)
-) ENGINE=InnoDB AUTO_INCREMENT=972 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=977 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish2_ci;
 
 --
 -- Volcado de datos para la tabla `seguridad_menu`
@@ -5252,7 +5402,11 @@ INSERT INTO `seguridad_menu` (`menu_id`, `menu_modulo`, `menu_nombre`, `menu_ord
 (968, 'league', 'Mis partidos', 15, NULL, 'N', 'partidoAgenda', 'fas fa-clipboard-check', 'A'),
 (969, 'league', 'Plantilla', 70, NULL, 'N', 'plantillaPanel', 'fas fa-id-card', 'O'),
 (970, 'league', 'Sorteo', 80, NULL, 'N', 'sorteoPanel', 'fas fa-random', 'O'),
-(971, 'league', 'Eliminatorias', 90, NULL, 'N', 'playoffPanel', 'fas fa-sitemap', 'O');
+(971, 'league', 'Eliminatorias', 90, NULL, 'N', 'playoffPanel', 'fas fa-sitemap', 'O'),
+(972, 'league', 'Acta del partido', 100, NULL, 'N', 'actaPartido', 'fas fa-clipboard-list', 'O'),
+(973, 'league', 'Líderes', 110, NULL, 'N', 'rankingPanel', 'fas fa-medal', 'O'),
+(975, 'league', 'Cobranza', 120, NULL, 'N', 'cobranzaPanel', 'fas fa-file-invoice-dollar', 'A'),
+(976, 'league', 'Conceptos cobrables', 130, NULL, 'N', 'conceptoList', 'fas fa-tags', 'A');
 
 -- --------------------------------------------------------
 
@@ -5274,7 +5428,7 @@ CREATE TABLE IF NOT EXISTS `seguridad_permiso` (
   UNIQUE KEY `uq_permiso_rol_menu` (`permiso_rolid`,`permiso_menuid`),
   KEY `permiso_rolid` (`permiso_rolid`),
   KEY `permiso_menuid` (`permiso_menuid`)
-) ENGINE=InnoDB AUTO_INCREMENT=192 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=201 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish2_ci;
 
 --
 -- Volcado de datos para la tabla `seguridad_permiso`
@@ -5374,7 +5528,13 @@ INSERT INTO `seguridad_permiso` (`permiso_id`, `permiso_rolid`, `permiso_menuid`
 (188, 1, 968, 'S', 'S', 'S', 'S', 'A'),
 (189, 1, 969, 'S', 'S', 'S', 'S', 'A'),
 (190, 1, 970, 'S', 'S', 'S', 'S', 'A'),
-(191, 1, 971, 'S', 'S', 'S', 'S', 'A');
+(191, 1, 971, 'S', 'S', 'S', 'S', 'A'),
+(192, 1, 972, 'S', 'S', 'S', 'S', 'A'),
+(193, 1, 973, 'S', 'S', 'S', 'S', 'A'),
+(195, 8, 972, 'S', 'N', 'S', 'N', 'A'),
+(196, 9, 972, 'S', 'N', 'S', 'N', 'A'),
+(198, 1, 975, 'S', 'S', 'S', 'S', 'A'),
+(199, 1, 976, 'S', 'S', 'S', 'S', 'A');
 
 -- --------------------------------------------------------
 
@@ -5467,7 +5627,7 @@ CREATE TABLE IF NOT EXISTS `seguridad_usuario` (
   UNIQUE KEY `usuario_usuario` (`usuario_usuario`),
   KEY `usuario_rolid` (`usuario_rolid`),
   KEY `usuario_identificacion_2` (`usuario_empleadoid`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish2_ci;
 
 --
 -- Volcado de datos para la tabla `seguridad_usuario`
@@ -6292,12 +6452,48 @@ CREATE TABLE IF NOT EXISTS `v_comprobante_emitido` (
 -- --------------------------------------------------------
 
 --
+-- Estructura Stand-in para la vista `v_dsl_saldo`
+-- (Véase abajo para la vista actual)
+--
+DROP VIEW IF EXISTS `v_dsl_saldo`;
+CREATE TABLE IF NOT EXISTS `v_dsl_saldo` (
+`obligacion_id` int
+,`obligacion_conceptoid` int
+,`concepto_nombre` varchar(80)
+,`obligacion_origentipo` varchar(20)
+,`obligacion_origenid` int
+,`obligacion_equipoid` int
+,`obligacion_deudor` varchar(150)
+,`obligacion_detalle` varchar(250)
+,`obligacion_fecha` date
+,`obligacion_vence` date
+,`obligacion_estado` varchar(12)
+,`obligacion_facturaid` int
+,`total` decimal(12,2)
+,`abonado` decimal(32,2)
+,`saldo` decimal(33,2)
+,`dias_vencido` int
+);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura para la vista `v_comprobante_emitido`
 --
 DROP TABLE IF EXISTS `v_comprobante_emitido`;
 
 DROP VIEW IF EXISTS `v_comprobante_emitido`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_comprobante_emitido`  AS SELECT (cast('basketball' as char(20) charset utf8mb4) collate utf8mb4_unicode_ci) AS `origen_modulo`, `f`.`id` AS `origen_id`, (`f`.`clave_acceso` collate utf8mb4_unicode_ci) AS `clave_acceso`, (`f`.`tipo_comprobante` collate utf8mb4_unicode_ci) AS `tipo_comprobante`, (`f`.`establecimiento` collate utf8mb4_unicode_ci) AS `establecimiento`, (`f`.`punto_emision` collate utf8mb4_unicode_ci) AS `punto_emision`, (`f`.`secuencial` collate utf8mb4_unicode_ci) AS `secuencial`, `f`.`fecha_emision` AS `fecha_emision`, (`f`.`cliente_identificacion` collate utf8mb4_unicode_ci) AS `cliente_identificacion`, (`f`.`cliente_razon_social` collate utf8mb4_unicode_ci) AS `cliente_razon_social`, `f`.`subtotal` AS `subtotal`, `f`.`descuento` AS `descuento`, `f`.`iva` AS `iva`, `f`.`total` AS `total`, (cast(`f`.`estado_sri` as char(20) charset utf8mb4) collate utf8mb4_unicode_ci) AS `estado_sri`, (`f`.`numero_autorizacion` collate utf8mb4_unicode_ci) AS `numero_autorizacion`, `f`.`fecha_autorizacion` AS `fecha_autorizacion` FROM `facturas_electronicas` AS `f`union all select (cast('league' as char(20) charset utf8mb4) collate utf8mb4_unicode_ci) AS `CAST('league' AS CHAR(20))     COLLATE utf8mb4_unicode_ci`,`l`.`factura_id` AS `factura_id`,(`l`.`factura_claveacceso` collate utf8mb4_unicode_ci) AS `L.factura_claveacceso          COLLATE utf8mb4_unicode_ci`,(`l`.`factura_tipocomprobante` collate utf8mb4_unicode_ci) AS `L.factura_tipocomprobante      COLLATE utf8mb4_unicode_ci`,(`l`.`factura_establecimiento` collate utf8mb4_unicode_ci) AS `L.factura_establecimiento      COLLATE utf8mb4_unicode_ci`,(`l`.`factura_puntoemision` collate utf8mb4_unicode_ci) AS `L.factura_puntoemision         COLLATE utf8mb4_unicode_ci`,(`l`.`factura_secuencial` collate utf8mb4_unicode_ci) AS `L.factura_secuencial           COLLATE utf8mb4_unicode_ci`,`l`.`factura_fechaemision` AS `factura_fechaemision`,(`l`.`factura_clienteid_num` collate utf8mb4_unicode_ci) AS `L.factura_clienteid_num        COLLATE utf8mb4_unicode_ci`,(`l`.`factura_clienterazon` collate utf8mb4_unicode_ci) AS `L.factura_clienterazon         COLLATE utf8mb4_unicode_ci`,`l`.`factura_subtotal` AS `factura_subtotal`,`l`.`factura_descuento` AS `factura_descuento`,`l`.`factura_iva` AS `factura_iva`,`l`.`factura_total` AS `factura_total`,(cast(`l`.`factura_estadosri` as char(20) charset utf8mb4) collate utf8mb4_unicode_ci) AS `CAST(L.factura_estadosri AS CHAR(20)) COLLATE utf8mb4_unicode_ci`,(`l`.`factura_numautorizacion` collate utf8mb4_unicode_ci) AS `L.factura_numautorizacion      COLLATE utf8mb4_unicode_ci`,`l`.`factura_fechaautoriza` AS `factura_fechaautoriza` from `dsl_factura` `l`  ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura para la vista `v_dsl_saldo`
+--
+DROP TABLE IF EXISTS `v_dsl_saldo`;
+
+DROP VIEW IF EXISTS `v_dsl_saldo`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_dsl_saldo`  AS SELECT `o`.`obligacion_id` AS `obligacion_id`, `o`.`obligacion_conceptoid` AS `obligacion_conceptoid`, `c`.`concepto_nombre` AS `concepto_nombre`, `o`.`obligacion_origentipo` AS `obligacion_origentipo`, `o`.`obligacion_origenid` AS `obligacion_origenid`, `o`.`obligacion_equipoid` AS `obligacion_equipoid`, `o`.`obligacion_deudor` AS `obligacion_deudor`, `o`.`obligacion_detalle` AS `obligacion_detalle`, `o`.`obligacion_fecha` AS `obligacion_fecha`, `o`.`obligacion_vence` AS `obligacion_vence`, `o`.`obligacion_estado` AS `obligacion_estado`, `o`.`obligacion_facturaid` AS `obligacion_facturaid`, ((`o`.`obligacion_valor` + `o`.`obligacion_recargo`) - `o`.`obligacion_descuento`) AS `total`, coalesce(`a`.`abonado`,0) AS `abonado`, (((`o`.`obligacion_valor` + `o`.`obligacion_recargo`) - `o`.`obligacion_descuento`) - coalesce(`a`.`abonado`,0)) AS `saldo`, (case when ((`o`.`obligacion_vence` is not null) and (`o`.`obligacion_vence` < curdate()) and (`o`.`obligacion_estado` in ('PENDIENTE','PARCIAL'))) then (to_days(curdate()) - to_days(`o`.`obligacion_vence`)) else 0 end) AS `dias_vencido` FROM ((`dsl_obligacion` `o` join `dsl_concepto` `c` on((`c`.`concepto_id` = `o`.`obligacion_conceptoid`))) left join (select `dsl_abono`.`abono_obligacionid` AS `abono_obligacionid`,sum(`dsl_abono`.`abono_valor`) AS `abonado` from `dsl_abono` where (`dsl_abono`.`abono_anulado` = 'N') group by `dsl_abono`.`abono_obligacionid`) `a` on((`a`.`abono_obligacionid` = `o`.`obligacion_id`))) ;
 
 --
 -- Restricciones para tablas volcadas
@@ -6401,6 +6597,12 @@ ALTER TABLE `dsa_tarifa`
   ADD CONSTRAINT `fk_tarifa_instalacion` FOREIGN KEY (`tarifa_instalacionid`) REFERENCES `dsa_instalacion` (`instalacion_id`) ON DELETE CASCADE;
 
 --
+-- Filtros para la tabla `dsl_abono`
+--
+ALTER TABLE `dsl_abono`
+  ADD CONSTRAINT `fk_dsla_obligacion` FOREIGN KEY (`abono_obligacionid`) REFERENCES `dsl_obligacion` (`obligacion_id`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `dsl_categoria`
 --
 ALTER TABLE `dsl_categoria`
@@ -6470,6 +6672,15 @@ ALTER TABLE `dsl_inscripcion`
 --
 ALTER TABLE `dsl_jornada`
   ADD CONSTRAINT `fk_dslj_fase` FOREIGN KEY (`jornada_faseid`) REFERENCES `dsl_fase` (`fase_id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `dsl_obligacion`
+--
+ALTER TABLE `dsl_obligacion`
+  ADD CONSTRAINT `fk_dslo_concepto` FOREIGN KEY (`obligacion_conceptoid`) REFERENCES `dsl_concepto` (`concepto_id`),
+  ADD CONSTRAINT `fk_dslo_equipo` FOREIGN KEY (`obligacion_equipoid`) REFERENCES `dsl_equipo` (`equipo_id`),
+  ADD CONSTRAINT `fk_dslo_factura` FOREIGN KEY (`obligacion_facturaid`) REFERENCES `dsl_factura` (`factura_id`),
+  ADD CONSTRAINT `fk_dslo_persona` FOREIGN KEY (`obligacion_personaid`) REFERENCES `dsl_persona` (`persona_id`);
 
 --
 -- Filtros para la tabla `dsl_partido`
