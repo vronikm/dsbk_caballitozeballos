@@ -4,25 +4,37 @@
 	use app\models\mainModel;
 
 	class pagosController extends mainModel{
+		/*
+		| Busca alumnos para la pantalla de pagos.
+		|
+		| Los criterios van como parametros ligados. Antes se concatenaban, y
+		| aunque la comilla llegaba escapada por limpiarCadena() —lo que de
+		| rebote impedia la inyeccion—, ese mismo escape rompia las busquedas
+		| legitimas: un apellido como O'Brien viajaba convertido en
+		| O&#039;Brien y no coincidia con nada.
+		|
+		| Ahora el valor viaja tal cual lo escribio el usuario y es PDO quien
+		| lo separa de la consulta.
+		*/
 		public function listarAlumnosPagos($identificacion, $apellidopaterno, $primernombre, $estado, $sede){
-			// Preparar condiciones dinámicas
 			$tabla="";
 			$condiciones = [];
-			$busqueda = [];
+			$parametros  = [];
+			$busqueda    = [];
 
-			// Identificación
 			if ($identificacion != "") {
-				$busqueda[] = "alumno_identificacion LIKE '".$identificacion."%'";
+				$busqueda[] = "alumno_identificacion LIKE :identificacion";
+				$parametros[':identificacion'] = $identificacion.'%';
 			}
 
-			// Nombre
 			if ($primernombre != "") {
-				$busqueda[] = "alumno_primernombre LIKE '".$primernombre."%'";
+				$busqueda[] = "alumno_primernombre LIKE :primernombre";
+				$parametros[':primernombre'] = $primernombre.'%';
 			}
 
-			// Apellido
 			if ($apellidopaterno != "") {
-				$busqueda[] = "alumno_apellidopaterno LIKE '".$apellidopaterno."%'";
+				$busqueda[] = "alumno_apellidopaterno LIKE :apellidopaterno";
+				$parametros[':apellidopaterno'] = $apellidopaterno.'%';
 			}
 
 			// Agrupar búsqueda por nombre/identificación/apellido
@@ -32,16 +44,17 @@
 
 			// Si no hay ningún filtro de identificación, nombre o apellido
 			if ($identificacion == "" && $primernombre == "" && $apellidopaterno == "") {
-				if ($estado == "") {					
+				if ($estado == "") {
 					$condiciones = ["alumno_primernombre <> ''"];
 				}
 			}
-			
+
 			// Filtro de estado
 			if ($estado == "") {
 				$condiciones[] = "alumno_estado = 'A'";
 			} else {
-				$condiciones[] = "alumno_estado = '".$estado."'";
+				$condiciones[] = "alumno_estado = :estado";
+				$parametros[':estado'] = $estado;
 			}
 
 			// Filtro de sede
@@ -49,20 +62,25 @@
 				if ($sede == 0) {
 					$condiciones[] = "alumno_sedeid <> 0";
 				} else {
-					$condiciones[] = "alumno_sedeid = '".$sede."'";
+					$condiciones[] = "alumno_sedeid = :sede";
+					$parametros[':sede'] = $sede;
 				}
 			} else {
-				$condiciones = ["alumno_primernombre = ''"]; // sin sede -> nunca traerá resultados
+				/* Sin sede no se lista nada. Se descartan los parametros ya
+				   recogidos: la condicion que los usaba acaba de desaparecer
+				   y PDO falla si sobra alguno. */
+				$condiciones = ["alumno_primernombre = ''"];
+				$parametros  = [];
 			}
 
 			// Construir SQL final
 			$consulta_datos = "SELECT * FROM sujeto_alumno WHERE " . implode(" AND ", $condiciones) . " ORDER BY alumno_estado DESC";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){				
-				$consulta_descuento = "SELECT descuento_alumnoid, descuento_estado  FROM alumno_pago_descuento WHERE descuento_alumnoid = ".$rows['alumno_id'];
-				$descuento = $this->ejecutarConsulta($consulta_descuento);
+				$consulta_descuento = "SELECT descuento_alumnoid, descuento_estado  FROM alumno_pago_descuento WHERE descuento_alumnoid = :alumno";
+				$descuento = $this->ejecutarConsulta($consulta_descuento, [':alumno' => (int)$rows['alumno_id']]);
 				if($descuento->rowCount()==1){
 					foreach($descuento as $rows_descuento){
 						if($rows_descuento["descuento_estado"] == 'N'){
@@ -74,8 +92,8 @@
 				}else{
 					$boton = "btn-secondary";	
 				}				
-				$consulta_pagos = "SELECT pago_id FROM alumno_pago WHERE pago_alumnoid = ".$rows['alumno_id'];
-				$pagos = $this->ejecutarConsulta($consulta_pagos);
+				$consulta_pagos = "SELECT pago_id FROM alumno_pago WHERE pago_alumnoid = :alumno";
+				$pagos = $this->ejecutarConsulta($consulta_pagos, [':alumno' => (int)$rows['alumno_id']]);
 				if($pagos->rowCount()>0){
 					$botonpago = "btn-info";
 				}else{
@@ -113,8 +131,8 @@
 						<td>'.$rows['alumno_fechanacimiento'].'</td>
 						<td>'.$clase.$pendiente.'</a></td>
 						<td>
-							<a href="'.APP_URL.'pagosNew/'.$rows['alumno_id'].'/" class="btn float-right '.$botonpago.' btn-xs" target="_blank">Registrar pagos</a>
-							<a href="'.APP_URL.'pagosDescuento/'.$rows['alumno_id'].'/" class="btn float-right '.$boton.' btn-xs" style="margin-right: 5px;" target="_blank">Descuentos</a>
+							<a href="'.APP_URL.'pagosNew/'.$rows['alumno_id'].'/" class="btn float-right '.$botonpago.' btn-xs" target="_blank"><i class="fas fa-dollar-sign mr-1"></i>Registrar pagos</a>
+							<a href="'.APP_URL.'pagosDescuento/'.$rows['alumno_id'].'/" class="btn float-right '.$boton.' btn-xs" style="margin-right: 5px;" target="_blank"><i class="fas fa-dollar-sign mr-1"></i>Descuentos</a>
 						</td>
 					</tr>';	
 			}
@@ -123,18 +141,23 @@
 
 		public function listarOptionSede($sedeid, $rolid = null, $usuario = null){
 			$option="";
+			/* El parametro acompana solo a la rama que lo usa: la consulta
+			   del administrador no lleva :usuario y PDO rechaza los que
+			   sobran. */
+			$parametros=[];
 
 			if($rolid != 1 && $rolid != 2){
 				$consulta_datos="SELECT S.sede_id, S.sede_nombre 
 									FROM general_sede S
 									INNER JOIN seguridad_usuario_sede US ON US.usuariosede_sedeid = S.sede_id
 									INNER JOIN seguridad_usuario U ON U.usuario_id = US.usuariosede_usuarioid
-									WHERE U.usuario_usuario  = '".$usuario."'";
+									WHERE U.usuario_usuario = :usuario";
+				$parametros[':usuario'] = $usuario;
 			}else{
 				$consulta_datos="SELECT sede_id, sede_nombre FROM general_sede";
 			}	
 					
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				if($sedeid == $rows['sede_id']){	
@@ -160,8 +183,8 @@
 						WHERE RP.pago_estado = 'P'
 						GROUP BY RA.alumno_id
 					)R ON R.alumno = A.alumno_id
-				WHERE A.alumno_id = ".$alumnoid;	
-			$datos = $this->ejecutarConsulta($consulta_datos);
+				WHERE A.alumno_id = :alumno";	
+			$datos = $this->ejecutarConsulta($consulta_datos, [':alumno' => (int)$alumnoid]);
 			return $datos;
 		}
 		
@@ -171,25 +194,25 @@
 								Year(alumno_fechanacimiento) anio,A.*
 					FROM sujeto_alumno A
 					LEFT JOIN general_sede S ON S.sede_id = A.alumno_sedeid					
-				WHERE A.alumno_id = ".$alumnoid;				
-			$datos = $this->ejecutarConsulta($consulta_datos);				
+				WHERE A.alumno_id = :alumno";				
+			$datos = $this->ejecutarConsulta($consulta_datos, [':alumno' => (int)$alumnoid]);				
 			return $datos;
 		}
 		
 		public function AlumnoDescuento($alumnoid){		
 			$consulta_datos="SELECT D.* FROM alumno_pago_descuento D					
 							 INNER JOIN general_tabla_catalogo RD ON RD.catalogo_valor = D.descuento_rubroid 
-							 WHERE D.descuento_alumnoid  = ".$alumnoid ." AND D.descuento_estado = 'S' ";
+							 WHERE D.descuento_alumnoid = :alumno AND D.descuento_estado = 'S' ";
 				
-			$datos = $this->ejecutarConsulta($consulta_datos);				
+			$datos = $this->ejecutarConsulta($consulta_datos, [':alumno' => (int)$alumnoid]);				
 			return $datos;
 		}
 		
 		public function BuscarDescuento($alumnoid){		
 			$consulta_datos="SELECT D.* FROM alumno_pago_descuento D 
-				WHERE D.descuento_alumnoid = ".$alumnoid;
+				WHERE D.descuento_alumnoid = :alumno";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);					
+			$datos = $this->ejecutarConsulta($consulta_datos, [':alumno' => (int)$alumnoid]);					
 			return $datos;
 		}
 		
@@ -200,9 +223,9 @@
 							FROM sujeto_alumno A
 							INNER JOIN alumno_pago P ON P.pago_alumnoid = A.alumno_id
 							INNER JOIN general_tabla_catalogo C ON C.catalogo_valor = P.pago_rubroid
-						WHERE P.pago_estado = 'P' AND A.alumno_id = ".$alumnoid;	
+						WHERE P.pago_estado = 'P' AND A.alumno_id = :alumno";	
 			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':alumno' => (int)$alumnoid]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){		
 				$tabla.='
@@ -225,7 +248,7 @@
 					$valor_pension = $descuento["descuento_valor"];								
 				}
 			}else{
-				$check_pension=$this->ejecutarConsulta("SELECT sede_pension	FROM general_sede, sujeto_alumno WHERE alumno_sedeid = sede_id AND alumno_id = ".$alumnoid);
+				$check_pension=$this->ejecutarConsulta("SELECT sede_pension	FROM general_sede, sujeto_alumno WHERE alumno_sedeid = sede_id AND alumno_id = :alumno", [':alumno' => (int)$alumnoid]);
 				$valor_pension="";
 				if($check_pension->rowCount()>0){				
 					foreach($check_pension as $rows){	
@@ -238,9 +261,9 @@
 			$ultimafecha = "SELECT MAX(P.pago_fecha) fecha
 			FROM sujeto_alumno A
 			INNER JOIN alumno_pago P ON P.pago_alumnoid = A.alumno_id
-			WHERE P.pago_rubroid = 'RPE' AND pago_estado != 'E' AND A.alumno_id = ".$alumnoid;
+			WHERE P.pago_rubroid = 'RPE' AND pago_estado != 'E' AND A.alumno_id = :alumno";
 
-			$datos = $this->ejecutarConsulta($ultimafecha);
+			$datos = $this->ejecutarConsulta($ultimafecha, [':alumno' => (int)$alumnoid]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){	
 				$ultimafecha = $rows["fecha"];
@@ -253,7 +276,7 @@
 			$ultimo_dia = date('Y-m-t', $timestamp);
 
 			$consulta_datos="SELECT CONCAT(
-					CASE DATE_FORMAT(DATE_ADD('".$ultimafecha."', INTERVAL (units.i + tens.i * 10 + 1) MONTH), '%m')
+					CASE DATE_FORMAT(DATE_ADD(:f1, INTERVAL (units.i + tens.i * 10 + 1) MONTH), '%m')
 						WHEN '01' THEN 'Enero'
 						WHEN '02' THEN 'Febrero'
 						WHEN '03' THEN 'Marzo'
@@ -266,13 +289,13 @@
 						WHEN '10' THEN 'Octubre'
 						WHEN '11' THEN 'Noviembre'
 						WHEN '12' THEN 'Diciembre'
-					END, ' / ', DATE_FORMAT(DATE_ADD('".$ultimafecha."', INTERVAL (units.i + tens.i * 10 + 1) MONTH), '%Y')
-					) AS mes, DATE_ADD('".$ultimafecha."', INTERVAL (units.i + tens.i * 10 + 1) MONTH) AS fecha_ordenar    
+					END, ' / ', DATE_FORMAT(DATE_ADD(:f2, INTERVAL (units.i + tens.i * 10 + 1) MONTH), '%Y')
+					) AS mes, DATE_ADD(:f3, INTERVAL (units.i + tens.i * 10 + 1) MONTH) AS fecha_ordenar    
 				FROM ( SELECT 0 AS i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 ) AS units  
 				JOIN ( SELECT 0 AS i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 ) AS tens 
-				WHERE DATE_ADD('".$ultimafecha."', INTERVAL (units.i + tens.i * 10 + 1) MONTH) <= '".$ultimo_dia."' ORDER BY fecha_ordenar;";	
+				WHERE DATE_ADD(:f4, INTERVAL (units.i + tens.i * 10 + 1) MONTH) <= :ultimo ORDER BY fecha_ordenar;";	
 			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':f1' => $ultimafecha, ':f2' => $ultimafecha, ':f3' => $ultimafecha, ':f4' => $ultimafecha, ':ultimo' => $ultimo_dia]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){					
 				$tabla.='
@@ -598,7 +621,7 @@
 					];
 	
 					// Actualizar numero de recibo
-					$this->ejecutarConsulta("UPDATE general_escuela SET escuela_recibo = ".$num_recibo." WHERE escuela_id = 1");
+					$this->ejecutarConsulta("UPDATE general_escuela SET escuela_recibo = :recibo WHERE escuela_id = 1", [':recibo' => (int)$num_recibo]);
 				
 				}else{
 					
@@ -864,7 +887,7 @@
 					];
 	
 					// Actualizar numero de recibo
-					$this->ejecutarConsulta("UPDATE general_escuela SET escuela_recibo = ".$num_recibo." WHERE escuela_id = 1");
+					$this->ejecutarConsulta("UPDATE general_escuela SET escuela_recibo = :recibo WHERE escuela_id = 1", [':recibo' => (int)$num_recibo]);
 				
 				}else{
 					
@@ -1139,7 +1162,7 @@
 					];
 	
 					// Actualizar numero de recibo
-					$this->ejecutarConsulta("UPDATE general_escuela SET escuela_recibo = ".$num_recibo." WHERE escuela_id = 1");
+					$this->ejecutarConsulta("UPDATE general_escuela SET escuela_recibo = :recibo WHERE escuela_id = 1", [':recibo' => (int)$num_recibo]);
 				
 				}else{
 					
@@ -1399,11 +1422,11 @@
 				
 				
 				// Actualizar saldo y valor
-				$this->ejecutarConsulta("UPDATE alumno_pago SET pago_valor = ".$total.", pago_saldo = ".$saldo.", pago_estado = '".$estado_saldo."' WHERE pago_id = ".$transaccion_pagoid);
+				$this->ejecutarConsulta("UPDATE alumno_pago SET pago_valor = :valor, pago_saldo = :saldo, pago_estado = :estado WHERE pago_id = :pago", [':valor' => $total, ':saldo' => $saldo, ':estado' => $estado_saldo, ':pago' => (int)$transaccion_pagoid]);
 			
 
 				// Actualizar numero de recibo
-				$this->ejecutarConsulta("UPDATE general_escuela SET escuela_recibo = ".$num_recibo." WHERE escuela_id = 1");
+				$this->ejecutarConsulta("UPDATE general_escuela SET escuela_recibo = :recibo WHERE escuela_id = 1", [':recibo' => (int)$num_recibo]);
 				
 			}else{
 				
@@ -1447,7 +1470,7 @@
 		    }			
 
 			#Verificar si el descuento ya fue ingresado
-			$check_descuento=$this->ejecutarConsulta("SELECT * FROM alumno_pago_descuento WHERE descuento_alumnoid='$descuento_alumnoid'");
+			$check_descuento=$this->ejecutarConsulta("SELECT * FROM alumno_pago_descuento WHERE descuento_alumnoid = :alumno", [':alumno' => (int)$descuento_alumnoid]);
 		    if($check_descuento->rowCount()>0){
 		    	$alerta=[
 					"tipo"=>"simple",
@@ -1517,9 +1540,9 @@
 			$consulta_datos="SELECT ROW_NUMBER() OVER (ORDER BY PT.transaccion_id) AS fila_numero, PT.*, P.* 
 				FROM alumno_pago_transaccion PT
 				INNER JOIN alumno_pago P ON P.pago_id = PT.transaccion_pagoid  
-				WHERE (PT.transaccion_pagoid  = '".$pagoid."' AND PT.transaccion_estado NOT IN ('E')) ORDER BY transaccion_id DESC";		
+				WHERE (PT.transaccion_pagoid = :pago AND PT.transaccion_estado NOT IN ('E')) ORDER BY transaccion_id DESC";		
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':pago' => (int)$pagoid]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 			
@@ -1553,11 +1576,11 @@
 							<input type="hidden" name="modulo_pagos" value="eliminarpendiente">
 							<input type="hidden" name="transaccion_id" value="'.$rows['transaccion_id'].'">	
 							<input type="hidden" name="transaccion_pagoid" value="'.$rows['transaccion_pagoid'].'">						
-							<button type="submit" class="btn float-right btn-danger btn-sm" style="margin-right: 5px;">Eliminar</button>
+							<button type="submit" class="btn float-right btn-danger btn-sm" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 						</form>').'							
 
-						'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagospendienteUpdate/'.$rows['transaccion_id'].'/" class="btn float-right btn-success btn-sm" style="margin-right: 5px;">Editar</a>').'
-						<a href="'.APP_URL.'pagospendienteRecibo/'.$rows['transaccion_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank">Recibo</a>
+						'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagospendienteUpdate/'.$rows['transaccion_id'].'/" class="btn float-right btn-success btn-sm" style="margin-right: 5px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+						<a href="'.APP_URL.'pagospendienteRecibo/'.$rows['transaccion_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print mr-1"></i>Recibo</a>
 					</td>
 				</tr>';	
 			}
@@ -1576,9 +1599,9 @@
 					GROUP BY transaccion_pagoid
 				)P ON P.transaccion_pagoid = A.pago_id 
 				LEFT JOIN torneo_torneo T ON T.torneo_id = A.pago_campeonatoid 
-				WHERE (A.pago_alumnoid = '".$alumnoid."' AND A.pago_rubroid = '".$rubro."' AND A.pago_estado NOT IN ('E')) ORDER BY pago_id DESC";		
+				WHERE (A.pago_alumnoid = :alumno AND A.pago_rubroid = :rubro AND A.pago_estado NOT IN ('E')) ORDER BY pago_id DESC";		
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':alumno' => (int)$alumnoid, ':rubro' => $rubro]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){			
 				if ($rows['pago_estado'] == 'C'){
@@ -1593,9 +1616,9 @@
 				}
 
 				if($rows['pago_saldo'] > 0 ){
-					$btnPagar = '<a href="'.APP_URL.'pagosPendiente/'.$rows['pago_id'].'/" class="btn float-right btn-info btn-sm" style="margin-right: 5px;">Pagar</a>';
+					$btnPagar = '<a href="'.APP_URL.'pagosPendiente/'.$rows['pago_id'].'/" class="btn float-right btn-info btn-sm" style="margin-right: 5px;"><i class="fas fa-dollar-sign mr-1"></i>Pagar</a>';
 				}elseif($rows['pago_saldo'] == 0 && $rows['PAGOS_PENDIENTES']>0){
-					$btnPagar = '<a href="'.APP_URL.'pagosPendiente/'.$rows['pago_id'].'/" class="btn float-right btn-dark btn-sm" style="margin-right: 5px;">Pagos</a>';
+					$btnPagar = '<a href="'.APP_URL.'pagosPendiente/'.$rows['pago_id'].'/" class="btn float-right btn-dark btn-sm" style="margin-right: 5px;"><i class="fas fa-dollar-sign mr-1"></i>Pagos</a>';
 				}else{				
 					$btnPagar ="";
 				}
@@ -1626,12 +1649,12 @@
 								'.$this->siPuede('eliminar','pagosList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/pagosAjax.php" method="POST" autocomplete="off" >
 									<input type="hidden" name="modulo_pagos" value="eliminar">
 									<input type="hidden" name="pago_id" value="'.$rows['pago_id'].'">						
-									<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.'>Eliminar</button>
+									<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 								</form>').'							
 
-								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;" >Editar</a>').'
+								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 								'.$btnPagar.'
-								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank" target="_blank">Recibo</a>
+								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print mr-1"></i>Recibo</a>
 							</td>
 						</tr>';	
 				}elseif($rubro == 'RPC'){
@@ -1648,12 +1671,12 @@
 								'.$this->siPuede('eliminar','pagosList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/pagosAjax.php" method="POST" autocomplete="off" >
 									<input type="hidden" name="modulo_pagos" value="eliminar">
 									<input type="hidden" name="pago_id" value="'.$rows['pago_id'].'">						
-									<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.'>Eliminar</button>
+									<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 								</form>').'							
 
-								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;" >Editar</a>').'
+								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 								'.$btnPagar.'
-								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank" target="_blank">Recibo</a>
+								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print mr-1"></i>Recibo</a>
 							</td>
 						</tr>';	
 				}elseif($rubro == 'RNU'){
@@ -1671,12 +1694,12 @@
 								'.$this->siPuede('eliminar','pagosList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/pagosAjax.php" method="POST" autocomplete="off" >
 									<input type="hidden" name="modulo_pagos" value="eliminar">
 									<input type="hidden" name="pago_id" value="'.$rows['pago_id'].'">						
-									<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.'>Eliminar</button>
+									<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 								</form>').'							
 
-								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;" >Editar</a>').'
+								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 								'.$btnPagar.'
-								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank">Recibo</a>
+								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print mr-1"></i>Recibo</a>
 							</td>
 						</tr>';	
 				}else{
@@ -1693,12 +1716,12 @@
 							'.$this->siPuede('eliminar','pagosList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/pagosAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_pagos" value="eliminar">
 								<input type="hidden" name="pago_id" value="'.$rows['pago_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.'>Eliminar</button>
+								<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'							
 
-							'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;" >Editar</a>').'
+							'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 							'.$btnPagar.'
-							<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank">Recibo</a>
+							<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print mr-1"></i>Recibo</a>
 						</td>
 					</tr>';	
 				}
@@ -1746,7 +1769,7 @@
 			$transaccion_id=$this->limpiarCadena($_POST['transaccion_id']);
 			$transaccion_pagoid=$this->limpiarCadena($_POST['transaccion_pagoid']);
 
-			$datos = $this->ejecutarConsulta("SELECT * FROM alumno_pago_transaccion WHERE transaccion_id = '$transaccion_id'");			
+			$datos = $this->ejecutarConsulta("SELECT * FROM alumno_pago_transaccion WHERE transaccion_id = :trx", [':trx' => (int)$transaccion_id]);			
 			if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -1782,7 +1805,7 @@
 					"icono"=>"success"
 				];
 
-				$check_pago=$this->ejecutarConsulta("SELECT pago_valor, pago_saldo FROM alumno_pago WHERE pago_id = ".$transaccion_pagoid);
+				$check_pago=$this->ejecutarConsulta("SELECT pago_valor, pago_saldo FROM alumno_pago WHERE pago_id = :pago", [':pago' => (int)$transaccion_pagoid]);
 				//$check_pago=$this->seleccionarDatos("Unico","general_escuela","escuela_id","1");
 				if($check_pago->rowCount()>0){				
 					foreach($check_pago as $rows){	
@@ -1795,7 +1818,7 @@
 				$pago_valor -= $datos["transaccion_valor"];
 
 				// Actualizar saldo y valor
-				$this->ejecutarConsulta("UPDATE alumno_pago SET pago_valor = ".$pago_valor.", pago_saldo = ".$pago_saldo.", pago_estado = 'P' WHERE pago_id = ".$transaccion_pagoid);
+				$this->ejecutarConsulta("UPDATE alumno_pago SET pago_valor = :valor, pago_saldo = :saldo, pago_estado = 'P' WHERE pago_id = :pago", [':valor' => $pago_valor, ':saldo' => $pago_saldo, ':pago' => (int)$transaccion_pagoid]);
 			
 			}else{
 				$alerta=[
@@ -1861,9 +1884,9 @@
 								WHERE PT.transaccion_estado = 'C'
 								GROUP BY PT.transaccion_pagoid)T ON T.transaccion_pagoid = P.pago_id
 								LEFT JOIN alumno_pago_transaccion PT ON PT.transaccion_id  = T.IDT
-								WHERE P.pago_id = ".$pagoid;
+								WHERE P.pago_id = :pago";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':pago' => (int)$pagoid]);		
 			return $datos;
 		}
 
@@ -1881,9 +1904,9 @@
  					INNER JOIN general_tabla_catalogo R ON R.catalogo_valor = P.pago_rubroid 
 					INNER JOIN general_tabla_catalogo F ON F.catalogo_valor = PT.transaccion_formapagoid	
 					LEFT JOIN torneo_torneo T ON T.torneo_id = P.pago_campeonatoid			
-				WHERE PT.transaccion_id = ".$transaccion_id;	
+				WHERE PT.transaccion_id = :transaccion";	
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':transaccion' => (int)$transaccion_id]);		
 			return $datos;
 		}
 
@@ -1894,8 +1917,8 @@
 		}
 
 		public function informacionSede($sedeid){		
-			$consulta_datos="SELECT * FROM general_sede WHERE sede_id  = $sedeid";
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$consulta_datos="SELECT * FROM general_sede WHERE sede_id = :sede";
+			$datos = $this->ejecutarConsulta($consulta_datos, [':sede' => (int)$sedeid]);		
 			return $datos;
 		}
 
@@ -1965,9 +1988,9 @@
 					FROM alumno_pago_transaccion T 
 						INNER JOIN alumno_pago P ON P.pago_id = T.transaccion_pagoid 
 						INNER JOIN general_tabla_catalogo R ON R.catalogo_valor = P.pago_rubroid 				
-					WHERE T.transaccion_id = ".$transaccion_id;	
+					WHERE T.transaccion_id = :transaccion";	
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':transaccion' => (int)$transaccion_id]);		
 			return $datos;
 		}
 
@@ -1993,7 +2016,7 @@
 			$pagoid=$this->limpiarCadena($_POST['pago_id']);
 
 			# Verificando pago #
-			$datos = $this->ejecutarConsulta("SELECT * FROM alumno_pago WHERE pago_id = '$pagoid'");			
+			$datos = $this->ejecutarConsulta("SELECT * FROM alumno_pago WHERE pago_id = :pago", [':pago' => (int)$pagoid]);			
 			if($datos->rowCount()<=0){
 				$alerta=[
 					"tipo"=>"simple",
@@ -2223,7 +2246,7 @@
 			$pagoid=$this->limpiarCadena($_POST['pago_id']);
 
 			# Verificando pago #
-			$datos = $this->ejecutarConsulta("SELECT * FROM alumno_pago WHERE pago_id = '$pagoid'");			
+			$datos = $this->ejecutarConsulta("SELECT * FROM alumno_pago WHERE pago_id = :pago", [':pago' => (int)$pagoid]);			
 			if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -2489,7 +2512,7 @@
 			$transaccion_id = $this->limpiarCadena($_POST['transaccion_id']);
 
 			# Verificando pago #
-			$datos = $this->ejecutarConsulta("SELECT * FROM alumno_pago_transaccion WHERE transaccion_id = '$transaccion_id'");			
+			$datos = $this->ejecutarConsulta("SELECT * FROM alumno_pago_transaccion WHERE transaccion_id = :trx", [':trx' => (int)$transaccion_id]);			
 			if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -2710,7 +2733,7 @@
 					"icono"=>"success"
 				];		
 				
-				$check_pago=$this->ejecutarConsulta("SELECT pago_valor, pago_saldo FROM alumno_pago WHERE pago_id = ".$transaccion_pagoid);
+				$check_pago=$this->ejecutarConsulta("SELECT pago_valor, pago_saldo FROM alumno_pago WHERE pago_id = :pago", [':pago' => (int)$transaccion_pagoid]);
 				//$check_pago=$this->seleccionarDatos("Unico","general_escuela","escuela_id","1");
 				if($check_pago->rowCount()>0){				
 					foreach($check_pago as $rows){	
@@ -2730,7 +2753,7 @@
 				}				
 
 				// Actualizar saldo y valor
-				$this->ejecutarConsulta("UPDATE alumno_pago SET pago_valor = ".$pago_valor.", pago_saldo = ".$pago_saldo.", pago_estado = '".$estado_saldo."' WHERE pago_id = ".$transaccion_pagoid);
+				$this->ejecutarConsulta("UPDATE alumno_pago SET pago_valor = :valor, pago_saldo = :saldo, pago_estado = :estado WHERE pago_id = :pago", [':valor' => $pago_valor, ':saldo' => $pago_saldo, ':estado' => $estado_saldo, ':pago' => (int)$transaccion_pagoid]);
 			
 			}else{
 				$alerta=[
@@ -2748,7 +2771,7 @@
 			$descuento_alumnoid = $this->limpiarCadena($_POST['descuento_alumnoid']);
 
 			# Verificando pago #
-			$datos = $this->ejecutarConsulta("SELECT * FROM alumno_pago_descuento WHERE descuento_alumnoid = '$descuento_alumnoid'");			
+			$datos = $this->ejecutarConsulta("SELECT * FROM alumno_pago_descuento WHERE descuento_alumnoid = :alumno", [':alumno' => (int)$descuento_alumnoid]);			
 			if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",

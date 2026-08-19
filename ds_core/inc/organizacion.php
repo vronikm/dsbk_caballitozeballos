@@ -242,4 +242,38 @@ if (!function_exists('ds_organizacion')) {
         $archivo = ds_firma_archivo($sedeid);
         return $archivo !== '' ? ds_marca_dir() . $archivo : '';
     }
+
+    /**
+     * Dibuja la firma dentro de un recuadro SIN deformarla.
+     *
+     * Los recibos la pedían con ancho Y alto fijos (47 x 23 mm). FPDF, con
+     * las dos medidas dadas, estira la imagen hasta llenarlas: una rúbrica
+     * de proporción 1,6:1 metida en un hueco de 2:1 sale un 29% más ancha
+     * de lo que es. En una firma eso no es un detalle estético — deja de
+     * parecerse al trazo de la persona.
+     *
+     * Aquí se calcula la escala que cabe y se centra en el hueco. Si no hay
+     * firma configurada, o el archivo no está, no se dibuja nada y el
+     * documento se genera igual.
+     *
+     * @param object $pdf  Instancia de FPDF.
+     * @return bool  true si llegó a dibujarse.
+     */
+    function ds_firma_dibujar(object $pdf, int $sedeid,
+                              float $x, float $y, float $ancho, float $alto): bool
+    {
+        $archivo = ds_firma_ruta($sedeid);
+        if ($archivo === '' || !is_file($archivo)) { return false; }
+
+        $medidas = @getimagesize($archivo);
+        if ($medidas === false || $medidas[0] <= 0 || $medidas[1] <= 0) { return false; }
+
+        /* La escala menor de las dos es la que hace que quepa entera. */
+        $escala = min($ancho / $medidas[0], $alto / $medidas[1]);
+        $w = $medidas[0] * $escala;
+        $h = $medidas[1] * $escala;
+
+        $pdf->Image($archivo, $x + ($ancho - $w) / 2, $y + ($alto - $h) / 2, $w, $h);
+        return true;
+    }
 }

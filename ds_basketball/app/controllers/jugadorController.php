@@ -33,40 +33,59 @@
 			} 			
 
 			$tabla="";
-			$consulta_datos="SELECT * FROM sujeto_alumno 
-								WHERE (alumno_primernombre LIKE '".$primernombre."' 
-								OR alumno_identificacion LIKE '".$identificacion."' 
-								OR alumno_apellidopaterno LIKE '".$apellidopaterno."') ";			
+
+			/* El array acompaña a la consulta. Las ramas que la REEMPLAZAN
+			   lo vacían: pasar un parámetro que la consulta ya no usa es
+			   SQLSTATE[HY093]. */
+			$parametros = [];
+
+			$consulta_datos="SELECT * FROM sujeto_alumno
+								WHERE (alumno_primernombre LIKE :nombre
+								OR alumno_identificacion LIKE :ident
+								OR alumno_apellidopaterno LIKE :apellido) ";
+			$parametros[':nombre']   = $primernombre;
+			$parametros[':ident']    = $identificacion;
+			$parametros[':apellido'] = $apellidopaterno;
+
 			if($anio!=""){
-				$consulta_datos .= " and YEAR(alumno_fechanacimiento) = '".$anio."'"; 
+				$consulta_datos .= " and YEAR(alumno_fechanacimiento) = :anio";
+				$parametros[':anio'] = $anio;
 			}
 
 			if($identificacion=="" && $primernombre=="" && $apellidopaterno==""){
-				$consulta_datos="SELECT * FROM sujeto_alumno WHERE YEAR(alumno_fechanacimiento) = '".$anio."'";
+				$consulta_datos="SELECT * FROM sujeto_alumno WHERE YEAR(alumno_fechanacimiento) = :anio";
+				$parametros = [':anio' => $anio];
 			}
-			
+
 			if($identificacion=="" && $primernombre=="" && $apellidopaterno=="" && $anio == ""){
 				$consulta_datos = "SELECT * FROM sujeto_alumno WHERE alumno_primernombre <> '' ";
+				$parametros = [];
 			}
 
 			if($sede!=""){
 				if($sede == 0){
-					$consulta_datos .= " and alumno_sedeid <> '$sede'"; 
+					$consulta_datos .= " and alumno_sedeid <> :sede";
 				}else{
-					$consulta_datos .= " and alumno_sedeid = '$sede'"; 
+					$consulta_datos .= " and alumno_sedeid = :sede";
 				}
+				$parametros[':sede'] = $sede;
 			}else{
 				$consulta_datos = "SELECT * FROM sujeto_alumno WHERE alumno_primernombre = ''";
-			}			
+				$parametros = [];
+			}
 
 			$consulta_datos .= " AND alumno_estado = 'A'";
-			$consulta_datos .= " AND alumno_id NOT IN (SELECT jugador_alumnoid FROM torneo_equipo, torneo_jugador 
+			/* Estos dos se interpolaban directamente y el inventario no los
+			   marcaba: el patrón buscaba comillas y aquí no las hay. */
+			$consulta_datos .= " AND alumno_id NOT IN (SELECT jugador_alumnoid FROM torneo_equipo, torneo_jugador
 																			   WHERE equipo_id = jugador_equipoid
-																			   	AND equipo_torneoid = $equipo_torneoid
-																				AND equipo_categoria = $equipo_categoria
+																			   	AND equipo_torneoid = :torneo
+																				AND equipo_categoria = :categoria
 																				AND equipo_estado <> 'E')";
+			$parametros[':torneo']    = $equipo_torneoid;
+			$parametros[':categoria'] = $equipo_categoria;
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
             $posicion = "<select class='form-control' style='font-size: 13px; height: 31px;' id='posicion' name='posicion'>".$this->listarCatalogoPosicion()."</select>";
             $tipo = "<select class='form-control' style='font-size: 13px; height: 31px;' id='tipo' name='tipo'>".$this->listarCatalogoTipo()."</select>";
@@ -82,7 +101,7 @@
 						<td>												
 							<input type="hidden" name="modulo_jugador" value="agregar">
 							<input type="hidden" name="equipo_id" value="'.$equipo_id.'">						
-							<button type="submit" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;"">Agregar</button>					
+							<button type="submit" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;"><i class="fas fa-plus mr-1"></i>Agregar</button>					
 						</td>
 						</form>').'
 					</tr>
@@ -118,7 +137,7 @@
 					  	<td>'.$rows['TIPO'].'</td>
 						<td>												
 							<input type="hidden" name="modulo_jugador" value="eliminar">												
-							<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;">Eliminar</button>					
+							<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>					
 						</td>
 						</form>').'
 					</tr>
@@ -265,9 +284,9 @@
 							 WHERE equipo_sedeid = sede_id
 							 	AND equipo_profesorid = empleado_id
 							 	AND equipo_estado IN ('A','I')
-							 	AND equipo_id =".$equipo_id);	
+							 	AND equipo_id = :equipo");	
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':equipo' => (int)$equipo_id]);		
 			return $datos;
 		}
 			
@@ -327,8 +346,8 @@
 		}
 
 		public function informacionSede($sedeid){		
-			$consulta_datos="SELECT * FROM general_sede WHERE sede_id  = $sedeid";
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$consulta_datos="SELECT * FROM general_sede WHERE sede_id = :sede";
+			$datos = $this->ejecutarConsulta($consulta_datos, [':sede' => (int)$sedeid]);
 			return $datos;
 		}
 		public function listaJugadorPDF($equipo_id){		

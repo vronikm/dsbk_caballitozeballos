@@ -9,7 +9,7 @@
     	$filename = "app/views/dist/img/temp/";
 	
 	$insAlumno = new pagosController();	
-	$pagoid=$insLogin->limpiarCadena($url[1]);
+	$pagoid = ds_id_de_url($url, 1, APP_URL . 'pagosList/');
 
 	$datos=$insAlumno->generarRecibo($pagoid);
 
@@ -30,8 +30,12 @@
 
 		 $filename .= $datos["pago_recibo"].".jpeg";
 
-	}else{
-		include "app/views/inc/error_alert.php";
+	} else {
+		/* El registro no existe: se vuelve al listado. Antes se
+		   incluía el aviso pero la vista seguía ejecutando con
+		   $datos aún como PDOStatement y moría más abajo. */
+		header("Location: " . APP_URL . "pagosList/");
+		exit();
 	}
 
 	$sede=$insAlumno->informacionSede($datos["alumno_sedeid"]);
@@ -132,8 +136,9 @@
         $pdf->SetXY( 120, 112); $pdf->SetFont( "Arial", "B", 8 ); $pdf->Cell( 65, 8, "FIRMA AUTORIZADA", 0, 0, 'C');    
 
         $pdf->Image(APP_URL.$filename, 165, 89, 23, 23);
-        $__img = ds_firma_ruta((int)$sede["sede_id"]);
-    if (is_file($__img)) $pdf->Image($__img, 110, 89, 47, 23);
+    /* Respeta la proporcion: con ancho y alto fijos, FPDF estiraba
+       la rubrica hasta deformarla. */
+    ds_firma_dibujar($pdf, (int)$sede["sede_id"], 110, 89, 47, 23);
         
         unlink($filename);
 

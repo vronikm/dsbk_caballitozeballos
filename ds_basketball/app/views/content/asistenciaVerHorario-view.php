@@ -8,7 +8,9 @@
 	$optionsQR=array('sx'=>4,'sy'=>4,'p'=>-10);		
 
 	$insHorario = new asistenciaController();	
-	$horario_id = ($url[1] != "") ? $insHorario->limpiarCadena($url[1]) : 0;
+	/* El respaldo a 0 no evitaba nada: la consulta no encontraba horario y
+	   la vista seguía con $sede aún como PDOStatement. */
+	$horario_id = ds_id_de_url($url, 1, APP_URL . 'asistenciaListHorario/');
 
 	$datoshorario=$insHorario->seleccionarDatos("Unico","asistencia_horario","horario_id",$horario_id);
 	if($datoshorario->rowCount()==1){
@@ -39,7 +41,8 @@
 	<title><?php echo APP_NAME; ?> | Horario</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">	
 	<!-- daterange picker -->

@@ -14,7 +14,8 @@
 	<title><?php echo APP_NAME; ?> | Registro nuevo representante</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
 	
@@ -155,7 +156,7 @@
 											<div class="form-group">
 												<label for="repre_parentesco">Parentesco</label>
 												<select class="form-control select2" style="width: 100%;" id="repre_parentesco" name="repre_parentesco" >													
-													<?php echo $insRepre->listarCatalogoParentesco($repre_parentesco); ?>
+													<?php echo $insRepre->listarCatalogoParentesco(); ?>
 												</select>
 											</div> 
 										</div>
@@ -270,10 +271,7 @@
 										</div>               
 									</div>										
 								</div>										
-								<div class="card-footer">						
-									<button type="submit" class="btn btn-success btn-sm">Guardar</button>
-									<button type="reset" class="btn btn-dark btn-sm">Limpiar</button>						
-								</div>	
+								<?php echo ds_acciones_form('', ['limpiar' => true]); ?>
 									
 								</form>	
 							</div>

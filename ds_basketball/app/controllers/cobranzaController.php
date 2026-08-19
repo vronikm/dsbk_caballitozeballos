@@ -88,8 +88,8 @@
 						<td>'.$rows['ALUMNO'].'</td>
 						<td>'.$rows['TOTAL_MORA'].'</td>
 						<td>
-							'.$this->siPuede('editar','cobranzaPension','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de pensiones, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;">Notificar</a>').'
-                            <a href="'.APP_URL.'cobranzaDetallePension/'.$rows['repre_id'].'/" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;">Detalle</a>
+							'.$this->siPuede('editar','cobranzaPension','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de pensiones, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;"><i class="fas fa-paper-plane mr-1"></i>Notificar</a>').'
+                            <a href="'.APP_URL.'cobranzaDetallePension/'.$rows['repre_id'].'/" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;"><i class="fas fa-list mr-1"></i>Detalle</a>
 						</td>
 					</tr>';	
 			}
@@ -179,8 +179,8 @@
 						<td>'.$rows['ALUMNO'].'</td>
 						<td>'.$rows['TOTAL_MORA'].'</td>
 						<td>
-							'.$this->siPuede('editar','cobranzaPension','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de pensiones, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;">Notificar</a>').'
-                            <a href="'.APP_URL.'cobranzaDetallePension/'.$rows['repre_id'].'/" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;">Detalle</a>
+							'.$this->siPuede('editar','cobranzaPension','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de pensiones, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;"><i class="fas fa-paper-plane mr-1"></i>Notificar</a>').'
+                            <a href="'.APP_URL.'cobranzaDetallePension/'.$rows['repre_id'].'/" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;"><i class="fas fa-list mr-1"></i>Detalle</a>
 						</td>
 					</tr>';	
 			}
@@ -243,8 +243,8 @@
 						<td>'.$rows['ALUMNO'].'</td>
 						<td>'.$rows['TOTAL_MORA'].'</td>
 						<td>
-							'.$this->siPuede('editar','cobranzaUniforme','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de uniformes, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;">Notificar</a>').'
-                            <a href="'.APP_URL.'cobranzaDetalleUniforme/'.$rows['repre_id'].'/" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;">Detalle</a>
+							'.$this->siPuede('editar','cobranzaUniforme','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de uniformes, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;"><i class="fas fa-paper-plane mr-1"></i>Notificar</a>').'
+                            <a href="'.APP_URL.'cobranzaDetalleUniforme/'.$rows['repre_id'].'/" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;"><i class="fas fa-list mr-1"></i>Detalle</a>
 						</td>
 					</tr>';	
 			}
@@ -275,7 +275,7 @@
 									SUM(pago_saldo) AS SALDO
 									FROM alumno_pago
 										INNER JOIN sujeto_alumno ON alumno_id = pago_alumnoid
-									WHERE pago_rubroid = 'RPE' AND pago_estado = 'P' AND pago_saldo > 0 AND alumno_repreid = ".$repre_id." 
+									WHERE pago_rubroid = 'RPE' AND pago_estado = 'P' AND pago_saldo > 0 AND alumno_repreid = :repre 
 									GROUP BY pago_alumnoid
 								) P ON P.pago_alumnoid = A.alumno_id
 								LEFT JOIN (
@@ -297,7 +297,7 @@
 										LEFT JOIN alumno_pago ON pago_alumnoid = alumno_id 
 										LEFT JOIN alumno_pago_descuento ON descuento_alumnoid = alumno_id AND descuento_estado = 'S'
 										LEFT JOIN general_sede ON sede_id = alumno_sedeid
-									WHERE pago_rubroid = 'RPE' AND alumno_estado <> 'I' AND alumno_repreid = ".$repre_id." 
+									WHERE pago_rubroid = 'RPE' AND alumno_estado <> 'I' AND alumno_repreid = :repre 
 									GROUP BY 
 										pago_alumnoid
 									) BASE
@@ -306,7 +306,7 @@
 								WHERE PEN.TOTAL > 0 OR P.SALDO > 0
 								ORDER BY PEN.PENSIONES DESC";
 			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':repre' => (int)$repre_id]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){	
 				$NUM_SALDO += $rows['NUM_SALDO'];
@@ -366,13 +366,13 @@
 									SUM(pago_saldo) AS SALDO
 									FROM alumno_pago
 										INNER JOIN sujeto_alumno ON alumno_id = pago_alumnoid
-									WHERE pago_rubroid = 'RNU' AND pago_estado = 'P' AND pago_saldo > 0 AND alumno_repreid = ".$repre_id." 
+									WHERE pago_rubroid = 'RNU' AND pago_estado = 'P' AND pago_saldo > 0 AND alumno_repreid = :repre 
 									GROUP BY pago_alumnoid
 								) P ON P.pago_alumnoid = A.alumno_id
                                  inner join general_sede on alumno_sedeid = sede_id
 								WHERE P.SALDO > 0";
 			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':repre' => (int)$repre_id]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){	
 				$NUM_SALDO += $rows['NUM_SALDO'];

@@ -184,10 +184,10 @@
 			$consulta_datos=("SELECT ingreso_sedeid, ingreso_fecharecepcion, ingreso_empresa, ingreso_monto, ingreso_formaentrega,
                                     ingreso_concepto, ingreso_descripcion, ingreso_imagenpago 
 							 FROM balance_ingreso
-							 WHERE ingreso_id =".$ingresoid."
-							 	AND ingreso_estado = 'A'");	
+							 WHERE ingreso_id = :ingreso
+							 	AND ingreso_estado = 'A'");
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':ingreso' => (int)$ingresoid]);
 			return $datos;
 		}
 
@@ -273,10 +273,10 @@
 							'.$this->siPuede('eliminar','ingresoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/balanceAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_ingreso" value="eliminar">
 								<input type="hidden" name="ingreso_id" value="'.$rows['ingreso_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 3px;">Eliminar</button>
+								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 3px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'
 
-							'.$this->siPuede('editar','ingresoList','<a href="'.APP_URL.'ingresoList/'.$rows['ingreso_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 3px;">Editar</a>').'
+							'.$this->siPuede('editar','ingresoList','<a href="'.APP_URL.'ingresoList/'.$rows['ingreso_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 3px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 						</td>
 					</tr>';	
 			}
@@ -287,7 +287,7 @@
 			$ingresoid=$this->limpiarCadena($_POST['ingreso_id']);
 
 			# Verificando existencia de torneo #
-			$ingreso=$this->ejecutarConsulta("SELECT * FROM balance_ingreso WHERE ingreso_id='$ingresoid'");
+			$ingreso=$this->ejecutarConsulta("SELECT * FROM balance_ingreso WHERE ingreso_id = :ingreso", [':ingreso' => (int)$ingresoid]);
 			if($ingreso->rowCount()<=0){	
 				$alerta=[
 					"tipo"=>"simple",
@@ -480,7 +480,7 @@
 			$ingresoid=$this->limpiarCadena($_POST['ingreso_id']);
 
 			# Verificando usuario #
-		    $ingreso=$this->ejecutarConsulta("SELECT * FROM balance_ingreso WHERE ingreso_id='$ingresoid'");
+		    $ingreso=$this->ejecutarConsulta("SELECT * FROM balance_ingreso WHERE ingreso_id = :ingreso", [':ingreso' => (int)$ingresoid]);
 			if($ingreso->rowCount()<=0){	
 				$alerta=[
 					"tipo"=>"simple",
@@ -533,9 +533,9 @@
 			$consulta_datos=("SELECT egreso_sedeid, egreso_fechapago, egreso_empresa, egreso_monto, egreso_formaentrega,
                                      egreso_concepto, egreso_descripcion, egreso_imagenpago 
 							 FROM balance_egreso
-							 WHERE egreso_id =".$egresoid);	
+							 WHERE egreso_id = :egreso");	
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':egreso' => (int)$egresoid]);		
 			return $datos;
 		}
 
@@ -582,10 +582,10 @@
 							'.$this->siPuede('eliminar','egresoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/balanceAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_egreso" value="eliminar">
 								<input type="hidden" name="egreso_id" value="'.$rows['egreso_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 3px;">Eliminar</button>
+								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 3px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'
 
-							'.$this->siPuede('editar','egresoList','<a href="'.APP_URL.'egresoList/'.$rows['egreso_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 3px;">Editar</a>').'
+							'.$this->siPuede('editar','egresoList','<a href="'.APP_URL.'egresoList/'.$rows['egreso_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 3px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 						</td>
 					</tr>';	
 			}
@@ -773,7 +773,7 @@
 			$egresoid=$this->limpiarCadena($_POST['egreso_id']);
 
 			# Verificando existencia de torneo #
-			$egreso=$this->ejecutarConsulta("SELECT * FROM balance_egreso WHERE egreso_id='$egresoid'");
+			$egreso=$this->ejecutarConsulta("SELECT * FROM balance_egreso WHERE egreso_id = :egreso", [':egreso' => (int)$egresoid]);
 			if($egreso->rowCount()<=0){	
 				$alerta=[
 					"tipo"=>"simple",
@@ -966,7 +966,7 @@
 			$egresoid=$this->limpiarCadena($_POST['egreso_id']);
 
 			# Verificando usuario #
-		    $egreso=$this->ejecutarConsulta("SELECT * FROM balance_egreso WHERE egreso_id='$egresoid'");
+		    $egreso=$this->ejecutarConsulta("SELECT * FROM balance_egreso WHERE egreso_id = :egreso", [':egreso' => (int)$egresoid]);
 			if($egreso->rowCount()<=0){	
 				$alerta=[
 					"tipo"=>"simple",

@@ -52,6 +52,22 @@
 				$this->showError('Usuario o contraseña incorrectos.');
 			}
 
+			/* ----------  1 bis. Freno a la fuerza bruta  ---------- */
+			/* Sin esto se midieron 25 intentos fallidos seguidos sin una
+			   sola negativa, a unos 500 por minuto. El freno mira los
+			   fallos recientes ANTES de comprobar la clave, para que el
+			   coste de bcrypt tampoco se pueda usar como ariete. */
+			$espera = 0; $porQue = '';
+			if (intentos_frenado($usuario, $espera, $porQue)) {
+				intentos_registrar($usuario, false);
+
+				$minutos = (int)ceil($espera / 60);
+				$this->showError(
+					'Demasiados intentos fallidos. Vuelva a probar en '
+					. ($minutos > 1 ? "$minutos minutos." : 'un minuto.')
+				);
+			}
+
 			/* ----------  2. Consulta preparada  ---------- */
 			try {
 				$sql = "
@@ -77,7 +93,13 @@
 				$stmt = $this->ejecutarConsulta($sql, ['usuario' => $usuario]);
 
 				if ($stmt->rowCount() !== 1) {
-					/* ───── mensaje genérico: evita enumeración de usuarios ───── */
+					/* El mensaje genérico no bastaba: sin llegar a bcrypt,
+					   una cuenta inexistente respondía en ~9 ms frente a
+					   los ~121 ms de una real, y esa diferencia se mide
+					   desde fuera. Verificando contra un hash señuelo, los
+					   dos caminos cuestan lo mismo. */
+					password_verify($clave, intentos_hash_senuelo());
+					intentos_registrar($usuario, false);
 					$this->showError('Usuario o contraseña incorrectos.');
 				}
 
@@ -89,17 +111,28 @@
 			}
 
 			/* ----------  3. Comprobaciones de estado ---------- */
+			/* La clave se comprueba ANTES que el estado. Al revés, "usuario
+			   inactivo" se obtenía sin acertar la contraseña y volvía a
+			   delatar qué cuentas existen: justo lo que se acaba de cerrar
+			   por el lado del tiempo. */
+			if (!password_verify($clave, $user['usuario_clave'])) {
+				intentos_registrar($usuario, false);
+				$this->showError('Usuario o contraseña incorrectos.');
+			}
 			if ($user['usuario_estado'] === 'I') {
+				intentos_registrar($usuario, false);
 				$this->showError('Usuario inactivo. Contacte al administrador.');
 			}
 			if ($user['usuario_tienebloqueo'] === 'S') {
+				intentos_registrar($usuario, false);
 				$this->showError('Usuario bloqueado. Contacte al administrador.');
-			}
-			if (!password_verify($clave, $user['usuario_clave'])) {
-				$this->showError('Usuario o contraseña incorrectos.');
 			}
 
 			/* ----------  4. Login correcto ---------- */
+			/* Queda anotado: además de servir de auditoría, el acierto
+			   pone a cero el contador de fallos de esta cuenta. */
+			intentos_registrar($usuario, true);
+
 			session_regenerate_id(true);        // Previene Session Fixation
 
 			$_SESSION = [
@@ -126,17 +159,20 @@
 
 		/* ========== Helpers ========== */
 
-		/** Muestra un SweetAlert2 de error y detiene la ejecución. */
+		/**
+		 * Guarda el aviso y vuelve al formulario.
+		 *
+		 * Antes imprimía el <script> aquí mismo. Ahora el controlador corre
+		 * ANTES de la página, así que no hay ni Swal cargado ni sitio donde
+		 * escribir: el mensaje se deja en la sesión y lo pinta la vista.
+		 *
+		 * De paso se gana el patrón POST-Redirect-GET: al recargar no se
+		 * reenvía el formulario con la contraseña dentro.
+		 */
 		private function showError(string $mensaje): void
 		{
-			echo "<script>
-					Swal.fire({
-						icon: 'error',
-						title: 'Error',
-						text: '{$mensaje}'
-					});
-				</script>";
-			exit;
+			$_SESSION['login_aviso'] = $mensaje;
+			$this->redirect(APP_URL . 'login/');
 		}
 
 		/** Redirige de forma segura, compatible con cabeceras ya enviadas. */

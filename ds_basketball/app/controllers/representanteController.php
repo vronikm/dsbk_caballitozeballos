@@ -23,15 +23,19 @@
 			$tabla="";
 			$consulta_datos="SELECT * FROM alumno_representante
 								WHERE repre_estado in ('A','I')
-									AND (repre_primernombre LIKE '".$primernombre."' 
-										OR repre_identificacion LIKE '".$identificacion."' 
-										OR repre_apellidopaterno LIKE '".$apellidopaterno."')";			
+									AND (repre_primernombre LIKE :nombre 
+										OR repre_identificacion LIKE :ident 
+										OR repre_apellidopaterno LIKE :apellido)";			
+			$parametros = [':nombre' => $primernombre, ':ident' => $identificacion,
+			                ':apellido' => $apellidopaterno];
 			
 			if($identificacion=="" && $primernombre=="" && $apellidopaterno==""){
 				$consulta_datos = "SELECT * FROM alumno_representante WHERE repre_primernombre <> '' AND repre_estado in ('A','I') ";
+				/* Consulta nueva sin filtros: el array se vacia. */
+				$parametros = [];
 			}			
 										
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 		
 			if($datos->rowCount()>0){
 				$datos = $datos->fetchAll();
@@ -54,26 +58,26 @@
 						<td>'.$rows['repre_primernombre'].' '.$rows['repre_segundonombre'].'</td>
 						<td>'.$rows['repre_apellidopaterno'].' '.$rows['repre_apellidomaterno'].'</td>
 						<td>							
-							'.$this->siPuede('crear','representanteList','<a href="'.APP_URL.'alumnoNew/'.$rows['repre_id'].'/" class="btn float-right btn-secondary btn-xs" style="margin-right: 5px;">Nuevo Alumno</a>').'	
-							'.$this->siPuede('crear','representanteList','<a href="'.APP_URL.'representanteVinc/'.$rows['repre_id'].'/" class="btn float-right btn-warning btn-xs" style="margin-right: 5px;">Vincular alumno</a>').'
+							'.$this->siPuede('crear','representanteList','<a href="'.APP_URL.'alumnoNew/'.$rows['repre_id'].'/" class="btn float-right btn-secondary btn-xs" style="margin-right: 5px;"><i class="fas fa-plus mr-1"></i>Nuevo Alumno</a>').'	
+							'.$this->siPuede('crear','representanteList','<a href="'.APP_URL.'representanteVinc/'.$rows['repre_id'].'/" class="btn float-right btn-warning btn-xs" style="margin-right: 5px;"><i class="fas fa-link mr-1"></i>Vincular alumno</a>').'
 						</td>
 						<td>
 							<a href="'.APP_URL.'representanteFLPD/'.$rows['repre_id'].'/" target="_blank" class="nav-icon far fa-file float-right" title="Formulario LPD" style="margin-right: 5px;"></a>
 							'.$this->siPuede('editar','representanteList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/representanteAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_repre" value="estadofirmado">
 								<input type="hidden" name="repre_id" value="'.$rows['repre_id'].'">						
-								<button type="submit" class="btn float-right '.$boton.' btn-xs" style="margin-right: 5px;""> '.$texto.' </button>
+								<button type="submit" class="btn float-right '.$boton.' btn-xs" style="margin-right: 5px;"> '.$texto.' </button>
 							</form>').'	
 						</td>
 						<td>
 							'.$this->siPuede('eliminar','representanteList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/representanteAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_repre" value="eliminar">
 								<input type="hidden" name="repre_id" value="'.$rows['repre_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;">Eliminar</button>
+								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'
 													
-							'.$this->siPuede('editar','representanteList','<a href="'.APP_URL.'representanteUpdate/'.$rows['repre_id'].'/" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;">Actualizar</a>').'							
-							<a href="'.APP_URL.'representanteProfile/'.$rows['repre_id'].'/" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;">Ver</a>							
+							'.$this->siPuede('editar','representanteList','<a href="'.APP_URL.'representanteUpdate/'.$rows['repre_id'].'/" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;" title="Actualizar" aria-label="Actualizar"><i class="fas fa-pen"></i></a>').'							
+							<a href="'.APP_URL.'representanteProfile/'.$rows['repre_id'].'/" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;" title="Ver" aria-label="Ver"><i class="fas fa-eye"></i></a>							
 						</td>
 					</tr>';	
 			}
@@ -186,7 +190,7 @@
 
 			$registrar_alumno_representante=$this->guardarDatos("alumno_representante",$representante_reg);
 			if($registrar_alumno_representante->rowCount()>0){
-				$obtener_repreid=$this->ejecutarConsulta("SELECT repre_id FROM alumno_representante WHERE repre_identificacion='$repre_identificacion'");
+				$obtener_repreid=$this->ejecutarConsulta("SELECT repre_id FROM alumno_representante WHERE repre_identificacion = :ident", [':ident' => $repre_identificacion]);
 				if($obtener_repreid->rowCount()==1){
 					$repre=$obtener_repreid->fetchAll(); 					
 					foreach( $repre as $rows ){
@@ -203,7 +207,7 @@
 				];
 
 				/*---------------Obtengo campo repreid para la tabla alumno_representanteconyuge-------------*/
-				$check_representanteid=$this->ejecutarConsulta("SELECT repre_id FROM alumno_representante WHERE repre_identificacion='$repre_identificacion'");
+				$check_representanteid=$this->ejecutarConsulta("SELECT repre_id FROM alumno_representante WHERE repre_identificacion = :ident", [':ident' => $repre_identificacion]);
 		
 				if($check_representanteid->rowCount()==1){
 					$representante=$check_representanteid->fetchAll(); 					
@@ -326,7 +330,10 @@
 			return $option;
 		}
 		
-		public function listarCatalogoParentesco($repre_parentesco){
+		/* En el formulario de alta no hay parentesco previo que preseleccionar,
+		   asi que el argumento es opcional: exigirlo obligaba a la vista a
+		   pasar una variable inexistente y eso imprimia un aviso de PHP. */
+		public function listarCatalogoParentesco($repre_parentesco = ''){
 			$option ='<option value=0> Seleccione una opción</option>';
 
 
@@ -376,10 +383,10 @@
 								 FROM sujeto_alumno 
 								 INNER JOIN general_sede on alumno_sedeid = sede_id
 								 WHERE alumno_estado in ('A','I')
-									AND (alumno_repreid = ".$repreid.") 
-								ORDER BY alumno_fechaingreso";			
-			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+									AND (alumno_repreid = :repre)
+								ORDER BY alumno_fechaingreso";
+
+			$datos = $this->ejecutarConsulta($consulta_datos, [':repre' => (int)$repreid]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.='
@@ -401,7 +408,7 @@
 			$repreid=$this->limpiarCadena($_POST['repre_id']);
 			
 			# Verificando existencia de representante #
-			$representante=$this->ejecutarConsulta("SELECT * FROM alumno_representante WHERE repre_id='$repreid'");
+			$representante=$this->ejecutarConsulta("SELECT * FROM alumno_representante WHERE repre_id = :repre", [':repre' => (int)$repreid]);
 			if($representante->rowCount()<=0){	
 		        $alerta=[
 					"tipo"=>"simple",
@@ -542,7 +549,7 @@
 					/*---------------Registro de la información del cónyuge del representante del alumno---------*/
 				
 					/*---------------Variables para el registro del cónyuge del representante del alumno----------------*/
-					$check_representanteid=$this->ejecutarConsulta("SELECT repre_id FROM alumno_representante WHERE repre_identificacion='$repre_identificacion'");
+					$check_representanteid=$this->ejecutarConsulta("SELECT repre_id FROM alumno_representante WHERE repre_identificacion = :ident", [':ident' => $repre_identificacion]);
 					if($check_representanteid->rowCount()>0){
 						$representante=$check_representanteid->fetchAll(); 					
 						foreach( $representante as $rows ){
@@ -562,7 +569,7 @@
 
 						if (isset($_POST['conyuge_sexo'])){$conyuge_sexo = $_POST['conyuge_sexo'];}	
 
-						$conyuge=$this->ejecutarConsulta("SELECT * FROM alumno_representanteconyuge WHERE conyuge_repid='$representanteid'");
+						$conyuge=$this->ejecutarConsulta("SELECT * FROM alumno_representanteconyuge WHERE conyuge_repid = :repre", [':repre' => (int)$representanteid]);
 						if($conyuge->rowCount()>0){				
 							
 							$conyuge_reg=[
@@ -716,7 +723,7 @@
 			$repre_id=$this->limpiarCadena($_POST['repre_id']);
 
 			# Verificando existencia de representante #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM alumno_representante WHERE repre_id='$repre_id'");
+		    $datos=$this->ejecutarConsulta("SELECT * FROM alumno_representante WHERE repre_id = :repre", [':repre' => (int)$repre_id]);
 		    if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -797,15 +804,19 @@
 			$tabla="";
 			$consulta_datos="SELECT * FROM sujeto_alumno 
 								WHERE alumno_estado in ('A','I')
-									AND (alumno_primernombre LIKE '".$primernombre."' 
-									OR alumno_identificacion LIKE '".$identificacion."' 
-									OR alumno_apellidopaterno LIKE '".$apellidopaterno."') ";			
+									AND (alumno_primernombre LIKE :nombre 
+									OR alumno_identificacion LIKE :ident 
+									OR alumno_apellidopaterno LIKE :apellido) ";			
+			$parametros = [':nombre' => $primernombre, ':ident' => $identificacion,
+			                ':apellido' => $apellidopaterno];
 			
 			if($identificacion=="" && $primernombre=="" && $apellidopaterno==""){
 				$consulta_datos = "SELECT * FROM sujeto_alumno WHERE alumno_primernombre <> '' AND alumno_estado in ('A','I')";
+				/* Consulta nueva sin filtros: el array se vacia. */
+				$parametros = [];
 			}
 			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.='
@@ -818,7 +829,7 @@
 								<input type="hidden" name="modulo_repre" value="vincularepresentado">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">		
 								<input type="hidden" name="alumno_repreid" value="'.$repreid.'">
-								<button type="submit" href="'.APP_URL.'representanteList/" class="btn float-right btn-success btn-xs" style="margin-right: 5px;""> Vincular </button>							
+								<button type="submit" href="'.APP_URL.'representanteList/" class="btn float-right btn-success btn-xs" style="margin-right: 5px;"><i class="fas fa-link mr-1"></i>Vincular</button>							
 
 								</form>').'
 						</td>
@@ -834,7 +845,7 @@
 			$alumnorepreid 	= $this->limpiarCadena($_POST['alumno_repreid']);
 
 			# Verificando pago #
-			$datos = $this->ejecutarConsulta("SELECT * FROM sujeto_alumno WHERE alumno_id = '$alumnoid'");			
+			$datos = $this->ejecutarConsulta("SELECT * FROM sujeto_alumno WHERE alumno_id = :alumno", [':alumno' => (int)$alumnoid]);			
 			if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -897,8 +908,8 @@
 		}
 
 		public function informacionSede($sedeid){		
-			$consulta_datos="SELECT * FROM general_sede WHERE sede_id  = $sedeid";
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$consulta_datos="SELECT * FROM general_sede WHERE sede_id = :sede";
+			$datos = $this->ejecutarConsulta($consulta_datos, [':sede' => (int)$sedeid]);		
 			return $datos;
 		}
 
@@ -906,7 +917,7 @@
 			$repre_id=$this->limpiarCadena($_POST['repre_id']);
 
 			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM alumno_representante WHERE repre_id='$repre_id'");
+		    $datos=$this->ejecutarConsulta("SELECT * FROM alumno_representante WHERE repre_id = :repre", [':repre' => (int)$repre_id]);
 		    if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",

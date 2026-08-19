@@ -46,7 +46,7 @@
 			# Verificando email #
 			if($empleado_correo!=""){
 				if(filter_var($empleado_correo, FILTER_VALIDATE_EMAIL)){
-					$check_email=$this->ejecutarConsulta("SELECT empleado_correo FROM sujeto_empleado WHERE empleado_correo='$empleado_correo'");
+					$check_email=$this->ejecutarConsulta("SELECT empleado_correo FROM sujeto_empleado WHERE empleado_correo = :correo", [':correo' => $empleado_correo]);
 					if($check_email->rowCount()>0){
 						$alerta=[
 							"tipo"=>"simple",
@@ -69,7 +69,7 @@
 
 				# Verificando celular #
 				if($empleado_celular!=""){
-				$check_movil=$this->ejecutarConsulta("SELECT empleado_celular FROM sujeto_empleado WHERE empleado_celular='$empleado_celular'");
+				$check_movil=$this->ejecutarConsulta("SELECT empleado_celular FROM sujeto_empleado WHERE empleado_celular = :celular", [':celular' => $empleado_celular]);
 				if($check_movil->rowCount()>0){
 					$alerta=[
 						"tipo"=>"simple",
@@ -341,16 +341,16 @@
 							'.$this->siPuede('eliminar','empleadoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/empleadoAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_empleado" value="eliminar">
 								<input type="hidden" name="empleado_id" value="'.$rows['empleado_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;">Eliminar</button>
+								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'
 							
 							'.$this->siPuede('editar','empleadoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/empleadoAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_empleado" value="actualizarestado">
 								<input type="hidden" name="empleado_id" value="'.$rows['empleado_id'].'">						
-								<button type="submit" class="btn float-right '.$boton.' btn-xs" style="margin-right: 5px;""> '.$texto.' </button>
+								<button type="submit" class="btn float-right '.$boton.' btn-xs" style="margin-right: 5px;"> '.$texto.' </button>
 							</form>').'
 
-							'.$this->siPuede('editar','empleadoList','<a href="'.APP_URL.'empleadoList/'.$rows['empleado_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 5px;">Editar</a>').'
+							'.$this->siPuede('editar','empleadoList','<a href="'.APP_URL.'empleadoList/'.$rows['empleado_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 5px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 						</td>
 						</td>
 					</tr>';	
@@ -404,7 +404,7 @@
 			$empleadoid=$this->limpiarCadena($_POST['empleado_id']);
 
 			# Verificando existencia de empleado #
-			$empleado=$this->ejecutarConsulta("SELECT * FROM sujeto_empleado WHERE empleado_id='$empleadoid'");
+			$empleado=$this->ejecutarConsulta("SELECT * FROM sujeto_empleado WHERE empleado_id = :id", [':id' => (int)$empleadoid]);
 			if($empleado->rowCount()<=0){	
 				$alerta=[
 					"tipo"=>"simple",
@@ -633,7 +633,7 @@
 			$empleado_id=$this->limpiarCadena($_POST['empleado_id']);
 
 			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM sujeto_empleado WHERE empleado_id='$empleado_id'");
+		    $datos=$this->ejecutarConsulta("SELECT * FROM sujeto_empleado WHERE empleado_id = :id", [':id' => (int)$empleado_id]);
 		    if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -687,7 +687,7 @@
 			$empleado_id=$this->limpiarCadena($_POST['empleado_id']);
 
 			# Verificando usuario #
-			$datos=$this->ejecutarConsulta("SELECT * FROM sujeto_empleado WHERE empleado_id='$empleado_id'");
+			$datos=$this->ejecutarConsulta("SELECT * FROM sujeto_empleado WHERE empleado_id = :id", [':id' => (int)$empleado_id]);
 			if($datos->rowCount()<=0){
 				$alerta=[
 					"tipo"=>"simple",
@@ -760,8 +760,8 @@
                                 empleado_identificacion as identificacion, P.* 
                                 FROM sujeto_empleado P
                                 LEFT JOIN general_tabla_catalogo C ON P.empleado_especialidadid = C.catalogo_valor
-								WHERE P.empleado_id = ".(int)$empleadoid;
-			$datos = $this->ejecutarConsulta($consulta_datos);
+								WHERE P.empleado_id = :empleado";
+			$datos = $this->ejecutarConsulta($consulta_datos, [':empleado' => (int)$empleadoid]);
 			return $datos;
 		}
 
@@ -1081,8 +1081,8 @@
                                 )P ON P.trxh_pagoid = H.ingreso_id
                                 LEFT JOIN general_tabla_catalogo F on F.catalogo_valor = ingreso_formapagoid 
                                 LEFT JOIN general_tabla_catalogo T on T.catalogo_valor = ingreso_tipoingresoid 
-                                WHERE (H.ingreso_empleadoid = '".$empleadoid."' AND H.ingreso_estado NOT IN ('E')) ORDER BY ingreso_id DESC";
-                $datos = $this->ejecutarConsulta($consulta_datos);
+                                WHERE (H.ingreso_empleadoid = :empleado AND H.ingreso_estado NOT IN ('E')) ORDER BY ingreso_id DESC";
+                $datos = $this->ejecutarConsulta($consulta_datos, [':empleado' => (int)$empleadoid]);
                 $datos = $datos->fetchAll();
                 foreach($datos as $rows){
 
@@ -1115,9 +1115,9 @@
 						'.$this->siPuede('eliminar','empleadoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/ingresoAjax.php" method="POST" autocomplete="off" >
 							<input type="hidden" name="modulo_ingreso" value="eliminar">
 							<input type="hidden" name="ingreso_id" value="'.$rows['ingreso_id'].'">						
-							<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.'>Eliminar</button>
+							<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 						</form>').'
-						'.$this->siPuede('editar','empleadoList','<a href="'.APP_URL.'empleadoIE/'.$empleadoid.'/'.$rows['ingreso_id'].'/" class="btn float-right btn-success btn-sm" style="margin-right: 5px;" >Editar</a>').'						
+						'.$this->siPuede('editar','empleadoList','<a href="'.APP_URL.'empleadoIE/'.$empleadoid.'/'.$rows['ingreso_id'].'/" class="btn float-right btn-success btn-sm" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'						
 					</td>
 				</tr>';	
 			}
@@ -1128,7 +1128,7 @@
             $ingresoid=$this->limpiarCadena($_POST['ingreso_id']);
 
 			# Verificando existencia de equipo #
-			$ingreso=$this->ejecutarConsulta("SELECT * FROM empleado_ingreso WHERE ingreso_id='$ingresoid'");
+			$ingreso=$this->ejecutarConsulta("SELECT * FROM empleado_ingreso WHERE ingreso_id = :id", [':id' => (int)$ingresoid]);
 			if($ingreso->rowCount()<=0){	
 				$alerta=[
 					"tipo"=>"simple",
@@ -1463,10 +1463,10 @@
 					FROM empleado_ingreso_trx
 					GROUP BY trxh_pagoid
 				)P ON P.trxh_pagoid = H.ingreso_id 
-				WHERE (H.ingreso_id = '".$ingreso_id."' AND H.ingreso_estado NOT IN ('E')) ORDER BY ingreso_id DESC";		
+				WHERE (H.ingreso_id = :ingreso AND H.ingreso_estado NOT IN ('E')) ORDER BY ingreso_id DESC";		
 
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':ingreso' => (int)$ingreso_id]);		
 			return $datos;
 		}
 
@@ -1620,8 +1620,8 @@
                                 )P ON P.trxegreso_egresoid = E.egreso_id
                                 LEFT JOIN general_tabla_catalogo F on F.catalogo_valor = egreso_formaegresoid 
                                 LEFT JOIN general_tabla_catalogo T on T.catalogo_valor = egreso_tipoid 
-                                WHERE (E.egreso_empleadoid = '".$empleadoid."' AND E.egreso_estado NOT IN ('E')) ORDER BY egreso_id DESC";
-                $datos = $this->ejecutarConsulta($consulta_datos);
+                                WHERE (E.egreso_empleadoid = :empleado AND E.egreso_estado NOT IN ('E')) ORDER BY egreso_id DESC";
+                $datos = $this->ejecutarConsulta($consulta_datos, [':empleado' => (int)$empleadoid]);
                 $datos = $datos->fetchAll();
                 foreach($datos as $rows){
 
@@ -1637,9 +1637,9 @@
                 }
 
 				if($rows['egreso_pendiente'] > 0 ){
-					$btnDescargar = '<a href="'.APP_URL.'empleadoDescargaEgreso/'.$rows['egreso_id'].'/" class="btn float-right btn-info btn-sm" style="margin-right: 5px;">Descargar</a>';
+					$btnDescargar = '<a href="'.APP_URL.'empleadoDescargaEgreso/'.$rows['egreso_id'].'/" class="btn float-right btn-info btn-sm" style="margin-right: 5px;"><i class="fas fa-download mr-1"></i>Descargar</a>';
 				}elseif($rows['egreso_pendiente'] == 0 && $rows['PAGOS_PENDIENTES']>0){
-					$btnDescargar = '<a href="'.APP_URL.'empleadoDescargaEgreso/'.$rows['egreso_id'].'/" class="btn float-right btn-dark btn-sm" style="margin-right: 5px;">Pagos</a>';
+					$btnDescargar = '<a href="'.APP_URL.'empleadoDescargaEgreso/'.$rows['egreso_id'].'/" class="btn float-right btn-dark btn-sm" style="margin-right: 5px;"><i class="fas fa-dollar-sign mr-1"></i>Pagos</a>';
 				}else{				
 					$btnDescargar ="";
 				}
@@ -1663,9 +1663,9 @@
 						'.$this->siPuede('eliminar','empleadoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/empleadoAjax.php" method="POST" autocomplete="off" >
 							<input type="hidden" name="modulo_egreso" value="eliminar">
 							<input type="hidden" name="egreso_id" value="'.$rows['egreso_id'].'">						
-							<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminaregreso.'>Eliminar</button>
+							<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminaregreso.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 						</form>').'
-						'.$this->siPuede('editar','empleadoList','<a href="'.APP_URL.'empleadoEgresoUpdate/'.$empleadoid.'/'.$rows['egreso_id'].'/" class="btn float-right btn-success btn-sm '.$eliminaregreso.'" style="margin-right: 5px;" >Editar</a>').'
+						'.$this->siPuede('editar','empleadoList','<a href="'.APP_URL.'empleadoEgresoUpdate/'.$empleadoid.'/'.$rows['egreso_id'].'/" class="btn float-right btn-success btn-sm '.$eliminaregreso.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 						'.$btnDescargar.'
 					</td>
 				</tr>';	
@@ -1681,10 +1681,10 @@
 					FROM empleado_egreso_trx
 					GROUP BY trxegreso_egresoid 
 				)P ON P.trxegreso_egresoid  = E.egreso_id 
-				WHERE (E.egreso_id = '".$egreso_id."' AND E.egreso_estado NOT IN ('E')) ORDER BY egreso_id DESC";		
+				WHERE (E.egreso_id = :egreso AND E.egreso_estado NOT IN ('E')) ORDER BY egreso_id DESC";		
 
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':egreso' => (int)$egreso_id]);		
 			return $datos;
 		}
 
@@ -1692,7 +1692,7 @@
             $egresoid=$this->limpiarCadena($_POST['egreso_id']);
 
 			# Verificando existencia de equipo #
-			$egreso=$this->ejecutarConsulta("SELECT * FROM empleado_egreso WHERE egreso_id='$egresoid'");
+			$egreso=$this->ejecutarConsulta("SELECT * FROM empleado_egreso WHERE egreso_id = :id", [':id' => (int)$egresoid]);
 			if($egreso->rowCount()<=0){	
 				$alerta=[
 					"tipo"=>"simple",
@@ -1853,9 +1853,9 @@
 			$consulta_datos="SELECT  R.catalogo_descripcion RUBRO, E.* 
 					FROM empleado_egreso E
 						INNER JOIN general_tabla_catalogo R ON R.catalogo_valor = E.egreso_tipoid 				
-					WHERE E.egreso_id = ".$egresoid;	
+					WHERE E.egreso_id = :egreso";	
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':egreso' => (int)$egresoid]);		
 			return $datos;
 		}
 
@@ -1962,7 +1962,7 @@
                     "icono"=>"success"
                 ];
 				// Actualizar saldo y valor
-				$this->ejecutarConsulta("UPDATE empleado_egreso SET egreso_descargado = ".$descargado.", egreso_pendiente = ".$saldo.", egreso_estado = '".$estado_saldo."' WHERE egreso_id = ".$trxegreso_egresoid);
+				$this->ejecutarConsulta("UPDATE empleado_egreso SET egreso_descargado = :descargado, egreso_pendiente = :saldo, egreso_estado = :estado WHERE egreso_id = :egreso", [':descargado' => $descargado, ':saldo' => $saldo, ':estado' => $estado_saldo, ':egreso' => (int)$trxegreso_egresoid]);
             }
             return json_encode($alerta);
         }
@@ -1972,9 +1972,9 @@
 			$consulta_datos="SELECT ROW_NUMBER() OVER (ORDER BY PT.trxegreso_id) AS fila_numero, PT.*, P.* 
 				FROM empleado_egreso_trx PT
 				INNER JOIN empleado_egreso P ON P.egreso_id = PT.trxegreso_egresoid  
-				WHERE (PT.trxegreso_egresoid  = '".$egresoid."' AND PT.trxegreso_estado NOT IN ('E')) ORDER BY trxegreso_id DESC";		
+				WHERE (PT.trxegreso_egresoid = :egreso AND PT.trxegreso_estado NOT IN ('E')) ORDER BY trxegreso_id DESC";		
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':egreso' => (int)$egresoid]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 			
@@ -2002,7 +2002,7 @@
 							<input type="hidden" name="trxegreso_id" value="'.$rows['trxegreso_id'].'">	
 							<input type="hidden" name="trxegreso_egresoid" value="'.$rows['trxegreso_egresoid'].'">	
 							<input type="hidden" name="trxegreso_descargo" value="'.$rows['trxegreso_descargo'].'">						
-							<button type="submit" class="btn float-right btn-danger btn-sm" style="margin-right: 5px;">Eliminar</button>
+							<button type="submit" class="btn float-right btn-danger btn-sm" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 						</form>').'
 					</td>
 				</tr>';	
@@ -2032,9 +2032,9 @@
 
 			// Actualizar saldo y valor
 			$actualizar= $this->ejecutarConsulta("UPDATE empleado_egreso 
-													SET egreso_descargado = egreso_descargado - ".$trxegreso_descargo.", 
-														egreso_pendiente = egreso_pendiente + ".$trxegreso_descargo." 
-													WHERE egreso_id = ".$egreso_id);
+													SET egreso_descargado = egreso_descargado - :descargoResta, 
+														egreso_pendiente = egreso_pendiente + :descargoSuma 
+													WHERE egreso_id = :egreso", [':descargoResta' => $trxegreso_descargo, ':descargoSuma' => $trxegreso_descargo, ':egreso' => (int)$egreso_id]);
 
 			if($actualizar->rowCount()<=0){
 				$alerta=[
@@ -2091,9 +2091,9 @@
 			$consulta_datos="SELECT C.catalogo_descripcion tipo_egreso, egreso_fecharegistro fecha, egreso_pendiente pendiente
 								FROM empleado_egreso 
 								INNER JOIN general_tabla_catalogo C ON C.catalogo_valor = egreso_tipoid
-								WHERE egreso_estado = 'P' AND egreso_empleadoid = ".$empleadoid;	
+								WHERE egreso_estado = 'P' AND egreso_empleadoid = :empleado";	
 			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':empleado' => (int)$empleadoid]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){		
 				$tabla.='
@@ -2111,9 +2111,9 @@
 			$consulta_datos="SELECT SUM(egreso_valor) VALOR_ANTICIPO, SUM(egreso_pendiente) ANTICIPO_PENDIENTE
 						from empleado_egreso 
 						where egreso_estado = 'P'
-							AND egreso_empleadoid = ".$empleadoid;
+							AND egreso_empleadoid = :empleado";
 				
-			$datos = $this->ejecutarConsulta($consulta_datos);				
+			$datos = $this->ejecutarConsulta($consulta_datos, [':empleado' => (int)$empleadoid]);				
 			return $datos;
 		}
 
@@ -2126,9 +2126,9 @@
 								INNER JOIN general_tabla_catalogo ON catalogo_valor = empleado_especialidadid
 								INNER JOIN general_tabla ON tabla_id = catalogo_tablaid
 								where empleado_estado = 'A'
-									AND empleado_identificacion = '$identificacion'";
+									AND empleado_identificacion = :identificacion";
 				
-			$datos = $this->ejecutarConsulta($consulta_datos);				
+			$datos = $this->ejecutarConsulta($consulta_datos, [':identificacion' => $identificacion]);				
 			return $datos;
 		}
 
@@ -2213,16 +2213,17 @@
 			$tabla="";
 			// Convertir fecha a formato MySQL (YYYY-MM-DD) si no lo está
 			$fechaFormatoMysql = DateTime::createFromFormat('d/m/Y', $fecha);
+			if($fechaFormatoMysql === false){ return ""; }
 			$fecha = $fechaFormatoMysql->format('Y-m-d');
 
 			$consulta_datos="SELECT DATE(asistencia_hora) AS fecha,
     								TIME(asistencia_hora) AS hora,
 									asistencia_tipo, asistencia_ubicacion
 							 FROM empleado_asistencia 
-							 WHERE asistencia_empleadoid = ".$empleado_id." 
-							 AND asistencia_hora >= '".$fecha."'";	
+							 WHERE asistencia_empleadoid = :empleado 
+							 AND asistencia_hora >= :fecha";	
 					
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':empleado' => (int)$empleado_id, ':fecha' => $fecha]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				if($rows['asistencia_tipo']=='E'){
@@ -2251,12 +2252,12 @@
 							WHERE asistencia_hora = (
 								SELECT MAX(asistencia_hora)
 								FROM empleado_asistencia
-								WHERE asistencia_empleadoid = (SELECT empleado_id FROM sujeto_empleado WHERE empleado_identificacion = '$identificacion')
-								AND asistencia_hora >= '$fecha'
+								WHERE asistencia_empleadoid = (SELECT empleado_id FROM sujeto_empleado WHERE empleado_identificacion = :identificacion)
+								AND asistencia_hora >= :fecha
 							)
 							LIMIT 1";
 				
-			$datos = $this->ejecutarConsulta($consulta_datos);				
+			$datos = $this->ejecutarConsulta($consulta_datos, [':identificacion' => $identificacion, ':fecha' => $fecha]);				
 			return $datos;
 		}
 

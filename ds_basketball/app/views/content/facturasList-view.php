@@ -2,36 +2,25 @@
 	use app\controllers\facturasController;
 	$insFactura = new facturasController();
 
-	if(isset($_POST['alumno_sedeid'])){
-		$alumno_sedeid = $insFactura->limpiarCadena($_POST['alumno_sedeid']);
-	} ELSE{
-		$alumno_sedeid = "";
-	}
+	/*
+	| Los criterios se toman tal cual los escribió el usuario y viajan a la
+	| consulta como parámetros ligados; el escape corresponde a la salida,
+	| donde se pintan. Ver la nota equivalente en pagosList-view.php.
+	*/
+	$criterio = static fn(string $clave) => trim((string)($_POST[$clave] ?? ''));
 
-	if(isset($_POST['alumno_identificacion'])){
-		$alumno_identificacion = $insFactura->limpiarCadena($_POST['alumno_identificacion']);
-	} ELSE{
-		$alumno_identificacion = "";
-	}
+	$alumno_sedeid          = $criterio('alumno_sedeid');
+	$alumno_identificacion  = $criterio('alumno_identificacion');
+	$alumno_primernombre    = $criterio('alumno_nombre1');
+	$alumno_apellidopaterno = $criterio('alumno_apellido1');
+	$alumno_anio            = $criterio('alumno_ano');
 
-	if(isset($_POST['alumno_nombre1'])){
-		$alumno_primernombre = $insFactura->limpiarCadena($_POST['alumno_nombre1']);
-	} ELSE{
-		$alumno_primernombre = "";
-	}
+	$h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 
-	if(isset($_POST['alumno_apellido1'])){
-		$alumno_apellidopaterno = $insFactura->limpiarCadena($_POST['alumno_apellido1']);
-	} ELSE{
-		$alumno_apellidopaterno = "";
-	}
-	
-	if(isset($_POST['alumno_ano'])){
-		$alumno_anio = $insFactura->limpiarCadena($_POST['alumno_ano']);
-	} ELSE{
-		$alumno_anio = "";
-	}
-		
+	/* Rol de la sesión: decide si el filtro ofrece "Todas las sedes".
+	   Faltaba definirlo, así que la condición era siempre falsa y la opción
+	   no aparecía para nadie. Mismo fallo que había en pagosList. */
+	$rolid = rol_actual();
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +32,8 @@
 	<title><?php echo APP_NAME; ?> | Facturas</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
 	<!-- DataTables -->
@@ -112,19 +102,19 @@
 							<div class="col-sm-2">
 								<div class="form-group input-group-sm">
 									<label for="alumno_identificacion">Identificación</label>                        
-									<input type="text" class="form-control" id="alumno_identificacion" name="alumno_identificacion" placeholder="Identificación" value="<?php echo $alumno_identificacion; ?>">
+									<input type="text" class="form-control" id="alumno_identificacion" name="alumno_identificacion" placeholder="Identificación" value="<?php echo $h($alumno_identificacion); ?>">
 								</div>        
 							</div>
 							<div class="col-sm-2">
 								<div class="form-group input-group-sm">
 									<label for="alumno_apellido1">Apellido paterno</label>
-									<input type="text" class="form-control" id="alumno_apellido1" name="alumno_apellido1" placeholder="Primer apellido" value="<?php echo $alumno_apellidopaterno; ?>">
+									<input type="text" class="form-control" id="alumno_apellido1" name="alumno_apellido1" placeholder="Primer apellido" value="<?php echo $h($alumno_apellidopaterno); ?>">
 								</div>         
 							</div>
 							<div class="col-md-2">
 								<div class="form-group input-group-sm">
 									<label for="alumno_nombre1">Primer nombre</label>
-									<input type="text" class="form-control" id="alumno_nombre1" name="alumno_nombre1" placeholder="Primer nombre" value="<?php echo $alumno_primernombre; ?>">
+									<input type="text" class="form-control" id="alumno_nombre1" name="alumno_nombre1" placeholder="Primer nombre" value="<?php echo $h($alumno_primernombre); ?>">
 								</div>
 							</div>  
 
@@ -132,7 +122,7 @@
 								<div class="form-group">
 									<div class="form-group input-group-sm">
 										<label for="alumno_ano">Año</label>
-										<input type="text" class="form-control" id="alumno_ano" name="alumno_ano" placeholder="año" value="<?php echo $alumno_anio; ?>">
+										<input type="text" class="form-control" id="alumno_ano" name="alumno_ano" placeholder="año" value="<?php echo $h($alumno_anio); ?>">
 									</div>	
 								</div>
 							</div>
@@ -156,7 +146,7 @@
 
 							<div class="col-md-2">
 								<div class="form-group input-group-sm">									
-									<button type="submit" class="form-control btn btn-sm bg-lightblue">Buscar</button>
+									<?php echo ds_boton_buscar(); ?>
 								</div>
 							</div>
 

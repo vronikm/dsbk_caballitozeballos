@@ -34,3 +34,20 @@ require_once __DIR__ . "/server.php";
 
 /*----------  Zona horaria  ----------*/
 date_default_timezone_set("America/Guayaquil");
+
+/*----------  Transporte  ----------*/
+// Fuera de la maquina local, el login viaja por HTTPS o no viaja. Sin
+// cifrado, la contrasena va en claro por la red y la cookie de sesion se
+// puede copiar tal cual desde cualquier punto intermedio.
+//
+// localhost y las redes privadas quedan exentas: el desarrollo sigue
+// funcionando por HTTP sin tocar nada.
+//
+// Poner en false SOLO si el servidor publico aun no tiene certificado, y
+// entendiendo que hasta entonces las credenciales circulan legibles.
+const DS_FORZAR_HTTPS = true;
+
+// Meses que el navegador recordara que este sitio es solo HTTPS (HSTS).
+// Se empieza corto a proposito: si algo va mal, el efecto caduca pronto.
+// Una vez comprobado que todo funciona, subirlo a 12.
+const DS_HSTS_MESES = 1;

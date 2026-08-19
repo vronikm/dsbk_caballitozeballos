@@ -7,36 +7,25 @@
 	   no aparecía para nadie, ni siquiera para los administradores. */
 	$rolid = rol_actual();
 
-	if(isset($_POST['alumno_sedeid'])){
-		$alumno_sedeid = $insPago->limpiarCadena($_POST['alumno_sedeid']);
-	} ELSE{
-		$alumno_sedeid = "";
-	}
+	/*
+	| Los criterios de búsqueda se toman TAL CUAL los escribió el usuario.
+	|
+	| Antes pasaban por limpiarCadena(), que aplica htmlspecialchars: eso
+	| convertía «O'Brien» en «O&#039;Brien» y la búsqueda no encontraba al
+	| alumno aunque existiera. El escape corresponde a la SALIDA, no a la
+	| entrada: abajo se escapan al pintarlos en el formulario, y la consulta
+	| los recibe como parámetros ligados.
+	*/
+	$criterio = static fn(string $clave) => trim((string)($_POST[$clave] ?? ''));
 
-	if(isset($_POST['alumno_identificacion'])){
-		$alumno_identificacion = $insPago->limpiarCadena($_POST['alumno_identificacion']);
-	} ELSE{
-		$alumno_identificacion = "";
-	}
+	$alumno_sedeid          = $criterio('alumno_sedeid');
+	$alumno_identificacion  = $criterio('alumno_identificacion');
+	$alumno_primernombre    = $criterio('alumno_nombre1');
+	$alumno_apellidopaterno = $criterio('alumno_apellido1');
+	$alumno_estado          = $criterio('alumno_estado');
 
-	if(isset($_POST['alumno_nombre1'])){
-		$alumno_primernombre = $insPago->limpiarCadena($_POST['alumno_nombre1']);
-	} ELSE{
-		$alumno_primernombre = "";
-	}
-
-	if(isset($_POST['alumno_apellido1'])){
-		$alumno_apellidopaterno = $insPago->limpiarCadena($_POST['alumno_apellido1']);
-	} ELSE{
-		$alumno_apellidopaterno = "";
-	}
-	
-	if(isset($_POST['alumno_estado'])){
-		$alumno_estado = $insPago->limpiarCadena($_POST['alumno_estado']);
-	} ELSE{
-		$alumno_estado = "";
-	}
-		
+	/* Para imprimirlos dentro de un atributo HTML sin abrirlo. */
+	$h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 ?>
 
 <!DOCTYPE html>
@@ -48,7 +37,8 @@
 	<title><?php echo APP_NAME; ?>| Pagos</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
 	<!-- DataTables -->
@@ -117,19 +107,19 @@
 							<div class="col-sm-2">
 								<div class="form-group input-group-sm">
 									<label for="alumno_identificacion">Identificación</label>                        
-									<input type="text" class="form-control" id="alumno_identificacion" name="alumno_identificacion" placeholder="Identificación" value="<?php echo $alumno_identificacion; ?>">
+									<input type="text" class="form-control" id="alumno_identificacion" name="alumno_identificacion" placeholder="Identificación" value="<?php echo $h($alumno_identificacion); ?>">
 								</div>        
 							</div>
 							<div class="col-sm-2">
 								<div class="form-group input-group-sm">
 									<label for="alumno_apellido1">Apellido paterno</label>
-									<input type="text" class="form-control" id="alumno_apellido1" name="alumno_apellido1" placeholder="Primer apellido" value="<?php echo $alumno_apellidopaterno; ?>">
+									<input type="text" class="form-control" id="alumno_apellido1" name="alumno_apellido1" placeholder="Primer apellido" value="<?php echo $h($alumno_apellidopaterno); ?>">
 								</div>         
 							</div>
 							<div class="col-md-2">
 								<div class="form-group input-group-sm">
 									<label for="alumno_nombre1">Primer nombre</label>
-									<input type="text" class="form-control" id="alumno_nombre1" name="alumno_nombre1" placeholder="Primer nombre" value="<?php echo $alumno_primernombre; ?>">
+									<input type="text" class="form-control" id="alumno_nombre1" name="alumno_nombre1" placeholder="Primer nombre" value="<?php echo $h($alumno_primernombre); ?>">
 								</div>
 							</div>  
 
@@ -164,7 +154,7 @@
 							<div class="col-md-2">
 								<div class="form-group">
 									<label for="alumno_sedeid">.</label>
-									<button type="submit" class="form-control btn btn-info">Buscar</button>
+									<?php echo ds_boton_buscar(); ?>
 								</div>
 							</div>
 

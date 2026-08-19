@@ -93,16 +93,62 @@ if (!function_exists('usuario_autenticado')) {
     }
 
     /**
+     * Deshace las sustituciones tipograficas mas usadas.
+     *
+     * "P@ssw0rd" y "password" son la misma contrasena para quien ataca: los
+     * diccionarios prueban las dos. Comparando tambien la version deshecha,
+     * una sola entrada de la lista cubre todas sus variantes.
+     */
+    function clave_sin_disfraz(string $clave): string
+    {
+        return strtr(strtolower($clave), [
+            '@' => 'a', '4' => 'a', '8' => 'b', '(' => 'c', '3' => 'e',
+            '6' => 'g', '1' => 'i', '!' => 'i', '|' => 'i', '0' => 'o',
+            '$' => 's', '5' => 's', '7' => 't', '+' => 't', '2' => 'z',
+        ]);
+    }
+
+    /**
+     * Las contrasenas mas usadas, en un conjunto listo para consultar.
+     *
+     * El archivo solo guarda las de 8 caracteres o mas: las mas cortas ya
+     * las rechaza la regla de longitud. Se lee una vez por peticion, y solo
+     * ocurre al FIJAR una contrasena, que es una operacion rara.
+     */
+    function claves_comunes(): array
+    {
+        static $lista = null;
+        if ($lista !== null) { return $lista; }
+
+        $lista   = [];
+        $archivo = __DIR__ . '/../data/claves-comunes.txt';
+
+        if (is_file($archivo)) {
+            foreach (file($archivo, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $l) {
+                $l = trim($l);
+                if ($l !== '') { $lista[$l] = true; }
+            }
+        }
+        return $lista;
+    }
+
+    /**
      * Valida una contrasena que se va a guardar.
      *
-     * No se restringen los caracteres a proposito. Limitarlos no aporta
+     * No se restringen los CARACTERES a proposito. Limitarlos no aporta
      * seguridad —la consulta va con parametros ligados y la comparacion es
-     * con password_verify()— y si empobrece las claves. Lo unico que se
-     * prohibe es el byte nulo, que trunca la cadena en C.
+     * con password_verify()— y si empobrece las claves. Lo que se mira es
+     * si la contrasena es ADIVINABLE, que es lo que de verdad la rompe:
+     * con el freno de fuerza bruta se admiten 20 intentos por hora, y a ese
+     * ritmo una clave de diccionario cae.
      *
+     * Solo se aplica al FIJAR una contrasena. El login no llama a esta
+     * funcion, asi que ninguna clave ya en uso deja de funcionar.
+     *
+     * $usuario permite rechazar la clave que repite el nombre de la cuenta.
      * $motivo recibe el texto que se le puede mostrar al usuario.
      */
-    function clave_valida(string $clave, ?string &$motivo = null): bool
+    function clave_valida(string $clave, ?string &$motivo = null, string $usuario = ''): bool
     {
         $minimo = clave_longitud_minima();
         $maximo = clave_longitud_maxima();
@@ -120,6 +166,43 @@ if (!function_exists('usuario_autenticado')) {
             return false;
         }
 
+        $normal   = strtolower(trim($clave));
+        $sinDisfraz = clave_sin_disfraz($clave);
+        $comunes  = claves_comunes();
+
+        if (isset($comunes[$normal]) || isset($comunes[$sinDisfraz])) {
+            $motivo = 'Esa contraseña aparece en las listas que se usan para atacar '
+                    . 'cuentas. Elija otra que no sea una palabra ni una fecha.';
+            return false;
+        }
+
+        /* La clave no puede ser el propio nombre de usuario ni contenerlo:
+           es lo primero que prueba cualquiera. */
+        $u = strtolower(trim($usuario));
+        if ($u !== '' && strlen($u) >= 4 && str_contains($normal, $u)) {
+            $motivo = 'La contraseña no puede contener el nombre de usuario.';
+            return false;
+        }
+
+        /* Un solo caracter repetido, aunque llegue a los 8. */
+        if (preg_match('/^(.)\1+$/u', $normal)) {
+            $motivo = 'La contraseña no puede ser un solo carácter repetido.';
+            return false;
+        }
+
+        /* Secuencias del teclado o del alfabeto: "12345678", "abcdefgh". */
+        $seguidos = 1;
+        $largo    = strlen($normal);
+        for ($i = 1; $i < $largo; $i++) {
+            $paso = ord($normal[$i]) - ord($normal[$i - 1]);
+            $seguidos = ($paso === 1 || $paso === -1) ? $seguidos + 1 : 1;
+            if ($seguidos >= 6) {
+                $motivo = 'La contraseña no puede ser una secuencia seguida '
+                        . 'como 12345678 o abcdefgh.';
+                return false;
+            }
+        }
+
         $motivo = '';
         return true;
     }
@@ -128,7 +211,8 @@ if (!function_exists('usuario_autenticado')) {
     function clave_regla_texto(): string
     {
         return 'Mínimo ' . clave_longitud_minima() . ' caracteres. Se admite cualquier '
-             . 'carácter, incluidos espacios y símbolos.';
+             . 'carácter, incluidos espacios y símbolos. No se aceptan contraseñas '
+             . 'de uso común, secuencias, ni el propio nombre de usuario.';
     }
 
     /**
@@ -543,5 +627,256 @@ if (!function_exists('usuario_autenticado')) {
 
         return DS_BASKETBALL_URL . 'app/media.php?t=' . rawurlencode($tipo)
                                  . '&f=' . rawurlencode($archivo);
+    }
+
+    /*==================================================================
+      Freno a los intentos de acceso
+      ==================================================================
+      Se midió el login sin freno: 25 intentos fallidos seguidos, ninguno
+      rechazado, a unos 500 por minuto sostenidos. Contra una clave débil
+      eso son horas, no años.
+
+      El freno es por VENTANA DE TIEMPO y no una marca permanente. Un
+      bloqueo que hubiera que levantar a mano sería un arma en manos del
+      atacante: bastaría con fallar cinco veces contra la cuenta del
+      administrador para dejarlo fuera. Pasada la ventana, se reabre solo.
+
+      Se cuenta por DOS vías porque cada una tapa el hueco de la otra:
+        · por usuario, contra quien insiste sobre una cuenta concreta
+          desde muchas IP;
+        · por IP, contra quien barre muchos usuarios desde un sitio.
+    */
+
+    /** Fallos tolerados sobre una misma cuenta antes de frenar. */
+    function intentos_max_usuario(): int { return 5; }
+
+    /** Fallos tolerados desde una misma IP, sumando todas las cuentas. */
+    function intentos_max_ip(): int { return 20; }
+
+    /** Minutos que dura la ventana y, por tanto, la espera máxima. */
+    function intentos_ventana_minutos(): int { return 15; }
+
+    /** Días que se conserva la bitácora antes de borrarse sola. */
+    function intentos_dias_retencion(): int { return 90; }
+
+    /**
+     * IP de origen en binario, lista para VARBINARY(16).
+     *
+     * Sólo se mira REMOTE_ADDR. Las cabeceras X-Forwarded-For las pone
+     * quien hace la petición y se falsean sin esfuerzo: darles crédito
+     * convertiría el freno por IP en un adorno. Si algún día hay un proxy
+     * delante, hay que resolver la IP real en el servidor web, no aquí.
+     */
+    function intentos_ip_binaria(): ?string
+    {
+        $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+        if ($ip === '' || filter_var($ip, FILTER_VALIDATE_IP) === false) {
+            return null;
+        }
+        $bin = @inet_pton($ip);
+        return $bin === false ? null : $bin;
+    }
+
+    /** Deja constancia del intento, haya salido bien o mal. */
+    function intentos_registrar(string $usuario, bool $exito): void
+    {
+        $con = seguridad_conexion();
+        if ($con === null) { return; }
+
+        try {
+            $st = $con->prepare(
+                "INSERT INTO seguridad_intento_acceso
+                    (intento_usuario, intento_ip, intento_exito)
+                 VALUES (:u, :ip, :e)"
+            );
+            $st->bindValue(':u',  mb_substr($usuario, 0, 20));
+            $st->bindValue(':ip', intentos_ip_binaria(), PDO::PARAM_LOB);
+            $st->bindValue(':e',  $exito ? 1 : 0, PDO::PARAM_INT);
+            $st->execute();
+
+            intentos_purgar($con);
+
+        } catch (\Throwable $e) {
+            /* Que la bitácora falle no puede impedir entrar a quien tiene
+               credenciales correctas. */
+        }
+    }
+
+    /**
+     * Borra lo que ya no sirve de la bitácora.
+     *
+     * Va aquí, de propina en algunos registros, y NO en una tarea
+     * programada: el despliegue puede no tener cron, o tenerlo y que nadie
+     * se acuerde de darlo de alta, y entonces la tabla crece para siempre.
+     * Enganchada al propio login, se mantiene sola esté donde esté.
+     *
+     * Se lanza una vez de cada 200 aproximadamente. Con un ataque en curso
+     * eso son varias limpiezas por hora; en uso normal, uno de cada tantos
+     * inicios de sesión paga un DELETE que no borra nada y que el índice
+     * por fecha resuelve al instante.
+     */
+    function intentos_purgar(PDO $con, bool $ahora = false): int
+    {
+        if (!$ahora && random_int(1, 200) !== 1) { return -1; }
+
+        try {
+            $st = $con->prepare(
+                "DELETE FROM seguridad_intento_acceso
+                  WHERE intento_fecha < NOW() - INTERVAL :d DAY"
+            );
+            $st->bindValue(':d', intentos_dias_retencion(), PDO::PARAM_INT);
+            $st->execute();
+            return $st->rowCount();
+        } catch (\Throwable $e) {
+            return -1;
+        }
+    }
+
+    /**
+     * Retrato de los intentos fallidos recientes.
+     *
+     * Sirve para avisar: hasta ahora el sistema anotaba el ataque y no se
+     * lo contaba a nadie. Devuelve los numeros y, sobre todo, si lo visto
+     * merece que alguien lo mire.
+     */
+    function intentos_resumen(int $horas = 24): array
+    {
+        $vacio = ['fallos' => 0, 'usuarios' => 0, 'ips' => 0,
+                  'inexistentes' => 0, 'horas' => $horas, 'alarma' => false];
+
+        $con = seguridad_conexion();
+        if ($con === null) { return $vacio; }
+
+        try {
+            $st = $con->prepare(
+                "SELECT COUNT(*) fallos,
+                        COUNT(DISTINCT intento_usuario) usuarios,
+                        COUNT(DISTINCT intento_ip) ips,
+                        /* Tanteos contra cuentas que NO existen: es la
+                           firma de un barrido, no de alguien que olvido
+                           su clave. */
+                        COUNT(DISTINCT CASE WHEN u.usuario_id IS NULL
+                                            THEN i.intento_usuario END) inexistentes
+                   FROM seguridad_intento_acceso i
+                   LEFT JOIN seguridad_usuario u ON u.usuario_usuario = i.intento_usuario
+                  WHERE i.intento_exito = 0
+                    AND i.intento_fecha >= NOW() - INTERVAL :h HOUR"
+            );
+            $st->bindValue(':h', $horas, PDO::PARAM_INT);
+            $st->execute();
+            $r = $st->fetch(PDO::FETCH_ASSOC) ?: [];
+        } catch (\Throwable $e) {
+            return $vacio;
+        }
+
+        $resumen = [
+            'fallos'       => (int)($r['fallos'] ?? 0),
+            'usuarios'     => (int)($r['usuarios'] ?? 0),
+            'ips'          => (int)($r['ips'] ?? 0),
+            'inexistentes' => (int)($r['inexistentes'] ?? 0),
+            'horas'        => $horas,
+        ];
+
+        /* Se avisa cuando el patron no se parece a un despiste. Un usuario
+           que se equivoca tres veces no debe generar ninguna alarma; que
+           alguien tantee cuentas inexistentes, si. */
+        $resumen['alarma'] = $resumen['inexistentes'] >= 3
+                          || $resumen['fallos']       >= 30
+                          || $resumen['usuarios']     >= 5;
+
+        return $resumen;
+    }
+
+    /**
+     * ¿Hay que frenar este intento?
+     *
+     * Devuelve true y, por referencia, los segundos que faltan para que
+     * la ventana se abra de nuevo, y por cuál de las dos vías se frenó.
+     */
+    function intentos_frenado(string $usuario, ?int &$segundos = null, ?string &$motivo = null): bool
+    {
+        $segundos = 0;
+        $motivo   = '';
+
+        $con = seguridad_conexion();
+        if ($con === null) { return false; }
+
+        $ventana = intentos_ventana_minutos();
+
+        try {
+            /* Sólo cuentan los fallos POSTERIORES al último acierto: quien
+               ya entró bien parte de cero, y no arrastra los tropiezos de
+               antes de acordarse de su clave. */
+            $st = $con->prepare(
+                "SELECT COUNT(*) fallos, TIMESTAMPDIFF(SECOND, NOW(), MIN(intento_fecha) + INTERVAL :v2 MINUTE) espera
+                   FROM seguridad_intento_acceso
+                  WHERE intento_usuario = :u
+                    AND intento_exito   = 0
+                    AND intento_fecha  >= NOW() - INTERVAL :v1 MINUTE
+                    AND intento_fecha  > COALESCE((
+                            SELECT MAX(intento_fecha) FROM seguridad_intento_acceso
+                             WHERE intento_usuario = :u2 AND intento_exito = 1
+                        ), '1000-01-01')"
+            );
+            $st->execute([':u' => $usuario, ':u2' => $usuario, ':v1' => $ventana, ':v2' => $ventana]);
+            $r = $st->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            if ((int)($r['fallos'] ?? 0) >= intentos_max_usuario()) {
+                $segundos = max(1, (int)$r['espera']);
+                $motivo   = 'usuario';
+                return true;
+            }
+
+            $ip = intentos_ip_binaria();
+            if ($ip === null) { return false; }
+
+            $st = $con->prepare(
+                "SELECT COUNT(*) fallos, TIMESTAMPDIFF(SECOND, NOW(), MIN(intento_fecha) + INTERVAL :v2 MINUTE) espera
+                   FROM seguridad_intento_acceso
+                  WHERE intento_ip     = :ip
+                    AND intento_exito  = 0
+                    AND intento_fecha >= NOW() - INTERVAL :v1 MINUTE"
+            );
+            $st->bindValue(':ip', $ip, PDO::PARAM_LOB);
+            $st->bindValue(':v1', $ventana, PDO::PARAM_INT);
+            $st->bindValue(':v2', $ventana, PDO::PARAM_INT);
+            $st->execute();
+            $r = $st->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            if ((int)($r['fallos'] ?? 0) >= intentos_max_ip()) {
+                $segundos = max(1, (int)$r['espera']);
+                $motivo   = 'ip';
+                return true;
+            }
+        } catch (\Throwable $e) {
+            /* Ante un fallo de la bitácora no se cierra el paso: se deja
+               pasar a la comprobación de contraseña, que es la barrera
+               que de verdad importa. */
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Hash de descarte contra el que verificar cuando el usuario no
+     * existe.
+     *
+     * Sin esto, una cuenta inexistente responde en ~9 ms y una real en
+     * ~121 ms, porque sólo la segunda llega a ejecutar bcrypt. Esa
+     * diferencia, medida desde fuera, revela qué usuarios existen por
+     * mucho que el mensaje de error sea el mismo para todos. Verificando
+     * siempre contra un hash real, los dos caminos cuestan lo mismo.
+     */
+    function intentos_hash_senuelo(): string
+    {
+        /* Hash real de una cadena que nadie va a teclear. Se deja escrito
+           en lugar de generarlo en cada petición: password_hash() cuesta
+           lo mismo que la propia verificación y duplicaría el tiempo.
+
+           Tiene que ser un bcrypt BIEN FORMADO. Uno inventado a mano pasa
+           por password_get_info() como "unknown", y aunque hoy consuma un
+           tiempo parecido, no hay ninguna garantía de que siga siendo así. */
+        return '$2y$10$7zxSdOMoTt4ztK41elEZg.B0DbZ9I0oBclQ8zaTnFwxdheDegW6p6';
     }
 }

@@ -10,7 +10,7 @@
     $optionsQR=array('sx'=>4,'sy'=>4,'p'=>-12);
     
     $insHorario = new asistenciaController();	
-	$horario_id = ($url[1] != "") ? $insHorario->limpiarCadena($url[1]) : 0;
+	$horario_id = ds_id_de_url($url, 1, APP_URL . 'asistenciaListHorario/');
     $filename = "app/views/dist/img/temp/".$horario_id.".jpeg";
 
 	$datoshorario=$insHorario->seleccionarDatos("Unico","asistencia_horario","horario_id",$horario_id);

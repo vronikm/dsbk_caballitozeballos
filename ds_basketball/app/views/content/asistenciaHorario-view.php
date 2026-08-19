@@ -41,7 +41,8 @@
 	<title><?php echo APP_NAME; ?> | Horarios</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
 	
@@ -168,9 +169,7 @@
 									</table>
 								</div>
 
-								<button type="submit" class="btn btn-success btn-sm">Guardar</button>								
-								<button onclick="cerrarPestana()" class="btn btn-info btn-sm">Cancelar</button>
-								<button type="reset" class="btn btn-dark btn-sm">Limpiar</button>								
+								<?php echo ds_acciones_form('', ['limpiar' => true, 'salirJs' => 'cerrarPestana()', 'volver' => 'Cerrar']); ?>
 							</form>	
 
 						</div>

@@ -486,7 +486,7 @@ class coreController
 
             /* La contrasena solo se toca si se escribio una nueva. */
             if ($clave !== '') {
-                if (!clave_valida($clave, $motivo)) {
+                if (!clave_valida($clave, $motivo, $usuario)) {
                     return $this->alerta('simple', 'Contraseña no válida', $motivo, 'error');
                 }
                 $campos .= ", usuario_clave = :c, usuario_fechacambioclave = NOW()";
@@ -501,7 +501,7 @@ class coreController
                 : $this->alerta('simple', 'Error', 'No fue posible actualizar el usuario.', 'error');
         }
 
-        if (!clave_valida($clave, $motivo)) {
+        if (!clave_valida($clave, $motivo, $usuario)) {
             return $this->alerta('simple', 'Contraseña no válida', $motivo, 'error');
         }
 

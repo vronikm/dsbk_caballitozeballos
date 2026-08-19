@@ -4,7 +4,7 @@
 	use app\controllers\pagosController;
 	$insAlumno = new pagosController();	
 
-	$alumno=$insLogin->limpiarCadena($url[1]);
+	$alumno = ds_id_de_url($url, 1, APP_URL . 'pagosList/');
 
 	$datos=$insAlumno->BuscarAlumnoDescuento($alumno);
 	
@@ -41,8 +41,12 @@
 			$descuento_fecha 		= date('Y-m-d');
 			$descuento_estado		= "";
 		}
-	}else{
-		include "app/views/inc/error_alert.php";
+	} else {
+		/* El registro no existe: se vuelve al listado. Antes se
+		   incluía el aviso pero la vista seguía ejecutando con
+		   $datos aún como PDOStatement y moría más abajo. */
+		header("Location: " . APP_URL . "pagosList/");
+		exit();
 	}
 ?>
 
@@ -55,7 +59,8 @@
 	<title><?php echo APP_NAME; ?> | Descuentos</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
 	
@@ -245,8 +250,7 @@
 												</div>											
 											</div>	
 											
-											<button type="submit" class="btn btn-success btn-sm">Guardar</button>
-											<button type="reset" class="btn btn-dark btn-sm">Limpiar</button>
+											<?php echo ds_acciones_form('', ['limpiar' => true]); ?>
 
 											</form>							
 										</div>										

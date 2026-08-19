@@ -62,11 +62,25 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                     <div class="form-row">
                         <div class="form-group col-md-4">
-                            <label for="instalacion_codigo">Código <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="instalacion_codigo" name="instalacion_codigo"
-                                   maxlength="20" required
-                                   value="<?php echo htmlspecialchars((string)($inst['instalacion_codigo'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
-                            <small class="text-muted">Único dentro de la sede. Ej.: CAN-01</small>
+                            <label for="instalacion_codigo">Código</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="instalacion_codigo" name="instalacion_codigo"
+                                       maxlength="20" placeholder="Se genera solo"
+                                       value="<?php echo htmlspecialchars((string)($inst['instalacion_codigo'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php if ($esAlta): ?>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="btnCodigoAuto"
+                                            title="Volver a la propuesta del sistema">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <small class="text-muted" id="ayudaCodigo">
+                                <?php echo $esAlta
+                                    ? 'Se asigna solo al elegir sede y tipo. Puede escribir el suyo.'
+                                    : 'Único dentro de la sede. Déjelo en blanco para reasignarlo.'; ?>
+                            </small>
                         </div>
 
                         <div class="form-group col-md-8">
@@ -153,6 +167,75 @@ require_once __DIR__ . "/inc/layout-top.php";
     clase.addEventListener('change', alternar);
     alternar();
 })();
+
+<?php if ($esAlta): ?>
+/* El código se propone solo: prefijo de la sede + tipo + consecutivo.
+   Sólo en el alta: cambiarlo en una instalación ya registrada obligaría a
+   volver a rotularla.
+
+   Quien escriba su propio código manda: en cuanto se teclea en el campo se
+   deja de proponer, y sólo el botón de recarga devuelve el mando al
+   sistema. Esto es comodidad de la pantalla; la asignación de verdad la
+   hace el servidor al guardar. */
+(function () {
+    var campo  = document.getElementById('instalacion_codigo');
+    var sede   = document.getElementById('instalacion_sedeid');
+    var clase  = document.getElementById('instalacion_clase');
+    var boton  = document.getElementById('btnCodigoAuto');
+    var ayuda  = document.getElementById('ayudaCodigo');
+
+    if (!campo || !sede || !clase) { return; }
+
+    var propuesto = '';      /* lo último que propuso el servidor */
+    var manual    = false;   /* el usuario tomó el mando */
+
+    campo.addEventListener('input', function () {
+        manual = true;
+        ayuda.textContent = 'Código propio. Use el botón para volver a la propuesta.';
+    });
+
+    function proponer() {
+        if (manual || !sede.value) { return; }
+
+        var datos = new FormData();
+        datos.append('modulo_arena', 'sugerirCodigo');
+        datos.append('instalacion_sedeid', sede.value);
+        datos.append('instalacion_clase', clase.value);
+        datos.append('instalacion_id', '0');
+
+        fetch('<?php echo APP_URL; ?>ajax/arenaAjax.php', {
+            method: 'POST', body: datos, credentials: 'same-origin'
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            if (manual || !d || !d.codigo) { return; }
+            propuesto = d.codigo;
+            campo.value = d.codigo;
+            ayuda.textContent = 'Propuesto por el sistema. Puede escribir otro.';
+        })
+        .catch(function () {
+            /* Si la propuesta no llega, el campo sigue editable y el
+               servidor asigna el código igualmente al guardar. */
+            ayuda.textContent = 'Déjelo en blanco y el sistema lo asignará al guardar.';
+        });
+    }
+
+    if (boton) {
+        boton.addEventListener('click', function () {
+            manual = false;
+            campo.value = '';
+            proponer();
+        });
+    }
+
+    sede.addEventListener('change', proponer);
+    clase.addEventListener('change', proponer);
+
+    /* Al abrir el alta la sede suele venir vacía; si el navegador la
+       recuerda, se propone de entrada. */
+    proponer();
+})();
+<?php endif; ?>
 </script>
 
 <?php require_once __DIR__ . "/inc/layout-bottom.php"; ?>

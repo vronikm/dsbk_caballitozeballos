@@ -319,3 +319,50 @@ td.ds-tabla-acciones .ds-hueco {
     .ds-core .tabla-permisos th.accion,
     .ds-core .tabla-permisos td.accion { width: auto; }
 }
+
+/* ==========================================================================
+   Botones propios de las filas de tabla
+   --------------------------------------------------------------------------
+   .btn-ver y .btn-actualizar no existen en Bootstrap: son de este proyecto.
+   Vivian dentro de dist/css/adminlte.css, el fichero del proveedor, donde
+   una actualizacion de AdminLTE los habria borrado y los botones "Ver" y
+   "Actualizar" de todas las tablas se habrian quedado sin color.
+
+   Se escriben con dos clases (.btn.btn-ver) a proposito: core.css se carga
+   ANTES que adminlte.css en las 70 vistas, y .btn de Bootstrap lleva
+   background-color:transparent. Con una sola clase la especificidad
+   empataria y ganaria el que carga despues, es decir Bootstrap.
+
+   El borde iba en verde —hsl(135,33%,68%)— en los dos, copiado de
+   .btn-actualizar sin ajustarlo: .btn-ver es azul y llevaba borde verde, y
+   ambos hover terminaban en #1e7e34. Aqui cada uno lleva el borde de su
+   propio color.
+   ========================================================================== */
+
+.btn.btn-actualizar {
+    color: #312f2f;
+    background-color: #9ed3ab;
+    border-color: #92c8a0;
+    box-shadow: none;
+}
+
+.btn.btn-actualizar:hover,
+.btn.btn-actualizar:focus {
+    color: #fff;
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn.btn-ver {
+    color: #312f2f;
+    background-color: #9fb9d0;
+    border-color: #8aa8c3;
+    box-shadow: none;
+}
+
+.btn.btn-ver:hover,
+.btn.btn-ver:focus {
+    color: #fff;
+    background-color: #17a2b8;
+    border-color: #138496;
+}

@@ -2,21 +2,31 @@
 	use app\controllers\reporteController;
 	$insAsistencia = new reporteController();
 
-	if(isset($_POST['asistencia_fecha_inicio'])){
+	/*
+	| Sin filtro, el rango arranca en la última marcación registrada.
+	|
+	| Cuando todavía no hay ninguna —una escuela recién puesta en marcha—
+	| MAX() devuelve NULL, esa cadena vacía viajaba al SQL como fecha y
+	| MySQL rechazaba la consulta con "Incorrect DATETIME value: ''". La
+	| pantalla moría por no tener datos, que es justo cuando más se abre.
+	*/
+	$ultimaMarcacion = static function($insAsistencia) {
+		$fila = $insAsistencia->fechaMarcacion()->fetch();
+		$fecha = is_array($fila) ? trim((string)($fila['FECHA_MAXIMA'] ?? '')) : '';
+		return $fecha !== '' ? $fecha : date('Y-m-d');
+	};
+
+	if(isset($_POST['asistencia_fecha_inicio']) && $_POST['asistencia_fecha_inicio'] !== ''){
 		$fecha_inicio = $insAsistencia->limpiarCadena($_POST['asistencia_fecha_inicio']);
 	} ELSE{
-		$fecha_inicio = $insAsistencia->fechaMarcacion();
-		$fecha_inicio = $fecha_inicio->fetch(); 
-		$fecha_inicio = $fecha_inicio['FECHA_MAXIMA'];
+		$fecha_inicio = $ultimaMarcacion($insAsistencia);
 	}
 
-	if(isset($_POST['asistencia_fecha_fin'])){
+	if(isset($_POST['asistencia_fecha_fin']) && $_POST['asistencia_fecha_fin'] !== ''){
 		$fecha_fin = $insAsistencia->limpiarCadena($_POST['asistencia_fecha_fin']);
 	} ELSE{
-		$fecha_fin = $insAsistencia->fechaMarcacion();
-		$fecha_fin = $fecha_fin->fetch(); 
-		$fecha_fin = $fecha_fin['FECHA_MAXIMA'];
-	}	
+		$fecha_fin = $ultimaMarcacion($insAsistencia);
+	}
 
 	if(isset($_POST['empleado_nombre'])){
 		$empleado_nombre = $insAsistencia->limpiarCadena($_POST['empleado_nombre']);
@@ -33,7 +43,8 @@
 	<title><?php echo APP_NAME; ?>| Asistencia de empleados</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
 	<!-- DataTables -->
@@ -125,7 +136,7 @@
 								<div class="col-md-3">
 									<div class="form-group">
 										<label for="empleado_nombre">.</label>
-										<button type="submit" class="form-control btn btn-info">Buscar</button>
+										<?php echo ds_boton_buscar(); ?>
 									</div>
 								</div>
 							</div>					

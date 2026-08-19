@@ -11,7 +11,7 @@
     $filename = "app/views/dist/img/temp/";
 
     $insListaHorario = new asistenciaController();	
-	$horario_id      = $insListaHorario->limpiarCadena($url[1]);
+	$horario_id = ds_id_de_url($url, 1, APP_URL . 'asistenciaHorarioLista/');
     $datos=$insListaHorario->BuscarHorarioSede($horario_id);
 
     if($datos->rowCount()==1){
