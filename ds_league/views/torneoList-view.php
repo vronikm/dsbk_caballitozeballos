@@ -57,12 +57,13 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <th>Temporada</th>
                                 <th>Deporte</th>
                                 <th class="text-right">Categorías</th>
+                                <th>Portal</th>
                                 <th class="ds-tabla-acciones"></th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php if (!$torneos): ?>
-                            <tr><td colspan="5" class="text-center text-muted py-4">
+                            <tr><td colspan="6" class="text-center text-muted py-4">
                                 No hay torneos<?php echo $temporadaId > 0 ? ' en esta temporada' : ''; ?>.
                             </td></tr>
                         <?php else: foreach ($torneos as $o): ?>
@@ -71,6 +72,25 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <td class="text-muted"><?php echo $h($o['temporada_nombre']); ?></td>
                                 <td class="text-muted"><?php echo $h($o['torneo_deporte']); ?></td>
                                 <td class="text-right"><?php echo (int)$o['categorias']; ?></td>
+                                <td>
+                                    <?php $pub = ($o['torneo_publico'] ?? 'N') === 'S'; ?>
+                                    <?php if (puede_eliminar('torneoList')): ?>
+                                        <button type="button" data-id="<?php echo (int)$o['torneo_id']; ?>"
+                                                class="btn btn-xs btn-<?php echo $pub ? 'success' : 'outline-secondary'; ?> js-publicar"
+                                                data-nombre="<?php echo $h($o['torneo_nombre']); ?>"
+                                                data-pub="<?php echo $pub ? 'S' : 'N'; ?>">
+                                            <i class="fas fa-<?php echo $pub ? 'globe' : 'eye-slash'; ?> mr-1"></i>
+                                            <?php echo $pub ? 'Publicado' : 'Privado'; ?>
+                                        </button>
+                                    <?php else: ?>
+                                        <span class="badge badge-<?php echo $pub ? 'success' : 'secondary'; ?>">
+                                            <?php echo $pub ? 'Publicado' : 'Privado'; ?></span>
+                                    <?php endif; ?>
+                                    <?php if ($pub && !empty($o['torneo_slug'])): ?>
+                                        <br><a href="<?php echo APP_URL; ?>publico/t/<?php echo $h($o['torneo_slug']); ?>/"
+                                               target="_blank" rel="noopener" style="font-size:.78rem;">ver en el portal ↗</a>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="ds-tabla-acciones">
                                     <a href="<?php echo APP_URL; ?>categoriaList/<?php echo (int)$o['torneo_id']; ?>/"
                                        class="btn btn-sm btn-ver" title="Ver categorías">
@@ -147,5 +167,53 @@ require_once __DIR__ . "/inc/layout-top.php";
 
 <?php endif; ?>
 
+<script>
+/* Publicar abre al mundo datos que incluyen nombres de menores, así que se
+   confirma explícitamente y el aviso dice qué se publica y qué no. Un
+   interruptor silencioso convertiría una decisión de privacidad en un clic
+   distraído. */
+(function () {
+    document.querySelectorAll('.js-publicar').forEach(function (b) {
+        b.addEventListener('click', function () {
+            var pub = b.getAttribute('data-pub') === 'S';
+            var nom = b.getAttribute('data-nombre');
+
+            Swal.fire({
+                icon:  pub ? 'question' : 'warning',
+                title: pub ? '¿Retirar del portal?' : '¿Publicar en el portal?',
+                html:  pub
+                    ? '«' + nom + '» dejará de ser visible para el público.'
+                    : '<div style="text-align:left">«' + nom + '» pasará a ser visible para '
+                      + 'cualquiera, sin necesidad de iniciar sesión.<br><br>'
+                      + '<b>Se publica:</b> nombres, dorsales, equipos, resultados y estadísticas.'
+                      + '<br><b>No se publica:</b> documentos de identidad ni fechas de nacimiento. '
+                      + 'Las fotografías, sólo con autorización registrada.</div>',
+                showCancelButton:  true,
+                confirmButtonText: pub ? 'Retirar' : 'Publicar',
+                cancelButtonText:  'Cancelar',
+                confirmButtonColor: pub ? '#6c757d' : '#28a745'
+            }).then(function (r) {
+                if (!r.isConfirmed) { return; }
+
+                var fd = new FormData();
+                fd.append('modulo_league', 'publicarTorneo');
+                fd.append('torneo_id', b.getAttribute('data-id'));
+                fd.append('publicar', pub ? 'N' : 'S');
+
+                fetch('<?php echo APP_URL; ?>ajax/leagueAjax.php', { method: 'POST', body: fd })
+                    .then(function (x) { return x.json(); })
+                    .then(function (j) {
+                        Swal.fire({ icon: j.icono, title: j.titulo, text: j.texto })
+                            .then(function () { if (j.tipo === 'recargar') { location.reload(); } });
+                    })
+                    .catch(function () {
+                        Swal.fire({ icon: 'error', title: 'Sin respuesta',
+                                    text: 'No se pudo contactar con el servidor.' });
+                    });
+            });
+        });
+    });
+})();
+</script>
 <?php require_once __DIR__ . "/inc/editor-fila.php"; ?>
 <?php require_once __DIR__ . "/inc/layout-bottom.php"; ?>

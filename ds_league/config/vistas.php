@@ -35,4 +35,12 @@ return [
 
     /* Cuadro eliminatorio de una categoría */
     'playoffPanel',
+
+    /* Estadísticas */
+    'actaPartido',
+    'rankingPanel',
+
+    /* Finanzas */
+    'conceptoList',
+    'cobranzaPanel',
 ];

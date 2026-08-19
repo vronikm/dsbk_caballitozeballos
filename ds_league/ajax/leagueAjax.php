@@ -76,6 +76,7 @@ switch ($_POST['modulo_league']) {
 
     case 'guardarTemporada':  echo $ins->guardarTemporada();  break;
     case 'guardarTorneo':     echo $ins->guardarTorneo();     break;
+    case 'publicarTorneo':    echo $ins->publicarTorneo();    break;
     case 'guardarCategoria':  echo $ins->guardarCategoria();  break;
     case 'guardarEquipo':     echo $ins->guardarEquipo();     break;
 
@@ -91,6 +92,7 @@ switch ($_POST['modulo_league']) {
 
     case 'guardarPersona':     echo $ins->guardarPersona();     break;
     case 'habilitarPlantilla': echo $ins->habilitarPlantilla(); break;
+    case 'consentimientoImagen': echo $ins->consentimientoImagen(); break;
     case 'bajaPlantilla':      echo $ins->bajaPlantilla();      break;
 
     case 'ejecutarSorteo':
@@ -99,8 +101,35 @@ switch ($_POST['modulo_league']) {
 
     case 'guardarFase':      echo $ins->guardarFase();      break;
 
+    case 'guardarActa':
+        echo (new \league\controllers\estadisticaController())->guardarActa();
+        break;
+
     case 'generarLlaves':
         echo (new \league\controllers\playoffController())->generarLlaves();
+        break;
+
+    /* Finanzas. Cada caso nombra su método de forma literal: despachar
+       con $ins->{$_POST[...]}() sería más corto, pero convierte un campo
+       del formulario en el nombre del método a ejecutar. */
+    case 'guardarConcepto':
+        echo (new \league\controllers\finanzaController())->guardarConcepto();
+        break;
+
+    case 'guardarObligacion':
+        echo (new \league\controllers\finanzaController())->guardarObligacion();
+        break;
+
+    case 'guardarAbono':
+        echo (new \league\controllers\finanzaController())->guardarAbono();
+        break;
+
+    case 'anularAbono':
+        echo (new \league\controllers\finanzaController())->anularAbono();
+        break;
+
+    case 'anularObligacion':
+        echo (new \league\controllers\finanzaController())->anularObligacion();
         break;
 
     default:
