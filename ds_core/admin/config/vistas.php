@@ -20,5 +20,6 @@ return [
     'sedeList', 'sedeForm',
     'catalogoList',
     'facturacionConfigSri',
+    'puntoEmisionList',
     'carnetConfig',
 ];

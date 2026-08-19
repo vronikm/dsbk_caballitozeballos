@@ -1498,4 +1498,168 @@ class coreController
 
         return $html;
     }
+
+    /*======================================================================
+      Puntos de emisión por módulo
+
+      El SRI numera los comprobantes por (tipo, establecimiento, punto de
+      emisión) y exige que el secuencial no se repita dentro de esa terna.
+      Dar a cada módulo su propio punto hace imposible la colisión; esta
+      pantalla es donde se asigna.
+      ====================================================================*/
+
+    /** Puntos configurados, con el uso real de cada uno. */
+    public function puntosEmision(): array
+    {
+        /* Se cuenta desde la vista consolidada y no desde una tabla
+           concreta: es lo que permite ver que un punto ya fue usado,
+           venga el comprobante del módulo que venga. */
+        return $this->filas(
+            "SELECT P.*,
+                    COALESCE(S.secuencial_actual, 0) AS contador,
+                    (SELECT COUNT(*) FROM v_comprobante_emitido V
+                      WHERE V.establecimiento = P.punto_establecimiento
+                        AND V.punto_emision   = P.punto_codigo) AS emitidos
+               FROM facturas_electronicas_punto_emision P
+               LEFT JOIN facturas_electronicas_secuenciales S
+                      ON S.establecimiento   = P.punto_establecimiento
+                     AND S.punto_emision     = P.punto_codigo
+                     AND S.tipo_comprobante  = '01'
+              ORDER BY P.punto_establecimiento, P.punto_codigo"
+        );
+    }
+
+    /** Módulos del ecosistema que todavía no tienen punto asignado. */
+    public function modulosSinPunto(): array
+    {
+        $asignados = array_column($this->puntosEmision(), 'punto_modulo');
+        $libres    = [];
+
+        foreach (ds_modulos() as $clave => $m) {
+            /* Core no factura: administra. */
+            if ($clave === 'core') { continue; }
+            if (!in_array($clave, $asignados, true)) {
+                $libres[$clave] = $m['nombre'];
+            }
+        }
+
+        return $libres;
+    }
+
+    /**
+     * Da de alta o modifica un punto de emisión.
+     *
+     * Sólo el superadministrador. No es una restricción de comodidad: de
+     * aquí depende con qué numeración se emiten documentos con validez
+     * tributaria.
+     */
+    public function guardarPuntoEmision(): string
+    {
+        if (!es_superadministrador()) {
+            return $this->alerta('simple', 'Acceso denegado',
+                'Sólo el superadministrador puede configurar puntos de emisión.', 'error');
+        }
+
+        $id      = (int)($_POST['punto_id'] ?? 0);
+        $modulo  = strtolower(trim((string)($_POST['punto_modulo'] ?? '')));
+        $estab   = trim((string)($_POST['punto_establecimiento'] ?? ''));
+        $codigo  = trim((string)($_POST['punto_codigo'] ?? ''));
+        $inicio  = (int)($_POST['punto_secuencialinicio'] ?? 1);
+        $desc    = trim((string)($_POST['punto_descripcion'] ?? ''));
+        $estado  = ($_POST['punto_estado'] ?? 'I') === 'A' ? 'A' : 'I';
+
+        /*----------  Forma de los códigos  ----------*/
+        /* El SRI los define como tres dígitos exactos. Se valida aquí y no
+           sólo en el navegador, porque este endpoint es alcanzable sin
+           pasar por el formulario. */
+        if (!preg_match('/^\d{3}$/', $estab)) {
+            return $this->alerta('simple', 'Establecimiento no válido',
+                'El código de establecimiento son tres dígitos, por ejemplo 001.', 'error');
+        }
+        if (!preg_match('/^\d{3}$/', $codigo)) {
+            return $this->alerta('simple', 'Punto de emisión no válido',
+                'El punto de emisión son tres dígitos, por ejemplo 002.', 'error');
+        }
+        if ($inicio < 1 || $inicio > 999999999) {
+            return $this->alerta('simple', 'Secuencial no válido',
+                'El número inicial debe estar entre 1 y 999999999.', 'error');
+        }
+
+        /*----------  El módulo tiene que existir  ----------*/
+        $conocidos = array_keys(ds_modulos());
+        if (!in_array($modulo, $conocidos, true) || $modulo === 'core') {
+            return $this->alerta('simple', 'Módulo no válido',
+                'Seleccione un módulo del ecosistema que pueda emitir comprobantes.', 'error');
+        }
+
+        /*----------  No retroceder por debajo de lo ya emitido  ----------*/
+        /* La base impide duplicar el número de un comprobante, pero no
+           impide dejar el punto apuntando a un secuencial ya usado: eso se
+           descubriría al emitir, con el documento a medio hacer. Se
+           comprueba aquí, que es donde el aviso todavía sirve. */
+        $emitido = (int)$this->escalar(
+            "SELECT COALESCE(MAX(CAST(secuencial AS UNSIGNED)), 0)
+               FROM v_comprobante_emitido
+              WHERE establecimiento = :e AND punto_emision = :p",
+            [':e' => $estab, ':p' => $codigo]
+        );
+
+        if ($emitido > 0 && $inicio <= $emitido) {
+            return $this->alerta('simple', 'Numeración ya utilizada',
+                "Desde {$estab}-{$codigo} ya se emitió hasta el número {$emitido}. "
+                . 'El número inicial debe ser mayor.', 'error');
+        }
+
+        /*----------  Escritura  ----------*/
+        try {
+            $con = $this->con();
+            if ($con === null) {
+                return $this->alerta('simple', 'Sin conexión',
+                    'No fue posible conectar con la base de datos.', 'error');
+            }
+
+            if ($id > 0) {
+                $sql = "UPDATE facturas_electronicas_punto_emision
+                           SET punto_modulo = :m, punto_establecimiento = :e,
+                               punto_codigo = :c, punto_secuencialinicio = :i,
+                               punto_descripcion = :d, punto_estado = :s,
+                               punto_usuarioid = :u
+                         WHERE punto_id = :id";
+                $par = [':id' => $id];
+            } else {
+                $sql = "INSERT INTO facturas_electronicas_punto_emision
+                               (punto_modulo, punto_establecimiento, punto_codigo,
+                                punto_secuencialinicio, punto_descripcion,
+                                punto_estado, punto_usuarioid)
+                        VALUES (:m, :e, :c, :i, :d, :s, :u)";
+                $par = [];
+            }
+
+            $st = $con->prepare($sql);
+            $st->execute($par + [
+                ':m' => $modulo, ':e' => $estab, ':c' => $codigo, ':i' => $inicio,
+                ':d' => $desc,   ':s' => $estado, ':u' => usuario_actual_id() ?: null,
+            ]);
+
+            $accion = $id > 0 ? 'actualizó' : 'creó';
+            return $this->alerta('recargar', 'Punto de emisión guardado',
+                "Se {$accion} el punto {$estab}-{$codigo} para el módulo {$modulo}.", 'success');
+
+        } catch (\PDOException $e) {
+            /* Hay dos claves únicas en la tabla, y decir cuál se violó es
+               la diferencia entre un aviso útil y «error de base de datos». */
+            if ((int)$e->getCode() === 23000) {
+                $msg = strpos($e->getMessage(), 'uk_fepe_punto') !== false
+                    ? "El punto {$estab}-{$codigo} ya está asignado a otro módulo. "
+                      . 'Un punto de emisión pertenece a uno solo: es lo que impide '
+                      . 'que dos módulos generen el mismo número.'
+                    : "El módulo «{$modulo}» ya tiene un punto asignado en el "
+                      . "establecimiento {$estab}.";
+                return $this->alerta('simple', 'Asignación duplicada', $msg, 'error');
+            }
+
+            return $this->alerta('simple', 'No se pudo guardar',
+                'La base de datos rechazó el cambio.', 'error');
+        }
+    }
 }

@@ -64,8 +64,10 @@ if (!function_exists('ds_modulos')) {
                 'icono'   => 'fas fa-trophy',
                 'acento'  => 'var(--ds-league)',
                 'url'     => DS_LEAGUE_URL,
-                'activo'  => false,
-                'accesos' => [],
+                'activo'  => true,
+                'accesos' => [
+                    ['texto' => 'Panel', 'icono' => 'fas fa-trophy', 'ruta' => 'panel/'],
+                ],
             ],
             'insights' => [
                 'nombre'  => 'Insights',
