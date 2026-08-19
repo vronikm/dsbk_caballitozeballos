@@ -394,7 +394,7 @@ if (!function_exists('usuario_autenticado')) {
             $sql = $con->prepare(
                 "SELECT menu_vista
                    FROM seguridad_menu
-                  WHERE menu_estado = 'A'
+                  WHERE menu_estado IN ('A', 'O')
                     AND menu_vista NOT IN ('', 'No')
                     AND (:modulo = '' OR menu_modulo = :modulo2)"
             );
@@ -410,7 +410,7 @@ if (!function_exists('usuario_autenticado')) {
                    JOIN seguridad_menu    m ON m.menu_id = p.permiso_menuid
                   WHERE p.permiso_rolid  = :rol
                     AND p.permiso_estado = 'A'
-                    AND m.menu_estado    = 'A'
+                    AND m.menu_estado    IN ('A', 'O')
                     AND (:modulo = '' OR m.menu_modulo = :modulo2)"
             );
             $sql->execute([':rol' => rol_actual(), ':modulo' => $modulo, ':modulo2' => $modulo]);
@@ -435,6 +435,29 @@ if (!function_exists('usuario_autenticado')) {
     }
 
     /**
+     * Modo estricto de permisos.
+     *
+     * Por omision, una vista que no esta registrada en seguridad_menu no se
+     * restringe: son las vistas de apoyo de Basketball —formularios, PDF,
+     * recibos— cuyo control efectivo esta en el listado desde el que se
+     * abren. Es una decision deliberada y ahi se mantiene.
+     *
+     * Un modulo puede rechazarla declarando DS_PERMISOS_ESTRICTOS en su
+     * config/app.php. Entonces lo no registrado se DENIEGA. League lo hace:
+     * tendra vistas de sorteo, designacion y carga de resultados, y ahi
+     * olvidar registrar una no puede significar dejarla abierta a cualquiera
+     * con acceso al modulo.
+     *
+     * La constante la define el config del modulo, que carga su propio front
+     * controller, de modo que el alcance es la peticion en curso y no hace
+     * falta mantener ninguna lista central.
+     */
+    function permisos_estrictos(): bool
+    {
+        return defined('DS_PERMISOS_ESTRICTOS') && DS_PERMISOS_ESTRICTOS === true;
+    }
+
+    /**
      * Indica si el rol de la sesion puede abrir una vista.
      *
      * Regla deliberada: una vista que NO esta registrada en seguridad_menu
@@ -455,7 +478,7 @@ if (!function_exists('usuario_autenticado')) {
         }
 
         if (!in_array($vista, $permisos['registradas'], true)) {
-            return true;
+            return !permisos_estrictos();
         }
 
         return !empty($permisos['permitidas'][$vista]['ver']);
@@ -481,7 +504,7 @@ if (!function_exists('usuario_autenticado')) {
         }
 
         if (!in_array($vista, $permisos['registradas'], true)) {
-            return true;
+            return !permisos_estrictos();
         }
 
         return !empty($permisos['permitidas'][$vista][$accion]);

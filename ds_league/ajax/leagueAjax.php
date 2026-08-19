@@ -1,0 +1,113 @@
+<?php
+/*
+|--------------------------------------------------------------------------
+| Endpoint AJAX de DigiSports League
+|--------------------------------------------------------------------------
+| Mismo guard que el resto del ecosistema: sesión, origen (anti-CSRF) y
+| acceso al módulo. El permiso por acción lo comprueba cada método del
+| controlador, porque depende de la operación concreta.
+|
+| Este archivo NO decide permisos: sólo comprueba que la petición sea
+| legítima y despacha. Si se resolviera aquí, habría dos sitios donde
+| mirar cuando algo se deniega.
+*/
+
+require_once __DIR__ . "/../config/app.php";
+require_once __DIR__ . "/../../ds_core/autoload.php";
+require_once __DIR__ . "/../../ds_core/modulos.php";
+require_once __DIR__ . "/../../ds_core/inc/session_start.php";
+
+use league\controllers\competenciaController;
+
+function league_rechazar(int $codigo, array $alerta): void
+{
+    if (!headers_sent()) {
+        http_response_code($codigo);
+        header('Content-Type: application/json; charset=utf-8');
+    }
+    echo json_encode($alerta, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+/*----------  1. Sesión activa  ----------*/
+if (!usuario_autenticado()) {
+    league_rechazar(401, [
+        'tipo'   => 'redireccionar',
+        'icono'  => 'warning',
+        'titulo' => 'Sesión finalizada',
+        'texto'  => 'Su sesión expiró. Vuelva a ingresar.',
+        'url'    => DS_BASKETBALL_URL . 'login/',
+    ]);
+}
+
+/*----------  2. Origen de la petición (anti-CSRF)  ----------*/
+if (!origen_es_valido()) {
+    league_rechazar(403, [
+        'tipo'   => 'simple',
+        'icono'  => 'error',
+        'titulo' => 'Solicitud bloqueada',
+        'texto'  => 'La solicitud no proviene del sistema. Recargue la página e inténtelo de nuevo.',
+    ]);
+}
+
+/*----------  3. Acceso al módulo  ----------*/
+if (!usuario_tiene_modulo(DS_MODULO)) {
+    league_rechazar(403, [
+        'tipo'   => 'simple',
+        'icono'  => 'error',
+        'titulo' => 'Acceso denegado',
+        'texto'  => 'Su rol no tiene acceso al módulo League.',
+    ]);
+}
+
+/*----------  Despacho  ----------*/
+if (!isset($_POST['modulo_league'])) {
+    league_rechazar(400, [
+        'tipo'   => 'simple',
+        'icono'  => 'error',
+        'titulo' => 'Solicitud incompleta',
+        'texto'  => 'No se indicó la operación a realizar.',
+    ]);
+}
+
+$ins = new competenciaController();
+
+switch ($_POST['modulo_league']) {
+
+    case 'guardarTemporada':  echo $ins->guardarTemporada();  break;
+    case 'guardarTorneo':     echo $ins->guardarTorneo();     break;
+    case 'guardarCategoria':  echo $ins->guardarCategoria();  break;
+    case 'guardarEquipo':     echo $ins->guardarEquipo();     break;
+
+    case 'inscribirEquipo':   echo $ins->inscribirEquipo();   break;
+    case 'estadoInscripcion': echo $ins->cambiarEstadoInscripcion(); break;
+
+    case 'generarFixture':    echo $ins->generarFixtureAjax(); break;
+    case 'guardarResultado':  echo $ins->guardarResultado();   break;
+    case 'programarPartido': echo $ins->programarPartido();  break;
+
+    case 'guardarDesignacion':  echo $ins->guardarDesignacion();  break;
+    case 'eliminarDesignacion': echo $ins->eliminarDesignacion(); break;
+
+    case 'guardarPersona':     echo $ins->guardarPersona();     break;
+    case 'habilitarPlantilla': echo $ins->habilitarPlantilla(); break;
+    case 'bajaPlantilla':      echo $ins->bajaPlantilla();      break;
+
+    case 'ejecutarSorteo':
+        echo (new \league\controllers\sorteoController())->ejecutarSorteo();
+        break;
+
+    case 'guardarFase':      echo $ins->guardarFase();      break;
+
+    case 'generarLlaves':
+        echo (new \league\controllers\playoffController())->generarLlaves();
+        break;
+
+    default:
+        league_rechazar(400, [
+            'tipo'   => 'simple',
+            'icono'  => 'error',
+            'titulo' => 'Operación desconocida',
+            'texto'  => 'La operación solicitada no existe en este módulo.',
+        ]);
+}

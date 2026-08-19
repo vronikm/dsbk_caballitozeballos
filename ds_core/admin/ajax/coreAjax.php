@@ -88,6 +88,11 @@ switch ($_POST['modulo_core']) {
     case 'eliminarSede':     echo $insCore->eliminarSede();       break;
 
     case 'guardarValorCatalogo':  echo $insCore->guardarValorCatalogo();  break;
+
+    /* La numeracion de comprobantes es del contribuyente, no de un
+       modulo: el metodo comprueba por su cuenta que quien llama sea el
+       superadministrador. */
+    case 'guardarPuntoEmision': echo $insCore->guardarPuntoEmision(); break;
     case 'eliminarValorCatalogo': echo $insCore->eliminarValorCatalogo(); break;
 
     default:

@@ -92,3 +92,15 @@
     /* Botones, iconos y pies de formulario del ecosistema: el estándar de
        interfaz vive en funciones para que las vistas no puedan desviarse. */
     require_once __DIR__ . "/ui.php";
+
+    /* Puntos de emisión y numeración de comprobantes. Va en el núcleo
+       porque la numeración es del contribuyente y no de un módulo: si
+       cada uno llevara su propia cuenta, dos podrían emitir el mismo
+       número y el SRI lo rechazaría por duplicado. */
+    require_once __DIR__ . "/facturacion.php";
+
+    /* Subida y normalizacion de imagenes. Vive en el nucleo porque la
+       validacion de un archivo subido es identica en todos los modulos
+       y es de los puntos mas atacados: repetirla es garantizar que una
+       copia se quede corta. */
+    require_once __DIR__ . "/imagenes.php";
