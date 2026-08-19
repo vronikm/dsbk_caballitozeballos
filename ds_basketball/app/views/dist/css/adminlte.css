@@ -2661,31 +2661,9 @@ fieldset:disabled a.btn {
   box-shadow: none;
 }
 
-.btn-actualizar {
-  color: #312f2f;
-  background-color: #9ed3ab;
-  border-color: hsl(135, 33%, 68%);
-  box-shadow: none;
-}
-
-.btn-actualizar:hover {
-  color: #fff;
-  background-color: #218838;
-  border-color: #1e7e34;
-}
-
-.btn-ver {
-  color: #312f2f;
-  background-color: #9fb9d0;
-  border-color: hsl(135, 33%, 68%);
-  box-shadow: none;
-}
-
-.btn-ver:hover {
-  color: #fff;
-  background-color: #17a2b8;
-  border-color: #1e7e34;
-}
+/* .btn-actualizar y .btn-ver se movieron a ds_core/assets/css/core.css.
+   No son de AdminLTE: eran anadidos de este proyecto dentro del fichero
+   del proveedor, y una actualizacion los habria borrado. */
 
 .btn-success:hover {
   color: #fff;

@@ -12,8 +12,12 @@
     $optionsQR=array('sx'=>4,'sy'=>4,'p'=>-12);
     $filename = "app/views/dist/img/temp/";
 
-    $categoriaid = ($url[1] != "") ? $url[1] : 0;
-    $sedeid      = ($url[2] != "") ? $url[2] : 0;
+    /* Los dos son opcionales: 0 significa "todas". Pero había que leerlos
+       con isset: al faltar el segmento en la URL, PHP emitía un aviso, ese
+       aviso ya era salida enviada y FPDF abortaba con "Some data has
+       already been output". El PDF moría por un warning, no por los datos. */
+    $categoriaid = isset($url[1]) && $url[1] !== "" ? (int)$url[1] : 0;
+    $sedeid      = isset($url[2]) && $url[2] !== "" ? (int)$url[2] : 0;
 
     if($sedeid == 0){
         $sedeid_Logo = 1;

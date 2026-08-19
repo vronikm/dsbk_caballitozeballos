@@ -2,7 +2,7 @@
 	use app\controllers\empleadoController;
 	$insDescEgreso = new empleadoController();	
 
-	$egresoid=$insLogin->limpiarCadena($url[1]);
+	$egresoid = ds_id_de_url($url, 1, APP_URL . 'egresoList/');
 
 	$datos=$insDescEgreso->BuscarRubroEgreso($egresoid);
 	
@@ -16,8 +16,12 @@
 			$valor_descargado=$datos['egreso_descargado'];
 		}
 
-	}else{
-		include "app/views/inc/error_alert.php";
+	} else {
+		/* El registro no existe: se vuelve al listado. Antes se
+		   incluía el aviso pero la vista seguía ejecutando con
+		   $datos aún como PDOStatement y moría más abajo. */
+		header("Location: " . APP_URL . "egresoList/");
+		exit();
 	}
 	$fechahoy = date('Y-m-d');
 ?>
@@ -31,7 +35,8 @@
 	<title><?php echo APP_NAME; ?> | Saldo pendiente egresos</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
 	

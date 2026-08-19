@@ -153,6 +153,105 @@ class arenaController
         return $r[0] ?? null;
     }
 
+    /**
+     * Prefijo de la sede para el código: "Sauces" -> SAU, "La Salle" -> LAS.
+     *
+     * Si dos sedes comparten las tres primeras letras se alarga a cuatro, y
+     * si aún así coinciden se añade el id. Sin eso "SAU-C01" podría nombrar
+     * dos canchas distintas, que es justo lo que el código debe evitar
+     * cuando alguien lo dice por teléfono o por radio.
+     */
+    private function prefijoSede(int $sedeid): string
+    {
+        static $cache = null;
+
+        if ($cache === null) {
+            $cache  = [];
+            $usados = [];
+
+            foreach ($this->filas("SELECT sede_id, sede_nombre FROM general_sede ORDER BY sede_id") as $s) {
+                $letras = strtoupper(preg_replace('/[^A-Za-z]/', '', \ds_sin_tildes((string)$s['sede_nombre'])));
+                if ($letras === '') { $letras = 'SEDE'; }
+
+                $p = substr($letras, 0, 3);
+                if (isset($usados[$p])) { $p = substr($letras, 0, 4); }
+                if (isset($usados[$p])) { $p = substr($letras, 0, 3) . $s['sede_id']; }
+
+                $usados[$p] = true;
+                $cache[(int)$s['sede_id']] = $p;
+            }
+        }
+
+        return $cache[$sedeid] ?? ('S' . $sedeid);
+    }
+
+    /**
+     * Propone el código de una instalación: PREFIJO-CLASE + consecutivo.
+     * Ej.: SAU-C01 (cancha 1 de Sauces), LAS-R02 (residencia 2 de La Salle).
+     *
+     * El código sólo servía para impedir duplicados dentro de la sede, pero
+     * se pedía a mano, así que cada alta inventaba su propia convención.
+     * Generándolo aquí la restricción sigue en pie y el usuario deja de
+     * cargar con ella.
+     */
+    public function codigoSugerido(int $sedeid, string $clase, int $excluirId = 0): string
+    {
+        $clase = ($clase === 'R') ? 'R' : 'C';
+        $raiz  = $this->prefijoSede($sedeid) . '-' . $clase;
+
+        /* Se parte del mayor consecutivo ya usado con esa raíz, no del
+           número de filas: si se da de baja una instalación intermedia el
+           conteo se repetiría y chocaría con la clave única. */
+        $mayor = (int)$this->escalar(
+            "SELECT COALESCE(MAX(CAST(SUBSTRING(instalacion_codigo, :largo) AS UNSIGNED)), 0)
+               FROM dsa_instalacion
+              WHERE instalacion_sedeid = :s
+                AND instalacion_codigo LIKE :raiz",
+            [':largo' => strlen($raiz) + 1, ':s' => $sedeid, ':raiz' => $raiz . '%']
+        );
+
+        /* Aun así se comprueba hueco por hueco: pueden convivir códigos
+           escritos a mano que no sigan el patrón y ocupen el sitio. La
+           consulta NO filtra por estado, porque la clave única tampoco lo
+           hace: una instalación dada de baja sigue reservando su código. */
+        for ($n = $mayor + 1; $n <= $mayor + 999; $n++) {
+            $codigo = $raiz . str_pad((string)$n, 2, '0', STR_PAD_LEFT);
+
+            $ocupado = (int)$this->escalar(
+                "SELECT COUNT(1) FROM dsa_instalacion
+                  WHERE instalacion_sedeid = :s AND instalacion_codigo = :c
+                    AND instalacion_id <> :id",
+                [':s' => $sedeid, ':c' => $codigo, ':id' => $excluirId]
+            );
+            if ($ocupado === 0) { return $codigo; }
+        }
+
+        /* Mil huecos ocupados seguidos no debería ocurrir; antes que
+           devolver vacío y dejar el alta sin código, se desempata. */
+        return $raiz . substr((string)time(), -4);
+    }
+
+    /**
+     * Versión AJAX de codigoSugerido(), para que el formulario muestre la
+     * propuesta en cuanto se eligen sede y tipo.
+     */
+    public function sugerirCodigo(): string
+    {
+        if (!puede_crear('instalacionList') && !puede_editar('instalacionList')) {
+            return json_encode(['codigo' => '']);
+        }
+
+        $sedeid = (int)($_POST['instalacion_sedeid'] ?? 0);
+        $clase  = (string)($_POST['instalacion_clase'] ?? 'C');
+        $id     = (int)($_POST['instalacion_id'] ?? 0);
+
+        if ($sedeid <= 0 || !$this->sedeOfreceAlquiler($sedeid)) {
+            return json_encode(['codigo' => '']);
+        }
+
+        return json_encode(['codigo' => $this->codigoSugerido($sedeid, $clase, $id)]);
+    }
+
     public function guardarInstalacion(): string
     {
         $id = (int)($_POST['instalacion_id'] ?? 0);
@@ -175,8 +274,10 @@ class arenaController
         $detalle   = trim((string)($_POST['instalacion_detalle'] ?? ''));
         $estado    = ($_POST['instalacion_estado'] ?? 'A') === 'A' ? 'A' : 'I';
 
-        if ($nombre === '' || $codigo === '') {
-            return $this->alerta('simple', 'Faltan datos', 'Código y nombre son obligatorios.', 'error');
+        /* El código ya no se exige: si llega en blanco se genera más abajo,
+           en cuanto la sede esté validada. */
+        if ($nombre === '') {
+            return $this->alerta('simple', 'Faltan datos', 'El nombre es obligatorio.', 'error');
         }
 
         /* general_sede es MyISAM y no admite clave foránea: la referencia
@@ -193,15 +294,29 @@ class arenaController
         /* Las residencias no tienen piso ni condición de cubierta. */
         if ($clase === 'R') { $cubierta = null; $pisoid = 0; }
 
+        /* Código en blanco: se genera aquí, no en el navegador. El
+           formulario sólo muestra la propuesta; si alguien envía la
+           petición sin pasar por él, el código se asigna igual. */
+        if ($codigo === '') {
+            $codigo = $this->codigoSugerido($sedeid, $clase, $id);
+        }
+
         $duplicado = (int)$this->escalar(
             "SELECT COUNT(1) FROM dsa_instalacion
               WHERE instalacion_sedeid = :s AND instalacion_codigo = :c
-                AND instalacion_estado <> 'E' AND instalacion_id <> :id",
+                AND instalacion_id <> :id",
             [':s' => $sedeid, ':c' => $codigo, ':id' => $id]
         );
+        /* Antes se excluían las bajas ('E'), pero la clave única de la
+           tabla no las excluye: el código de una instalación dada de baja
+           sigue ocupado. La comprobación decía "libre", el INSERT moría
+           contra la clave y el usuario sólo veía "No fue posible crear la
+           instalación", sin saber por qué. */
         if ($duplicado > 0) {
             return $this->alerta('simple', 'Código repetido',
-                "Ya existe una instalación con el código {$codigo} en esa sede.", 'error');
+                "Ya existe una instalación con el código {$codigo} en esa sede. "
+                . "Puede ser una instalación dada de baja: el código le sigue perteneciendo. "
+                . "Deje el campo en blanco y el sistema asignará el siguiente libre.", 'error');
         }
 
         $params = [

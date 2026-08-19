@@ -5,15 +5,19 @@
     include 'app/lib/fpdf.php';
 
     $insfrmLPD = new representanteController();	
-	$repreid = $insfrmLPD->limpiarCadena($url[1]);
+	$repreid = ds_id_de_url($url, 1, APP_URL . 'representanteList/');
 
 	$datos=$insfrmLPD->datosRepresentante($repreid);
 	
 	if($datos->rowCount()==1){
 		$datos=$datos->fetch();
 		$repre_sedeid = $datos['SEDE'];	
-	}else{
-		include "app/views/inc/error_alert.php";
+	} else {
+		/* El registro no existe: se vuelve al listado. Antes se
+		   incluía el aviso pero la vista seguía ejecutando con
+		   $datos aún como PDOStatement y moría más abajo. */
+		header("Location: " . APP_URL . "representanteList/");
+		exit();
 	}
 
 	$sede=$insfrmLPD->informacionSede($repre_sedeid);

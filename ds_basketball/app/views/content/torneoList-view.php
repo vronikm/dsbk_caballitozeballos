@@ -49,7 +49,8 @@
 	<title><?php echo APP_NAME; ?>| Torneos</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
 	<!-- iCheck for checkboxes and radio inputs -->
@@ -194,11 +195,7 @@
 														<input type="text" class="form-control" id="torneo_descripcion" name="torneo_descripcion" value="<?php echo $torneo_descripcion; ?>">
 													</div>	
 												</div>	
-												<div class="col-md-12">						
-													<button type="submit" class="btn btn-success btn-xs">Guardar</button>
-													<a href="<?php echo APP_URL; ?>torneoList/" class="btn btn-info btn-xs">Cancelar</a>
-													<button type="reset" class="btn btn-dark btn-xs">Limpiar</button>						
-												</div>	
+												<?php echo ds_acciones_form(APP_URL . 'torneoList/', ['limpiar' => true]); ?>	
 											</div>
 										</div>
 									</div>									

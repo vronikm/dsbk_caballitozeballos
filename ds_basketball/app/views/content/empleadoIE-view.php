@@ -170,7 +170,8 @@
 	<title><?php echo APP_NAME; ?> | Registro ingresos</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">	
 	<!-- daterange picker -->
@@ -436,12 +437,7 @@
 														';
 													}
 												?>
-												<div class="card-footer">						
-													<button type="submit" class="btn btn-success btn-sm">Guardar</button>
-													<button type="reset" class="btn btn-dark btn-sm">Limpiar</button>
-													
-													<a href="<?php echo APP_URL.'empleadoIE/'.$empleadoid.'/'; ?>" class="btn btn-info btn-sm">Cancelar</a>
-												</div>					
+												<?php echo ds_acciones_form(APP_URL . 'empleadoIE/' . $empleadoid . '/', ['limpiar' => true]); ?>
 											</form>
 											<div class="tab-custom-content">
 												<p class="lead mb-0">Pagos realizados</p>
@@ -534,12 +530,7 @@
 														</div>	
 													</div>												
 												</div>
-												<div class="card-footer">						
-													<button type="submit" class="btn btn-success btn-sm">Guardar</button>
-													<button type="reset" class="btn btn-dark btn-sm">Limpiar</button>
-													
-													<a href="<?php echo APP_URL.'empleadoIE/'.$empleadoid.'/'; ?>" class="btn btn-info btn-sm">Cancelar</a>
-												</div>					
+												<?php echo ds_acciones_form(APP_URL . 'empleadoIE/' . $empleadoid . '/', ['limpiar' => true]); ?>
 											</form>
 											<div class="tab-custom-content">
 												<p class="lead mb-0">Egresos registrados</p>

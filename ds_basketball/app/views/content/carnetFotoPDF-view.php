@@ -14,7 +14,7 @@ $tempDir    = "app/views/dist/img/temp/";
 // ============================================
 // OBTENER DATOS DEL ALUMNO
 // ============================================
-$alumnoid = $insCarnet->limpiarCadena($url[1]);
+$alumnoid = ds_id_de_url($url, 1, APP_URL . 'carnetList/');
 
 $datosRaw = $insCarnet->infoAlumnoCarnet($alumnoid);
 

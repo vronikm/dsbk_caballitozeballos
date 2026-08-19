@@ -72,6 +72,7 @@ switch ($_POST['modulo_arena']) {
 
     case 'guardarInstalacion':  echo $insArena->guardarInstalacion();  break;
     case 'eliminarInstalacion': echo $insArena->eliminarInstalacion(); break;
+    case 'sugerirCodigo':       echo $insArena->sugerirCodigo();       break;
 
     case 'guardarHorario':      echo $insArena->guardarHorario();      break;
     case 'eliminarHorario':     echo $insArena->eliminarHorario();     break;

@@ -8,7 +8,7 @@
 	$generator = new barcode_generator();
 	$optionsQR=array('sx'=>4,'sy'=>4,'p'=>-12);
     
-    $alumnoid=$insCarnet->limpiarCadena($url[1]);
+    $alumnoid = ds_id_de_url($url, 1, APP_URL . 'carnetList/');
     $datos=$insCarnet->infoAlumnoCarnet($alumnoid);
 
     if(is_string($datos)){

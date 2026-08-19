@@ -91,9 +91,9 @@
 							'.$this->siPuede('eliminar','asistenciaHora','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_asistencia" value="eliminar">
 								<input type="hidden" name="hora_id" value="'.$rows['hora_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;">Eliminar</button>
+								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'	
-							<a href="'.APP_URL.'asistenciaHora/'.$rows['hora_id'].'/" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;" >Editar</a>							
+							<a href="'.APP_URL.'asistenciaHora/'.$rows['hora_id'].'/" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>							
 						</td>
 					</tr>';	
 			}
@@ -104,7 +104,7 @@
 			$horaid=$this->limpiarCadena($_POST['hora_id']);
 
 			# Verificando pago #
-			$datos = $this->ejecutarConsulta("SELECT * FROM asistencia_hora WHERE hora_id = '$horaid'");			
+			$datos = $this->ejecutarConsulta("SELECT * FROM asistencia_hora WHERE hora_id = :hora", [':hora' => (int)$horaid]);			
 			if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -186,9 +186,9 @@
 		
 			$consulta_datos="SELECT H.* 
 					FROM asistencia_hora H										
-					WHERE hora_id = ".$horaid;	
+					WHERE hora_id = :hora";	
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':hora' => (int)$horaid]);		
 			return $datos;
 		}
 
@@ -231,9 +231,9 @@
 		public function BuscarLugar($lugarid){		
 			$consulta_datos="SELECT L.* 
 					FROM asistencia_lugar L									
-					WHERE L.lugar_id = ".$lugarid;	
+					WHERE L.lugar_id = :lugar";	
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':lugar' => (int)$lugarid]);		
 			return $datos;
 		}
 
@@ -263,10 +263,10 @@
 							'.$this->siPuede('eliminar','asistenciaLugar','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_asistencia" value="eliminar_lugar">
 								<input type="hidden" name="lugar_id" value="'.$rows['lugar_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;">Eliminar</button>
+								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'							
 
-							<a href="'.APP_URL.'asistenciaLugar/'.$rows['lugar_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 5px;" >Editar</a>
+							<a href="'.APP_URL.'asistenciaLugar/'.$rows['lugar_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>
 							
 						</td>
 					</tr>';	
@@ -298,10 +298,10 @@
 							LEFT JOIN asistencia_lugar ON lugar_id = detalle_lugarid
 							LEFT JOIN asistencia_hora ON hora_id = detalle_horaid 
 							LEFT JOIN sujeto_empleado ON empleado_id = detalle_profesorid	 
-							WHERE detalle_horarioid = ".$horario_id
-							.' ORDER BY detalle_dia';
+							WHERE detalle_horarioid = :horario
+							ORDER BY detalle_dia";
 							
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':horario' => (int)$horario_id]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$LU = "";
@@ -376,8 +376,8 @@
 		}
 
 		public function informacionSede($sedeid){		
-			$consulta_datos="SELECT * FROM general_sede WHERE sede_id  = $sedeid";
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$consulta_datos="SELECT * FROM general_sede WHERE sede_id = :sede";
+			$datos = $this->ejecutarConsulta($consulta_datos, [':sede' => (int)$sedeid]);		
 			return $datos;
 		}
 
@@ -393,7 +393,7 @@
 							FROM asistencia_horario 
 							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id 
 							LEFT JOIN asistencia_hora ON hora_id = detalle_horaid 
-							WHERE horario_id = ".$horario_id."
+							WHERE horario_id = :horario
 							GROUP BY Categoria
 							
 							UNION ALL
@@ -408,7 +408,7 @@
 							FROM asistencia_horario 
 							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id 
 							LEFT JOIN asistencia_lugar ON lugar_id = detalle_lugarid
-							WHERE horario_id = ".$horario_id."
+							WHERE horario_id = :horario
 							GROUP BY Categoria
 							
 							UNION ALL
@@ -423,11 +423,11 @@
 							FROM asistencia_horario 
 							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id 
 							LEFT JOIN sujeto_empleado ON empleado_id = detalle_profesorid	 
-							WHERE horario_id = ".$horario_id."
+							WHERE horario_id = :horario
 							GROUP BY Categoria";
 		
 							
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':horario' => (int)$horario_id]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.="	<tr style='font-size: 14px'>					
@@ -453,9 +453,9 @@
 							FROM asistencia_horario 
 							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id 
 							LEFT JOIN asistencia_hora ON hora_id = detalle_horaid 
-							WHERE horario_id = ".$horario_id;		
+							WHERE horario_id = :horario";		
 							
-			$datos = $this->ejecutarConsulta($consulta_datos);			
+			$datos = $this->ejecutarConsulta($consulta_datos, [':horario' => (int)$horario_id]);			
 			return $datos;
 		}
 
@@ -470,9 +470,9 @@
 							FROM asistencia_horario 
 							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id 
 							LEFT JOIN asistencia_lugar ON lugar_id = detalle_lugarid
-							WHERE horario_id = ".$horario_id;		
+							WHERE horario_id = :horario";		
 							
-			$datos = $this->ejecutarConsulta($consulta_datos);			
+			$datos = $this->ejecutarConsulta($consulta_datos, [':horario' => (int)$horario_id]);			
 			return $datos;
 		}
 
@@ -487,9 +487,9 @@
 							FROM asistencia_horario 
 							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id 
 							LEFT JOIN sujeto_empleado ON empleado_id = detalle_profesorid	 
-							WHERE horario_id = ".$horario_id;		
+							WHERE horario_id = :horario";		
 							
-			$datos = $this->ejecutarConsulta($consulta_datos);	
+			$datos = $this->ejecutarConsulta($consulta_datos, [':horario' => (int)$horario_id]);	
 			return $datos;
 		}
 
@@ -516,9 +516,9 @@
 			$consulta_datos="SELECT lugar_id, lugar_sedeid, lugar_nombre 
 								FROM asistencia_lugar 
 								WHERE  lugar_estado = 'A' 
-									AND lugar_sedeid  = ".$sedeid;		
+									AND lugar_sedeid = :sede";		
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':sede' => (int)$sedeid]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				if($lugarid != 0){
@@ -629,6 +629,9 @@
 			} 	
 
 			$tabla="";
+			/* El array se arma a la par que la consulta: cada rama
+			   registra solo lo que su SQL usa. */
+			$parametros = [];
 			$consulta_datos="SELECT distinct AH.*, IFNULL(TOTAL.TOTAL,0) ALUMNOS 
 								FROM asistencia_horario AH
 									INNER JOIN asistencia_horario_detalle on detalle_horarioid = horario_id
@@ -637,8 +640,10 @@
 												FROM asistencia_asignahorario
 												GROUP BY asignahorario_horarioid
 										)TOTAL ON TOTAL.HORARIOID = AH.horario_id 
-								WHERE (horario_nombre LIKE '".$horario_nombre."' 
-								OR horario_detalle LIKE '".$horario_detalle."') ";			
+								WHERE (horario_nombre LIKE :nombre 
+								OR horario_detalle LIKE :detalle) ";			
+			$parametros[':nombre']  = $horario_nombre;
+			$parametros[':detalle'] = $horario_detalle;
 
 			if($horario_nombre=="" && $horario_detalle=="" ){
 				$consulta_datos="SELECT distinct AH.*, IFNULL(TOTAL.TOTAL,0) ALUMNOS
@@ -650,13 +655,16 @@
 												GROUP BY asignahorario_horarioid
 										)TOTAL ON TOTAL.HORARIOID = AH.horario_id
 									WHERE horario_nombre <> '' ";
+				$parametros = [];
 			}
 
 			if($horario_sedeid!=""){
 				if($horario_sedeid == 0){
-					$consulta_datos .= " and horario_sedeid  <> '".$horario_sedeid."'"; 
+					$consulta_datos .= " and horario_sedeid <> :sede"; 
+					$parametros[':sede'] = $horario_sedeid;
 				}else{
-					$consulta_datos .= " and horario_sedeid  = '".$horario_sedeid."'"; 
+					$consulta_datos .= " and horario_sedeid = :sede"; 
+					$parametros[':sede'] = $horario_sedeid;
 				}
 			}else{
 				$consulta_datos = "SELECT distinct AH.*, IFNULL(TOTAL.TOTAL,0) ALUMNOS
@@ -668,10 +676,11 @@
 												GROUP BY asignahorario_horarioid
 										)TOTAL ON TOTAL.HORARIOID = AH.horario_id
 									WHERE horario_nombre = '' ";
+				$parametros = [];
 			}			
 
 			$consulta_datos .= " AND horario_estado <> 'E'"; 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				if ($rows['horario_estado'] == 'A'){
@@ -691,18 +700,18 @@
 						<td>'.$estado.'</td>
 						<td>'.$rows['ALUMNOS'].'</td>
 						<td>							
-							<a href="'.APP_URL.'asistenciaHorarioJugador/'.$rows['horario_id'].'/'.$horario_sedeid.'/" target="_blank" class="btn float-right btn-warning btn-xs" style="margin-right: 5px;">Asignar alumnos</a>
-							<a href="'.APP_URL.'asistenciaHorarioLista/'.$rows['horario_id'].'/" target="_blank" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;">Ver lista</a>
+							<a href="'.APP_URL.'asistenciaHorarioJugador/'.$rows['horario_id'].'/'.$horario_sedeid.'/" target="_blank" class="btn float-right btn-warning btn-xs" style="margin-right: 5px;"><i class="fas fa-link mr-1"></i>Asignar alumnos</a>
+							<a href="'.APP_URL.'asistenciaHorarioLista/'.$rows['horario_id'].'/" target="_blank" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;"><i class="fas fa-list mr-1"></i>Ver lista</a>
 						</td>
 						<td>
 							'.$this->siPuede('eliminar','asistenciaListHorario','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_asistencia" value="eliminar_horario">
 								<input type="hidden" name="horario_id" value="'.$rows['horario_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;">Eliminar</button>
+								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'	
 
-							<a href="'.APP_URL.'asistenciaHorario/'.$rows['horario_id'].'/" target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;">Editar</a>
-							<a href="'.APP_URL.'asistenciaVerHorario/'.$rows['horario_id'].'/" target="_blank" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;">Ver</a>
+							<a href="'.APP_URL.'asistenciaHorario/'.$rows['horario_id'].'/" target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>
+							<a href="'.APP_URL.'asistenciaVerHorario/'.$rows['horario_id'].'/" target="_blank" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;" title="Ver" aria-label="Ver"><i class="fas fa-eye"></i></a>
 						</td>
 					</tr>';	
 			}
@@ -711,6 +720,9 @@
 
 		public function listarHorariosProfesor($profesor_id){					
 			$tabla="";
+			/* La rama del administrador no usa :profesor, asi que el
+			   parametro solo acompana a la que si lo lleva. */
+			$parametros=[];
 			if ($_SESSION['rol'] <> 1 && $_SESSION['rol'] <> 2){
 				$consulta_datos="SELECT distinct AH.*, IFNULL(TOTAL.TOTAL,0) ALUMNOS, sede_nombre, lugar_nombre
 									FROM asistencia_horario AH
@@ -726,7 +738,8 @@
 									INNER JOIN asistencia_horario_detalle on detalle_horarioid = AH.horario_id
 									WHERE AH.horario_estado <> 'E'
 										AND detalle_lugarid = lugar_id
-										AND detalle_profesorid =".$profesor_id;	
+										AND detalle_profesorid = :profesor";	
+				$parametros[':profesor'] = (int)$profesor_id;
 			} else{
 				$consulta_datos="SELECT distinct AH.*, IFNULL(TOTAL.TOTAL,0) ALUMNOS, sede_nombre, lugar_nombre
 									FROM asistencia_horario AH
@@ -744,7 +757,7 @@
 										AND detalle_lugarid = lugar_id";	
 			}
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				if ($rows['horario_estado'] == 'A'){
@@ -765,7 +778,7 @@
 						<td>'.$rows['horario_detalle'].'</td>						
 						<td>'.$rows['ALUMNOS'].'</td>						
 						<td>
-							<a href="'.APP_URL.'asistenciaAlumno/'.$rows['horario_id'].'/" target="_blank" class="btn float-right btn-warning btn-xs">Listado de alumnos</a>
+							<a href="'.APP_URL.'asistenciaAlumno/'.$rows['horario_id'].'/" target="_blank" class="btn float-right btn-warning btn-xs"><i class="fas fa-list mr-1"></i>Listado de alumnos</a>
 						</td>
 					</tr>';	
 			}
@@ -775,7 +788,7 @@
 			$lugarid =$this->limpiarCadena($_POST['lugar_id']);
 
 			# Verificando pago #
-			$datos = $this->ejecutarConsulta("SELECT lugar_id FROM asistencia_lugar WHERE lugar_id = '$lugarid '");			
+			$datos = $this->ejecutarConsulta("SELECT lugar_id FROM asistencia_lugar WHERE lugar_id = :lugar", [':lugar' => (int)$lugarid]);			
 			if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -1048,7 +1061,7 @@
 					"icono"=>"success"
 				];
 
-				$detalle=$this->ejecutarConsulta("SELECT detalle_horarioid FROM asistencia_horario_detalle WHERE detalle_horarioid='$horario_id'");
+				$detalle=$this->ejecutarConsulta("SELECT detalle_horarioid FROM asistencia_horario_detalle WHERE detalle_horarioid = :horario", [':horario' => (int)$horario_id]);
 				if($detalle->rowCount()>0){
 					$this->eliminarRegistro("asistencia_horario_detalle","detalle_horarioid",$horario_id);					
 				}	
@@ -1154,14 +1167,14 @@
 			$tabla="";
 			$condiciones = [];
 			
-			$condiciones[] = "A.alumno_estado = 'A' AND A.alumno_sedeid='".$sede."' AND A.alumno_id NOT IN (SELECT asignahorario_alumnoid FROM asistencia_asignahorario)";
+			$condiciones[] = "A.alumno_estado = 'A' AND A.alumno_sedeid = :sede AND A.alumno_id NOT IN (SELECT asignahorario_alumnoid FROM asistencia_asignahorario)";
 
 			$consulta_datos = "SELECT S.sede_nombre, A.* FROM sujeto_alumno A
 							   INNER JOIN general_sede S ON S.sede_id = A.alumno_sedeid
 							   WHERE " . implode(" AND ", $condiciones);
 			
 			// Ejecutar consulta			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':sede' => (int)$sede]);
 			$datos = $datos->fetchAll();
 
 			foreach($datos as $rows){
@@ -1175,7 +1188,7 @@
 						<td>												
 							<input type="hidden" name="modulo_asistencia" value="asignar_alumno">	
 							<input type="hidden" name="horario_id" value="'.$horario_id.'">					
-							<button type="submit" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;"">Agregar</button>					
+							<button type="submit" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;"><i class="fas fa-plus mr-1"></i>Agregar</button>					
 						</td>
 						</form>').'
 					</tr>
@@ -1194,16 +1207,16 @@
 										GROUP BY detalle_horarioid, detalle_horaid, H.hora_inicio, H.hora_fin
 									)HORA ON HORA.detalle_horarioid = AH.horario_id
 
-								WHERE AH.horario_estado = 'A' AND AH.horario_id = ".$horario_id;
+								WHERE AH.horario_estado = 'A' AND AH.horario_id = :horario";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':horario' => (int)$horario_id]);		
 			return $datos;
 		}
 
 		public function BuscarSede($sede_id){
-			$consulta_datos="SELECT sede_nombre FROM general_sede WHERE sede_id = ".$sede_id;	
+			$consulta_datos="SELECT sede_nombre FROM general_sede WHERE sede_id = :sede";	
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':sede' => (int)$sede_id]);		
 			return $datos;
 		}
 
@@ -1270,9 +1283,9 @@
 										YEAR(A.alumno_fechanacimiento) AS CATEGORIA, H.*
 								FROM asistencia_asignahorario H
 										INNER JOIN sujeto_alumno A ON A.alumno_id = H.asignahorario_alumnoid
-								WHERE H.asignahorario_horarioid = $horarioid";
+								WHERE H.asignahorario_horarioid = :horario";
 			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':horario' => (int)$horarioid]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.='					
@@ -1284,7 +1297,7 @@
 						<td>'.$rows['CATEGORIA'].'</td>
 						<td>												
 							<input type="hidden" name="modulo_asistencia" value="eliminar_alumnolista">												
-							<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;">Eliminar</button>					
+							<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>					
 						</td>
 						</form>').'
 					</tr>
@@ -1389,28 +1402,28 @@
 								<input type="hidden" name="estado" value="J">
 								<input type="hidden" name="fecha" value="'.$fecha_formateada.'">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">						
-								<button type="submit" class="btn float-right '.$btn_j.' btn-xs" style="margin-right: 5px;"">Justificado</button>
+								<button type="submit" class="btn float-right '.$btn_j.' btn-xs" style="margin-right: 5px;">Justificado</button>
 							</form>').'
 							'.$this->siPuede('crear','asistencia','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" data-recargar-directo>
 								<input type="hidden" name="modulo_asistencia" value="asistencia">
 								<input type="hidden" name="estado" value="F">
 								<input type="hidden" name="fecha" value="'.$fecha_formateada.'">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">						
-								<button type="submit" class="btn float-right '.$btn_f.' btn-xs" style="margin-right: 5px;"">Falta</button>
+								<button type="submit" class="btn float-right '.$btn_f.' btn-xs" style="margin-right: 5px;">Falta</button>
 							</form>').'
 							'.$this->siPuede('crear','asistencia','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" data-recargar-directo>
 								<input type="hidden" name="modulo_asistencia" value="asistencia">	
 								<input type="hidden" name="estado" value="A">
 								<input type="hidden" name="fecha" value="'.$fecha_formateada.'">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">						
-								<button type="submit" class="btn float-right '.$btn_a.' btn-xs" style="margin-right: 5px;"">Atraso</button>
+								<button type="submit" class="btn float-right '.$btn_a.' btn-xs" style="margin-right: 5px;">Atraso</button>
 							</form>').'
 							'.$this->siPuede('crear','asistencia','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" data-recargar-directo>
 								<input type="hidden" name="modulo_asistencia" value="asistencia">	
 								<input type="hidden" name="estado" value="P">
 								<input type="hidden" name="fecha" value="'.$fecha_formateada.'">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">						
-								<button type="submit" class="btn float-right '.$btn_p.' btn-xs" style="margin-right: 5px;"">Presente</button>
+								<button type="submit" class="btn float-right '.$btn_p.' btn-xs" style="margin-right: 5px;">Presente</button>
 							</form>').'
 						</td>						
 					</tr>
@@ -1522,9 +1535,9 @@
 			$consulta_datos="SELECT S.sede_nombre, H.* 
 								FROM asistencia_horario H
         							INNER JOIN general_sede S ON S.sede_id = H.horario_sedeid
-							WHERE H.horario_estado = 'A' AND H.horario_id = ".$horario_id;	
+							WHERE H.horario_estado = 'A' AND H.horario_id = :horario";	
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':horario' => (int)$horario_id]);		
 			return $datos;
 		}
 
@@ -1685,7 +1698,7 @@
 
 
 			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT asistencia_id FROM asistencia_asistencia WHERE asistencia_alumnoid=$alumno_id AND asistencia_aniomes = '$anio$mes' ");
+		    $datos=$this->ejecutarConsulta("SELECT asistencia_id FROM asistencia_asistencia WHERE asistencia_alumnoid = :alumno AND asistencia_aniomes = :aniomes", [':alumno' => (int)$alumno_id, ':aniomes' => $anio . $mes]);
 		    if($datos->rowCount()<=0){
 				//insert
 
@@ -1765,13 +1778,28 @@
 						WHERE RP.pago_estado = 'P'
 						GROUP BY RA.alumno_id
 					)R ON R.alumno = A.alumno_id
-				WHERE A.alumno_id = ".$alumnoid;	
-			$datos = $this->ejecutarConsulta($consulta_datos);
+				WHERE A.alumno_id = :alumno";	
+			$datos = $this->ejecutarConsulta($consulta_datos, [':alumno' => (int)$alumnoid]);
 			return $datos;
 		}
 
 		public function CalendarioEventos($alumnoid){
 			// Consulta para obtener los eventos
+			/* Las 31 subconsultas (una por dia del mes) se generan aqui en
+			   lugar de escribirse a mano. Cada dia lleva SU marcador para no
+			   depender de que PDO emule las preparaciones. */
+			$union      = [];
+			$parametros = [];
+			for($d = 1; $d <= 31; $d++){
+				$dd  = str_pad((string)$d, 2, '0', STR_PAD_LEFT);
+				$par = ':a'.$dd;
+				$union[] = "SELECT asistencia_aniomes, 'D$dd' AS dia, asistencia_D$dd AS valor
+								FROM asistencia_asistencia
+							   WHERE asistencia_D$dd IS NOT NULL
+								 AND asistencia_alumnoid = $par";
+				$parametros[$par] = (int)$alumnoid;
+			}
+
 			$consulta_evento = "SELECT      
 									asistencia_aniomes AS anio_mes, 
 									STR_TO_DATE(CONCAT(asistencia_aniomes, LPAD(SUBSTRING_INDEX(dia, 'D', -1), 2, '0')), '%Y%m%d') AS 'start', 
@@ -1789,40 +1817,10 @@
 										WHEN valor = 'F' THEN '#dc3545'
 									END AS color    
 								FROM (
-									SELECT asistencia_aniomes, 'D01' AS dia, asistencia_D01 AS valor FROM asistencia_asistencia WHERE asistencia_D01 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D02' AS dia, asistencia_D02 AS valor FROM asistencia_asistencia WHERE asistencia_D02 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D03' AS dia, asistencia_D03 AS valor FROM asistencia_asistencia WHERE asistencia_D03 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D04' AS dia, asistencia_D04 AS valor FROM asistencia_asistencia WHERE asistencia_D04 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D05' AS dia, asistencia_D05 AS valor FROM asistencia_asistencia WHERE asistencia_D05 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D06' AS dia, asistencia_D06 AS valor FROM asistencia_asistencia WHERE asistencia_D06 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D07' AS dia, asistencia_D07 AS valor FROM asistencia_asistencia WHERE asistencia_D07 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D08' AS dia, asistencia_D08 AS valor FROM asistencia_asistencia WHERE asistencia_D08 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D09' AS dia, asistencia_D09 AS valor FROM asistencia_asistencia WHERE asistencia_D09 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D10' AS dia, asistencia_D10 AS valor FROM asistencia_asistencia WHERE asistencia_D10 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D11' AS dia, asistencia_D11 AS valor FROM asistencia_asistencia WHERE asistencia_D11 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D12' AS dia, asistencia_D12 AS valor FROM asistencia_asistencia WHERE asistencia_D12 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D13' AS dia, asistencia_D13 AS valor FROM asistencia_asistencia WHERE asistencia_D13 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D14' AS dia, asistencia_D14 AS valor FROM asistencia_asistencia WHERE asistencia_D14 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D15' AS dia, asistencia_D15 AS valor FROM asistencia_asistencia WHERE asistencia_D15 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D16' AS dia, asistencia_D16 AS valor FROM asistencia_asistencia WHERE asistencia_D16 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D17' AS dia, asistencia_D17 AS valor FROM asistencia_asistencia WHERE asistencia_D17 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D18' AS dia, asistencia_D18 AS valor FROM asistencia_asistencia WHERE asistencia_D18 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D19' AS dia, asistencia_D19 AS valor FROM asistencia_asistencia WHERE asistencia_D19 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D20' AS dia, asistencia_D20 AS valor FROM asistencia_asistencia WHERE asistencia_D20 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid."1 UNION ALL
-									SELECT asistencia_aniomes, 'D21' AS dia, asistencia_D21 AS valor FROM asistencia_asistencia WHERE asistencia_D21 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D22' AS dia, asistencia_D22 AS valor FROM asistencia_asistencia WHERE asistencia_D22 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D23' AS dia, asistencia_D23 AS valor FROM asistencia_asistencia WHERE asistencia_D23 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D24' AS dia, asistencia_D24 AS valor FROM asistencia_asistencia WHERE asistencia_D24 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D25' AS dia, asistencia_D25 AS valor FROM asistencia_asistencia WHERE asistencia_D25 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D26' AS dia, asistencia_D26 AS valor FROM asistencia_asistencia WHERE asistencia_D26 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D27' AS dia, asistencia_D27 AS valor FROM asistencia_asistencia WHERE asistencia_D27 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D28' AS dia, asistencia_D28 AS valor FROM asistencia_asistencia WHERE asistencia_D28 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D29' AS dia, asistencia_D29 AS valor FROM asistencia_asistencia WHERE asistencia_D29 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D30' AS dia, asistencia_D30 AS valor FROM asistencia_asistencia WHERE asistencia_D30 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid." UNION ALL
-									SELECT asistencia_aniomes, 'D31' AS dia, asistencia_D31 AS valor FROM asistencia_asistencia WHERE asistencia_D31 IS NOT NULL AND asistencia_alumnoid = ".$alumnoid."
+								" . implode("\r\n UNION ALL \r\n", $union) . "
 								) AS dias";
 
-			$datos = $this->ejecutarConsulta($consulta_evento);
+			$datos = $this->ejecutarConsulta($consulta_evento, $parametros);
 
 			$eventos = array();
 

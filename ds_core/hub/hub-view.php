@@ -39,7 +39,9 @@ $vendorCss = DS_BASKETBALL_URL . 'app/views/dist/plugins/fontawesome-free/css/al
     <title><?php echo DS_HUB_NAME; ?> | Hub</title>
 
     <link rel="icon" type="image/png" href="<?php echo DS_HUB_URL; ?>ds_core/assets/img/logo_ds.png">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&display=fallback">
+    <?php /* Tipografia servida desde el propio servidor. Ver el comentario
+             de ds_core/assets/css/fuentes.css. */ ?>
+    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
     <link rel="stylesheet" href="<?php echo $vendorCss; ?>">
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/digisports.css">
 </head>

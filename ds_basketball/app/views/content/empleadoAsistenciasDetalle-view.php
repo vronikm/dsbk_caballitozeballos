@@ -7,10 +7,21 @@
 	$symbology="qr";
 	$optionsQR=array('sx'=>4,'sy'=>4,'p'=>-10);		
 
-	$insDetalle   = new reporteController();	
-	$empleado_id  = $_POST['empleado_id'];
-	$fecha_inicio = $_POST['fecha_inicio'];
-	$fecha_fin    = $_POST['fecha_fin'];
+	$insDetalle   = new reporteController();
+
+	/* Esta pantalla es el detalle de un empleado y sólo se llega a ella
+	   enviando el formulario del reporte. Al abrirla por URL faltaban las
+	   tres claves de POST, PHP avisaba por cada una y el id vacío acababa
+	   en la consulta. Sin empleado no hay detalle: se vuelve al reporte. */
+	$empleado_id  = trim((string)($_POST['empleado_id'] ?? ''));
+
+	if ($empleado_id === '' || !ctype_digit($empleado_id)) {
+		header("Location: " . APP_URL . "empleadoAsistencias/");
+		exit();
+	}
+
+	$fecha_inicio = (string)($_POST['fecha_inicio'] ?? date('Y-m-01'));
+	$fecha_fin    = (string)($_POST['fecha_fin']    ?? date('Y-m-d'));
 
 	$datosAsistencia=$insDetalle->seleccionarDatos("Unico","sujeto_empleado","empleado_id",$empleado_id);
 	if($datosAsistencia->rowCount()==1){
@@ -30,7 +41,8 @@
 	<title>Reporte de asistencia de empleados</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">	
 	<!-- daterange picker -->

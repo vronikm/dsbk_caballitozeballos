@@ -9,7 +9,10 @@
 
 	$insDetallePendiente = new cobranzaController();	
 	$repre_id = ($url[1] != "") ? $insDetallePendiente->limpiarCadena($url[1]) : 0;
-	$lugar_sedeid = isset($_POST['horario_sedeid']) ? $insHorario->limpiarCadena($_POST['horario_sedeid']) : 0;
+	/* Usaba $insHorario, que en esta vista no existe: en cuanto el formulario
+	   enviara horario_sedeid, la pantalla moria. El controlador de aqui es
+	   $insDetallePendiente. */
+	$lugar_sedeid = isset($_POST['horario_sedeid']) ? $insDetallePendiente->limpiarCadena($_POST['horario_sedeid']) : 0;
 
 	$datosPendiente=$insDetallePendiente->seleccionarDatos("Unico","alumno_representante","repre_id",$repre_id);
 	if($datosPendiente->rowCount()==1){
@@ -17,7 +20,9 @@
 		$repre_nombre 		= $datosPendiente['repre_primernombre'].' '.$datosPendiente['repre_segundonombre'].' '.$datosPendiente['repre_apellidopaterno'].' '.$datosPendiente['repre_apellidomaterno'];
 	
 	}else{
-		$$repre_nombre 	= "";
+		/* Llevaba dos signos de dolar: era una variable variable, asi que
+		   $repre_nombre se quedaba sin definir y la pagina imprimia un aviso. */
+		$repre_nombre 	= "";
 	}
 ?>
 
@@ -30,7 +35,8 @@
 	<title><?php echo APP_NAME; ?> | Cobranza</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">	
 	<!-- daterange picker -->

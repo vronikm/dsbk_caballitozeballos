@@ -17,7 +17,8 @@
 	<title><?php echo APP_NAME; ?> | Registro nuevo alumno</title>
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
 	
@@ -370,7 +371,7 @@
 												<div class="form-group">
 													<label for="cemer_parentesco">Parentesco</label>
 													<select class="form-control select2" style="width: 100%;" id="cemer_parentesco" name="cemer_parentesco">
-														<?php echo $insAlumno->listarCatalogoParentesco($cemer_parentesco); ?>
+														<?php echo $insAlumno->listarCatalogoParentesco(); ?>
 													</select>
 												</div> 
 											</div>
@@ -463,11 +464,7 @@
 									</div>
 									<!-- /.tab-pane -->		
 									
-									<div class="card-footer">						
-										<button type="submit" class="btn btn-success btn-sm">Guardar</button>
-										<button type="reset" class="btn btn-dark btn-sm">Limpiar</button>
-										<?php include "./app/views/inc/btn_back.php";	?>				
-									</div>	
+									<?php echo ds_acciones_form('', ['limpiar' => true]); ?>	
 								</form>	
 
 								<!-- /.tab-pane -->

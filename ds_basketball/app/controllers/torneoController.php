@@ -231,7 +231,7 @@
 							'.$this->siPuede('eliminar','torneoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/torneoAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_torneo" value="eliminar">
 								<input type="hidden" name="torneo_id" value="'.$rows['torneo_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 3px;">Eliminar</button>
+								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 3px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'
 							
 							'.$this->siPuede('editar','torneoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/torneoAjax.php" method="POST" autocomplete="off" >
@@ -240,8 +240,8 @@
 								<button type="submit" class="btn float-right '.$boton.' btn-xs" style="margin-right: 3px;""> '.$texto.' </button>
 							</form>').'
 
-							'.$this->siPuede('editar','torneoList','<a href="'.APP_URL.'torneoList/'.$rows['torneo_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 3px;">Editar</a>').'
-							<a href="'.APP_URL.'equipoList/'.$rows['torneo_id'].'/" class="btn float-right btn-primary btn-xs" style="margin-right: 3px;">Equipos</a>
+							'.$this->siPuede('editar','torneoList','<a href="'.APP_URL.'torneoList/'.$rows['torneo_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 3px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+							<a href="'.APP_URL.'equipoList/'.$rows['torneo_id'].'/" class="btn float-right btn-primary btn-xs" style="margin-right: 3px;"><i class="fas fa-users mr-1"></i>Equipos</a>
 						</td>
 					</tr>';	
 			}
@@ -256,10 +256,10 @@
 									 ELSE torneo_estado 
 								END AS ESTADO 
 							 FROM torneo_torneo
-							 WHERE torneo_id =".$torneoid."
-							 	AND torneo_estado IN ('A','I')");	
+							 WHERE torneo_id = :torneo
+							 	AND torneo_estado IN ('A','I')");
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, [':torneo' => (int)$torneoid]);
 			return $datos;
 		}
 
@@ -268,7 +268,7 @@
 			$torneoid=$this->limpiarCadena($_POST['torneo_id']);
 
 			# Verificando existencia de torneo #
-			$torneo=$this->ejecutarConsulta("SELECT * FROM torneo_torneo WHERE torneo_id='$torneoid'");
+			$torneo=$this->ejecutarConsulta("SELECT * FROM torneo_torneo WHERE torneo_id = :torneo", [':torneo' => (int)$torneoid]);
 			if($torneo->rowCount()<=0){	
 				$alerta=[
 					"tipo"=>"simple",
@@ -470,7 +470,7 @@
 			$torneoid=$this->limpiarCadena($_POST['torneo_id']);
 
 			# Verificando usuario #
-			$torneo=$this->ejecutarConsulta("SELECT * FROM torneo_torneo WHERE torneo_id='$torneoid'");
+			$torneo=$this->ejecutarConsulta("SELECT * FROM torneo_torneo WHERE torneo_id = :torneo", [':torneo' => (int)$torneoid]);
 			if($torneo->rowCount()<=0){	
 		        $alerta=[
 					"tipo"=>"simple",
@@ -525,7 +525,7 @@
 			$torneoid=$this->limpiarCadena($_POST['torneo_id']);
 
 			# Verificando existencia de torneo #
-			$torneo=$this->ejecutarConsulta("SELECT * FROM torneo_torneo WHERE torneo_id='$torneoid'");
+			$torneo=$this->ejecutarConsulta("SELECT * FROM torneo_torneo WHERE torneo_id = :torneo", [':torneo' => (int)$torneoid]);
 			if($torneo->rowCount()<=0){	
 				$alerta=[
 					"tipo"=>"simple",

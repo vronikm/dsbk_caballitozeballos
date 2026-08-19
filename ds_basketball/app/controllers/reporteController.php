@@ -6,6 +6,14 @@
 
 	class reporteController extends mainModel{	
 		public function listarPagos($fecha_inicio, $fecha_fin, $sede_id){
+			/* Rango vacio: la pantalla acaba de abrirse y no se ha pedido
+			   nada todavia. Se devuelve el informe vacio, que es lo que
+			   hacia antes; con parametros ligados MySQL rechaza '' como
+			   fecha y tumbaria la pagina. */
+			if (trim((string)$fecha_inicio) === '' || trim((string)$fecha_fin) === '') {
+				return '';
+			}
+
 			$tabla="";
 			$VALOR_PAGADO = 0;
 			$VALOR_PENDIENTE = 0;
@@ -30,8 +38,8 @@
 								GROUP BY PT.transaccion_pagoid)T ON T.transaccion_pagoid = P.pago_id
 								LEFT JOIN alumno_pago_transaccion PT ON PT.transaccion_id  = T.IDT
 							where pago_estado <> 'E'
-								and alumno_sedeid = ".$sede_id."
-								and pago_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+								and alumno_sedeid = :p1
+								and pago_fecharegistro between :p2 and :p3
 							
 							union all 
 														
@@ -52,10 +60,10 @@
 								inner join general_tabla_catalogo F ON F.catalogo_valor = T.transaccion_formapagoid 								
 								inner join general_sede S on S.sede_id = alumno_sedeid
 							where transaccion_estado <> 'E'
-								and alumno_sedeid = ".$sede_id."
-								and transaccion_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'";
+								and alumno_sedeid = :p4
+								and transaccion_fecharegistro between :p5 and :p6";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $sede_id, ':p2' => $fecha_inicio, ':p3' => $fecha_fin, ':p4' => $sede_id, ':p5' => $fecha_inicio, ':p6' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$VALOR_PAGADO += $rows['VALOR_PAGADO'];
@@ -94,6 +102,14 @@
 		}
 
 		public function listarPagosConsolidado($fecha_inicio, $fecha_fin){
+			/* Rango vacio: la pantalla acaba de abrirse y no se ha pedido
+			   nada todavia. Se devuelve el informe vacio, que es lo que
+			   hacia antes; con parametros ligados MySQL rechaza '' como
+			   fecha y tumbaria la pagina. */
+			if (trim((string)$fecha_inicio) === '' || trim((string)$fecha_fin) === '') {
+				return '';
+			}
+
 			$tabla="";
 			$VALOR_PAGADO = 0;
 			$VALOR_PENDIENTE = 0;
@@ -119,7 +135,7 @@
 								GROUP BY PT.transaccion_pagoid)T ON T.transaccion_pagoid = P.pago_id
 								LEFT JOIN alumno_pago_transaccion PT ON PT.transaccion_id  = T.IDT
 							where pago_estado <> 'E'
-								and pago_fecha between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+								and pago_fecha between :p1 and :p2
 							
 							union all 
 														
@@ -141,10 +157,10 @@
 								inner join general_tabla_catalogo F ON F.catalogo_valor = T.transaccion_formapagoid 
 								inner join general_sede S on S.sede_id = alumno_sedeid
 							where transaccion_estado <> 'E'
-								and transaccion_fecha between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+								and transaccion_fecha between :p3 and :p4
 								ORDER BY FECHA_PAGO DESC";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $fecha_inicio, ':p2' => $fecha_fin, ':p3' => $fecha_inicio, ':p4' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$VALOR_PAGADO += $rows['VALOR_PAGADO'];
@@ -185,9 +201,9 @@
 			$consulta_fecham="SELECT max(pago_fecharegistro) AS FECHA_MAXIMA
 								FROM alumno_pago, sujeto_alumno
 								WHERE pago_alumnoid = alumno_id
-									AND alumno_sedeid = ".$sede_id."
+									AND alumno_sedeid = :p1
 								ORDER BY pago_fecharegistro";
-			$fecha_maxima = $this->ejecutarConsulta($consulta_fecham);		
+			$fecha_maxima = $this->ejecutarConsulta($consulta_fecham, [':p1' => $sede_id]);		
 			return $fecha_maxima;
 		}
 
@@ -214,7 +230,7 @@
 									SUM(pago_saldo) AS SALDO
 									FROM alumno_pago
 										INNER JOIN sujeto_alumno ON alumno_id = pago_alumnoid
-									WHERE pago_estado = 'P' AND pago_saldo > 0 AND alumno_sedeid = ".$sedeid." 
+									WHERE pago_estado = 'P' AND pago_saldo > 0 AND alumno_sedeid = :p1 
 									GROUP BY pago_alumnoid
 								) P ON P.pago_alumnoid = A.alumno_id
 								LEFT JOIN (
@@ -236,7 +252,7 @@
 										LEFT JOIN alumno_pago ON pago_alumnoid = alumno_id 
 										LEFT JOIN alumno_pago_descuento ON descuento_alumnoid = alumno_id AND descuento_estado = 'S'
 										LEFT JOIN general_sede ON sede_id = alumno_sedeid
-									WHERE pago_rubroid = 'RPE' AND alumno_estado <> 'I' AND alumno_sedeid = ".$sedeid." 
+									WHERE pago_rubroid = 'RPE' AND alumno_estado <> 'I' AND alumno_sedeid = :p2 
 									GROUP BY 
 										pago_alumnoid
 									) BASE
@@ -245,7 +261,7 @@
 									AND PEN.TOTAL > 0 OR P.SALDO > 0
 								ORDER BY PEN.PENSIONES DESC";
 			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $sedeid, ':p2' => $sedeid]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){	
 				$NUM_SALDO += $rows['NUM_SALDO'];
@@ -316,10 +332,10 @@
 								LEFT JOIN general_tabla_catalogo on pago_talla = catalogo_valor
 								INNER JOIN general_sede on alumno_sedeid = sede_id
 								WHERE pago_estado <> 'E'
-									AND alumno_sedeid = ".$sede_id."
-									AND pago_rubroid = '".$rubro."'";								
+									AND alumno_sedeid = :p1
+									AND pago_rubroid = :p2";								
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $sede_id, ':p2' => $rubro]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.='
@@ -348,9 +364,9 @@
 								INNER JOIN general_sede on alumno_sedeid = sede_id
 								LEFT JOIN general_tabla_catalogo on pago_talla = catalogo_valor
 								WHERE pago_estado <> 'E'
-									AND pago_rubroid = '".$rubro."'";
+									AND pago_rubroid = :p1";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $rubro]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.='
@@ -397,13 +413,19 @@
 							WHERE R.repre_estado in ('A','I')
 								AND A.alumno_estado in ('A','I')";
 
+			/* El array acompaña a la consulta: con sede 0 no hay filtro y
+			   tampoco puede haber parámetro. Pasarlo igual es
+			   SQLSTATE[HY093], que es como salió al probar «0 = todas». */
+			$parametros = [];
+
 			if($sede_id != 0){
-				$consulta_datos .= " AND A.alumno_sedeid = ".$sede_id;
+				$consulta_datos .= " AND A.alumno_sedeid = :q1";
+				$parametros[':q1'] = $sede_id;
 			}
 
 			$consulta_datos .= " ORDER BY REPRESENTANTE, S.sede_nombre, ALUMNO";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.='
@@ -439,13 +461,18 @@
 											WHERE T.tabla_nombre = 'parentesco') PAR ON PAR.catalogo_valor = CE.cemer_parentesco
 							WHERE A.alumno_estado in ('A','I')";
 
+			/* Mismo criterio que en listarRepresentantesPorSede: el
+			   parámetro solo existe si el filtro existe. */
+			$parametros = [];
+
 			if($sede_id != 0){
-				$consulta_datos .= " AND A.alumno_sedeid = ".$sede_id;
+				$consulta_datos .= " AND A.alumno_sedeid = :q1";
+				$parametros[':q1'] = $sede_id;
 			}
 
 			$consulta_datos .= " ORDER BY CE.cemer_nombre, S.sede_nombre, ALUMNO";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.='
@@ -462,6 +489,14 @@
 		}
 
 		public function resumenPagos($fecha_inicio, $fecha_fin, $sede_id){
+			/* Rango vacio: la pantalla acaba de abrirse y no se ha pedido
+			   nada todavia. Se devuelve el informe vacio, que es lo que
+			   hacia antes; con parametros ligados MySQL rechaza '' como
+			   fecha y tumbaria la pagina. */
+			if (trim((string)$fecha_inicio) === '' || trim((string)$fecha_fin) === '') {
+				return '';
+			}
+
 			$tabla="";
 			$VALOR_PAGADO = 0;
 			$PAGOS = 0;
@@ -482,8 +517,8 @@
 								GROUP BY PT.transaccion_pagoid)T ON T.transaccion_pagoid = P.pago_id
 								LEFT JOIN alumno_pago_transaccion PT ON PT.transaccion_id  = T.IDT
 							WHERE pago_estado <> 'E'
-								and alumno_sedeid = ".$sede_id."
-								and pago_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+								and alumno_sedeid = :p1
+								and pago_fecharegistro between :p2 and :p3
 							GROUP BY SEDE, FECHA_REG_SISTEMA, RUBRO, FORMA_PAGO							
 							
 							union all 
@@ -501,12 +536,12 @@
 								inner join general_tabla_catalogo F ON F.catalogo_valor = T.transaccion_formapagoid 								
 								inner join general_sede S on S.sede_id = alumno_sedeid
 							WHERE transaccion_estado <> 'E'
-								and alumno_sedeid = ".$sede_id."
-								and transaccion_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+								and alumno_sedeid = :p4
+								and transaccion_fecharegistro between :p5 and :p6
 							GROUP BY SEDE, FECHA_REG_SISTEMA, RUBRO, FORMA_PAGO
 							ORDER BY SEDE, FECHA_REG_SISTEMA, RUBRO";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $sede_id, ':p2' => $fecha_inicio, ':p3' => $fecha_fin, ':p4' => $sede_id, ':p5' => $fecha_inicio, ':p6' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$VALOR_PAGADO += $rows['VALOR_PAGADO'];
@@ -533,6 +568,14 @@
 			return $tabla;			
 		}
 		public function resumenPagosConsolidado($fecha_inicio, $fecha_fin){
+			/* Rango vacio: la pantalla acaba de abrirse y no se ha pedido
+			   nada todavia. Se devuelve el informe vacio, que es lo que
+			   hacia antes; con parametros ligados MySQL rechaza '' como
+			   fecha y tumbaria la pagina. */
+			if (trim((string)$fecha_inicio) === '' || trim((string)$fecha_fin) === '') {
+				return '';
+			}
+
 			$tabla="";
 			$VALOR_PAGADO = 0;
 			$consulta_datos="SELECT sede_nombre SEDE,
@@ -552,7 +595,7 @@
 								GROUP BY PT.transaccion_pagoid)T ON T.transaccion_pagoid = P.pago_id
 								LEFT JOIN alumno_pago_transaccion PT ON PT.transaccion_id  = T.IDT
 							where pago_estado <> 'E'
-								and pago_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+								and pago_fecharegistro between :p1 and :p2
 							GROUP BY SEDE, FECHA_REG_SISTEMA, RUBRO, FORMA_PAGO
 							
 							union all 
@@ -570,11 +613,11 @@
 								inner join general_tabla_catalogo F ON F.catalogo_valor = T.transaccion_formapagoid 								
 								inner join general_sede S on S.sede_id = alumno_sedeid
 							where transaccion_estado <> 'E'
-								and transaccion_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+								and transaccion_fecharegistro between :p3 and :p4
 							GROUP BY SEDE, FECHA_REG_SISTEMA, RUBRO, FORMA_PAGO
 							ORDER BY SEDE, RUBRO";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $fecha_inicio, ':p2' => $fecha_fin, ':p3' => $fecha_inicio, ':p4' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$VALOR_PAGADO += $rows['VALOR_PAGADO'];
@@ -614,6 +657,14 @@
 			return $fecha_maxima;
 		}
 		public function  pagosFacturacion($fecha_inicio, $fecha_fin){
+			/* Rango vacio: la pantalla acaba de abrirse y no se ha pedido
+			   nada todavia. Se devuelve el informe vacio, que es lo que
+			   hacia antes; con parametros ligados MySQL rechaza '' como
+			   fecha y tumbaria la pagina. */
+			if (trim((string)$fecha_inicio) === '' || trim((string)$fecha_fin) === '') {
+				return '';
+			}
+
 			$tabla="";
 			$consulta_datos="SELECT sede_nombre AS SEDE, repre_identificacion AS IDENTIFICACION, 
 								concat_ws(' ', repre_primernombre, repre_segundonombre, repre_apellidopaterno, repre_apellidomaterno) as REPRESENTANTE,
@@ -627,9 +678,9 @@
 								and alumno_sedeid = sede_id
 								and repre_factura = 'S'
 								and pago_estado = 'C'
-								and pago_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'";
+								and pago_fecharegistro between :p1 and :p2";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $fecha_inicio, ':p2' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.='
@@ -649,6 +700,14 @@
 			return $tabla;
 		}
 		public function resumenPagosForma($fecha_inicio, $fecha_fin, $sede_id){
+			/* Rango vacio: la pantalla acaba de abrirse y no se ha pedido
+			   nada todavia. Se devuelve el informe vacio, que es lo que
+			   hacia antes; con parametros ligados MySQL rechaza '' como
+			   fecha y tumbaria la pagina. */
+			if (trim((string)$fecha_inicio) === '' || trim((string)$fecha_fin) === '') {
+				return '';
+			}
+
 			$tabla="";
 			$VALOR_PAGADO = 0;
 			$PAGOS = 0;
@@ -670,8 +729,8 @@
 									GROUP BY PT.transaccion_pagoid)T ON T.transaccion_pagoid = P.pago_id
 									LEFT JOIN alumno_pago_transaccion PT ON PT.transaccion_id  = T.IDT
 								WHERE pago_estado <> 'E'
-									and alumno_sedeid = ".$sede_id."
-									and pago_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+									and alumno_sedeid = :p1
+									and pago_fecharegistro between :p2 and :p3
 								GROUP BY SEDE, FECHA_REG_SISTEMA, FORMA_PAGO
 								
 								union all 
@@ -688,14 +747,14 @@
 									inner join general_tabla_catalogo F ON F.catalogo_valor = T.transaccion_formapagoid 								
 									inner join general_sede S on S.sede_id = alumno_sedeid
 								WHERE transaccion_estado <> 'E'
-									and alumno_sedeid = ".$sede_id."
-									and transaccion_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+									and alumno_sedeid = :p4
+									and transaccion_fecharegistro between :p5 and :p6
 								GROUP BY SEDE, FECHA_REG_SISTEMA, FORMA_PAGO
 								) FORMAPAGO
 								group by SEDE, FECHA_REG_SISTEMA, FORMA_PAGO
 								order by SEDE, FECHA_REG_SISTEMA";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $sede_id, ':p2' => $fecha_inicio, ':p3' => $fecha_fin, ':p4' => $sede_id, ':p5' => $fecha_inicio, ':p6' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$VALOR_PAGADO += $rows['VALOR_PAGADO'];
@@ -720,6 +779,14 @@
 			return $tabla;			
 		}
 		public function resumenPagosFormaConsolidado($fecha_inicio, $fecha_fin){
+			/* Rango vacio: la pantalla acaba de abrirse y no se ha pedido
+			   nada todavia. Se devuelve el informe vacio, que es lo que
+			   hacia antes; con parametros ligados MySQL rechaza '' como
+			   fecha y tumbaria la pagina. */
+			if (trim((string)$fecha_inicio) === '' || trim((string)$fecha_fin) === '') {
+				return '';
+			}
+
 			$tabla="";
 			$VALOR_PAGADO = 0;
 			$consulta_datos="SELECT sede_nombre SEDE,
@@ -739,7 +806,7 @@
 								GROUP BY PT.transaccion_pagoid)T ON T.transaccion_pagoid = P.pago_id
 								LEFT JOIN alumno_pago_transaccion PT ON PT.transaccion_id  = T.IDT
 							where pago_estado <> 'E'
-								and pago_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+								and pago_fecharegistro between :p1 and :p2
 							GROUP BY SEDE, FECHA_REG_SISTEMA, RUBRO, FORMA_PAGO
 							
 							union all 
@@ -757,11 +824,11 @@
 								inner join general_tabla_catalogo F ON F.catalogo_valor = T.transaccion_formapagoid 								
 								inner join general_sede S on S.sede_id = alumno_sedeid
 							where transaccion_estado <> 'E'
-								and transaccion_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+								and transaccion_fecharegistro between :p3 and :p4
 							GROUP BY SEDE, FECHA_REG_SISTEMA, RUBRO, FORMA_PAGO
 							ORDER BY SEDE, RUBRO";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $fecha_inicio, ':p2' => $fecha_fin, ':p3' => $fecha_inicio, ':p4' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$VALOR_PAGADO += $rows['VALOR_PAGADO'];
@@ -784,6 +851,14 @@
 			return $tabla;			
 		}
 		public function balanceResultado($fecha_inicio, $fecha_fin, $sede_id){
+			/* Rango vacio: la pantalla acaba de abrirse y no se ha pedido
+			   nada todavia. Se devuelve el informe vacio, que es lo que
+			   hacia antes; con parametros ligados MySQL rechaza '' como
+			   fecha y tumbaria la pagina. */
+			if (trim((string)$fecha_inicio) === '' || trim((string)$fecha_fin) === '') {
+				return '';
+			}
+
 			$tabla="";
 			$TOTAL_INGRESOS = 0;
 			$MONTO_TOTAL_INGRESO = 0;
@@ -793,8 +868,8 @@
 								LEFT JOIN general_tabla_catalogo on pago_rubroid = catalogo_valor
 								INNER JOIN general_sede on alumno_sedeid = sede_id
 								WHERE pago_estado <> 'E'
-									AND alumno_sedeid =".$sede_id."
-									and pago_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+									AND alumno_sedeid =:q1
+									and pago_fecharegistro between :q2 and :q3
 								GROUP BY sede_nombre, catalogo_descripcion
 							
 							UNION ALL
@@ -807,8 +882,8 @@
 								LEFT JOIN general_tabla_catalogo on pago_rubroid = catalogo_valor
 								INNER JOIN general_sede on alumno_sedeid = sede_id
 								WHERE transaccion_estado <> 'E'
-									AND alumno_sedeid =".$sede_id."
-									and transaccion_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+									AND alumno_sedeid =:q4
+									and transaccion_fecharegistro between :q5 and :q6
 									AND alumno_sedeid =1
 								GROUP BY sede_nombre, catalogo_descripcion
 							
@@ -821,8 +896,8 @@
 								LEFT JOIN general_tabla_catalogo on egreso_tipoid = catalogo_valor
 								INNER JOIN general_sede on empleado_sedeid = sede_id
 								WHERE egreso_estado <> 'E'
-									AND empleado_sedeid = ".$sede_id."
-									AND egreso_fechaegreso between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+									AND empleado_sedeid = :q7
+									AND egreso_fechaegreso between :q8 and :q9
 								GROUP BY sede_nombre, catalogo_descripcion, empleado_nombre
 								
 							UNION ALL
@@ -833,11 +908,11 @@
 								LEFT JOIN general_tabla_catalogo on ingreso_concepto = catalogo_valor
 								INNER JOIN general_sede on ingreso_sedeid = sede_id
 								WHERE ingreso_estado <> 'E'
-									AND ingreso_sedeid = ".$sede_id."
-									and ingreso_fecharecepcion between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+									AND ingreso_sedeid = :q10
+									and ingreso_fecharecepcion between :q11 and :q12
 								GROUP BY sede_nombre, catalogo_descripcion, ingreso_empresa";
 
-			$datos = $this->ejecutarConsulta($consulta_ingresos);
+			$datos = $this->ejecutarConsulta($consulta_ingresos, [':q1' => $sede_id, ':q2' => $fecha_inicio, ':q3' => $fecha_fin, ':q4' => $sede_id, ':q5' => $fecha_inicio, ':q6' => $fecha_fin, ':q7' => $sede_id, ':q8' => $fecha_inicio, ':q9' => $fecha_fin, ':q10' => $sede_id, ':q11' => $fecha_inicio, ':q12' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$TOTAL_INGRESOS += $rows['TOTAL_INGRESOS'];
@@ -860,8 +935,8 @@
 									LEFT JOIN general_tabla_catalogo on ingreso_tipoingresoid = catalogo_valor
 									INNER JOIN general_sede on empleado_sedeid = sede_id
 									WHERE ingreso_estado <> 'E'
-										AND empleado_sedeid = ".$sede_id."
-										AND ingreso_fechapago BETWEEN ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+										AND empleado_sedeid = :q13
+										AND ingreso_fechapago BETWEEN :q14 and :q15
 									GROUP BY sede_nombre, catalogo_descripcion, ingreso_periodo, empleado_nombre, ingreso_valor
 
 								UNION ALL
@@ -871,11 +946,11 @@
 									LEFT JOIN general_tabla_catalogo on egreso_concepto = catalogo_valor
 									INNER JOIN general_sede on egreso_sedeid = sede_id
 									WHERE egreso_estado <> 'E'
-										AND egreso_sedeid = ".$sede_id."
-										AND egreso_fechapago between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+										AND egreso_sedeid = :q16
+										AND egreso_fechapago between :q17 and :q18
 									GROUP BY sede_nombre, catalogo_descripcion, egreso_empresa";
 
-			$datos = $this->ejecutarConsulta($consulta_egresos);
+			$datos = $this->ejecutarConsulta($consulta_egresos, [':q13' => $sede_id, ':q14' => $fecha_inicio, ':q15' => $fecha_fin, ':q16' => $sede_id, ':q17' => $fecha_inicio, ':q18' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$TOTAL_EGRESOS += $rows['TOTAL_EGRESOS'];
@@ -909,6 +984,14 @@
 			return $tabla;			
 		}
 		public function balanceResultadosConsolidado($fecha_inicio, $fecha_fin){
+			/* Rango vacio: la pantalla acaba de abrirse y no se ha pedido
+			   nada todavia. Se devuelve el informe vacio, que es lo que
+			   hacia antes; con parametros ligados MySQL rechaza '' como
+			   fecha y tumbaria la pagina. */
+			if (trim((string)$fecha_inicio) === '' || trim((string)$fecha_fin) === '') {
+				return '';
+			}
+
 			$tabla="";
 			$TOTAL_INGRESOS = 0;
 			$MONTO_TOTAL_INGRESO = 0;
@@ -918,7 +1001,7 @@
 								LEFT JOIN general_tabla_catalogo on pago_rubroid = catalogo_valor
 								INNER JOIN general_sede on alumno_sedeid = sede_id
 								WHERE pago_estado <> 'E'
-									and pago_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+									and pago_fecharegistro between :q1 and :q2
 								GROUP BY sede_nombre, catalogo_descripcion
 							
 							UNION ALL
@@ -931,7 +1014,7 @@
 								LEFT JOIN general_tabla_catalogo on pago_rubroid = catalogo_valor
 								INNER JOIN general_sede on alumno_sedeid = sede_id
 								WHERE transaccion_estado <> 'E'
-									and transaccion_fecharegistro between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+									and transaccion_fecharegistro between :q3 and :q4
 									AND alumno_sedeid =1
 								GROUP BY sede_nombre, catalogo_descripcion
 							
@@ -944,7 +1027,7 @@
 								LEFT JOIN general_tabla_catalogo on egreso_tipoid = catalogo_valor
 								INNER JOIN general_sede on empleado_sedeid = sede_id
 								WHERE egreso_estado <> 'E'
-									AND egreso_fechaegreso between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+									AND egreso_fechaegreso between :q5 and :q6
 								GROUP BY sede_nombre, catalogo_descripcion, empleado_nombre
 								
 							UNION ALL
@@ -955,10 +1038,10 @@
 								LEFT JOIN general_tabla_catalogo on ingreso_concepto = catalogo_valor
 								INNER JOIN general_sede on ingreso_sedeid = sede_id
 								WHERE ingreso_estado <> 'E'
-									and ingreso_fecharecepcion between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+									and ingreso_fecharecepcion between :q7 and :q8
 								GROUP BY sede_nombre, catalogo_descripcion, ingreso_empresa";
 
-			$datos = $this->ejecutarConsulta($consulta_ingresos);
+			$datos = $this->ejecutarConsulta($consulta_ingresos, [':q1' => $fecha_inicio, ':q2' => $fecha_fin, ':q3' => $fecha_inicio, ':q4' => $fecha_fin, ':q5' => $fecha_inicio, ':q6' => $fecha_fin, ':q7' => $fecha_inicio, ':q8' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$TOTAL_INGRESOS += $rows['TOTAL_INGRESOS'];
@@ -981,7 +1064,7 @@
 									LEFT JOIN general_tabla_catalogo on ingreso_tipoingresoid = catalogo_valor
 									INNER JOIN general_sede on empleado_sedeid = sede_id
 									WHERE ingreso_estado <> 'E'
-										AND ingreso_fechapago BETWEEN ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+										AND ingreso_fechapago BETWEEN :q9 and :q10
 									GROUP BY sede_nombre, catalogo_descripcion
 
 								UNION ALL
@@ -991,10 +1074,10 @@
 									LEFT JOIN general_tabla_catalogo on egreso_concepto = catalogo_valor
 									INNER JOIN general_sede on egreso_sedeid = sede_id
 									WHERE egreso_estado <> 'E'
-										AND egreso_fechapago between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+										AND egreso_fechapago between :q11 and :q12
 									GROUP BY sede_nombre, catalogo_descripcion, egreso_empresa";
 
-			$datos = $this->ejecutarConsulta($consulta_egresos);
+			$datos = $this->ejecutarConsulta($consulta_egresos, [':q9' => $fecha_inicio, ':q10' => $fecha_fin, ':q11' => $fecha_inicio, ':q12' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$TOTAL_EGRESOS += $rows['TOTAL_EGRESOS'];
@@ -1038,49 +1121,65 @@
 			} 					
 
 			$tabla="";
-			$consulta_datos="SELECT distinct alumno_id, alumno_identificacion, alumno_primernombre, alumno_segundonombre, 
+
+			/* El array se arma a la par que la consulta.
+			   Las ramas que REEMPLAZAN $consulta_datos lo vacian: pasar un
+			   parametro que la consulta ya no usa es SQLSTATE[HY093], y es
+			   el descuido que mas veces se ha colado en este proyecto. */
+			$parametros = [];
+
+			$consulta_datos="SELECT distinct alumno_id, alumno_identificacion, alumno_primernombre, alumno_segundonombre,
 									alumno_apellidopaterno, alumno_apellidomaterno, alumno_fechanacimiento
 								FROM sujeto_alumno
 								INNER JOIN asistencia_asistencia ON asistencia_alumnoid = alumno_id
-								WHERE (alumno_primernombre LIKE '".$primernombre."' 
-										OR alumno_apellidopaterno LIKE '".$apellidopaterno."') ";			
+								WHERE (alumno_primernombre LIKE :nombre
+										OR alumno_apellidopaterno LIKE :apellido) ";
+			$parametros[':nombre']   = $primernombre;
+			$parametros[':apellido'] = $apellidopaterno;
+
 			if($anio!=""){
-				$consulta_datos .= " and YEAR(alumno_fechanacimiento) = '".$anio."'"; 
+				$consulta_datos .= " and YEAR(alumno_fechanacimiento) = :anio";
+				$parametros[':anio'] = $anio;
 			}
 
 			if($primernombre=="" && $apellidopaterno==""){
-				$consulta_datos="SELECT distinct alumno_id, alumno_identificacion, alumno_primernombre, alumno_segundonombre, 
+				$consulta_datos="SELECT distinct alumno_id, alumno_identificacion, alumno_primernombre, alumno_segundonombre,
 										alumno_apellidopaterno, alumno_apellidomaterno, alumno_fechanacimiento
 									FROM sujeto_alumno
 									INNER JOIN asistencia_asistencia ON asistencia_alumnoid = alumno_id
-									WHERE YEAR(alumno_fechanacimiento) = '".$anio."'";
+									WHERE YEAR(alumno_fechanacimiento) = :anio";
+				/* Consulta nueva: solo sobrevive el año. */
+				$parametros = [':anio' => $anio];
 			}
-			
+
 			if($primernombre=="" && $apellidopaterno=="" && $anio == ""){
-				$consulta_datos = "SELECT distinct alumno_id, alumno_identificacion, alumno_primernombre, alumno_segundonombre, 
+				$consulta_datos = "SELECT distinct alumno_id, alumno_identificacion, alumno_primernombre, alumno_segundonombre,
 											alumno_apellidopaterno, alumno_apellidomaterno, alumno_fechanacimiento
 										FROM sujeto_alumno
 										INNER JOIN asistencia_asistencia ON asistencia_alumnoid = alumno_id
 										WHERE alumno_primernombre <> '' ";
+				$parametros = [];
 			}
 
 			if($sede!=""){
 				if($sede == 0){
-					$consulta_datos .= " and alumno_sedeid <> '".$sede."'"; 
+					$consulta_datos .= " and alumno_sedeid <> :sede";
 				}else{
-					$consulta_datos .= " and alumno_sedeid = '".$sede."'"; 
+					$consulta_datos .= " and alumno_sedeid = :sede";
 				}
+				$parametros[':sede'] = $sede;
 			}else{
-				$consulta_datos = "SELECT distinct alumno_id, alumno_identificacion, alumno_primernombre, alumno_segundonombre, 
+				$consulta_datos = "SELECT distinct alumno_id, alumno_identificacion, alumno_primernombre, alumno_segundonombre,
 											alumno_apellidopaterno, alumno_apellidomaterno, alumno_fechanacimiento
 										FROM sujeto_alumno
-										INNER JOIN asistencia_asistencia ON asistencia_alumnoid = alumno_id 
+										INNER JOIN asistencia_asistencia ON asistencia_alumnoid = alumno_id
 										WHERE alumno_primernombre = ''";
-			}			
+				$parametros = [];
+			}
 
-			$consulta_datos .= " AND alumno_estado = 'A' ORDER BY alumno_apellidopaterno, alumno_apellidomaterno, alumno_primernombre"; 
-			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$consulta_datos .= " AND alumno_estado = 'A' ORDER BY alumno_apellidopaterno, alumno_apellidomaterno, alumno_primernombre";
+
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.='
@@ -1101,11 +1200,15 @@
 			$consulta_datos="SELECT distinct empleado_id, empleado_identificacion, empleado_nombre
 								FROM sujeto_empleado
 								INNER JOIN empleado_asistencia ON asistencia_empleadoid = empleado_id
-								WHERE (empleado_nombre LIKE '%".$empleado_nombre."%'
-									OR asistencia_hora between '".$fecha_inicio."' and '".$fecha_fin."')
+								WHERE (empleado_nombre LIKE :p1
+									OR asistencia_hora between :p2 and :p3)
 									AND empleado_estado = 'A' ";
 			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			/* El comodin va en el VALOR, no en la consulta: escrito como
+			   LIKE '%:p1%' el marcador queda dentro de una cadena y PDO no
+			   lo ve, que es el "number of bound variables does not match
+			   number of tokens" que salio al probarlo. */
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => '%' . $empleado_nombre . '%', ':p2' => $fecha_inicio, ':p3' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.='
@@ -1117,7 +1220,7 @@
 								<input type="hidden" name="empleado_id" value="'.$rows['empleado_id'].'">
 								<input type="hidden" name="fecha_inicio" value="'.$fecha_inicio.'">		
 								<input type="hidden" name="fecha_fin" value="'.$fecha_fin.'">					
-								<button type="submit" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;" >Detalle ver</button>
+								<button type="submit" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;" ><i class="fas fa-list mr-1"></i>Detalle ver</button>
 							</form>						
 						</td>
 					</tr>';	
@@ -1138,9 +1241,9 @@
 							FROM empleado_asistencia
 							INNER JOIN sujeto_empleado ON empleado_id=asistencia_empleadoid
 							WHERE empleado_id = $empleado_id
-								AND asistencia_hora between '".$fecha_inicio."' and '".$fecha_fin."'";	
+								AND asistencia_hora between :p1 and :p2";	
 					
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $fecha_inicio, ':p2' => $fecha_fin]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				if($rows['asistencia_tipo']=='E'){
@@ -1170,11 +1273,11 @@
 												from asistencia_asignahorario
 														inner join asistencia_horario_detalle on detalle_horarioid = asignahorario_horarioid
 														inner join sujeto_alumno on alumno_id = asignahorario_alumnoid                                                                  
-												where alumno_estado = 'A' and alumno_fechaingreso <= ' ".$fecha_fin."'
+												where alumno_estado = 'A' and alumno_fechaingreso <= :p1
 										)l
 												inner join asistencia_lugar on lugar_id = l.detalle_lugarid
 												inner join general_sede on lugar_sedeid = sede_id 
-												left join alumno_pago_descuento d on d.descuento_alumnoid = l.asignahorario_alumnoid and descuento_estado = 'S' and descuento_fecha <= ' ".$fecha_fin."'
+												left join alumno_pago_descuento d on d.descuento_alumnoid = l.asignahorario_alumnoid and descuento_estado = 'S' and descuento_fecha <= :p2
 										group by sede_id, sede_nombre, lugar_id ,lugar_nombre
 										
 										union 
@@ -1182,10 +1285,10 @@
 										select SLE.sede_id, SLE.sede_nombre, 0,'SIN LUGAR DE ENTRENAMIENTO' lugar_nombre, count(1) as ALUMNOS_ENTRENAN, sum(SLE.pension_estimada) PENSIONES_ESTIMADAS
 												FROM(select sede_id, sede_nombre, 0,'SIN LUGAR DE ENTRENAMIENTO' lugar_nombre, IFNULL(descuento_valor,s.sede_pension) pension_estimada
 																from sujeto_alumno a
-																left join alumno_pago_descuento d on d.descuento_alumnoid = a.alumno_id and descuento_estado = 'S' and descuento_fecha <= ' ".$fecha_fin."'              
+																left join alumno_pago_descuento d on d.descuento_alumnoid = a.alumno_id and descuento_estado = 'S' and descuento_fecha <= :p3              
 																left join general_sede s on s.sede_id = a.alumno_sedeid
 																where a.alumno_id not in (select asignahorario_alumnoid from asistencia_asignahorario)
-																and a.alumno_estado = 'A' and a.alumno_fechaingreso <= ' ".$fecha_fin."') SLE
+																and a.alumno_estado = 'A' and a.alumno_fechaingreso <= :p4) SLE
 												group by SLE.sede_id, SLE.sede_nombre
 								)Base
 								
@@ -1204,7 +1307,7 @@
 																												left join asistencia_horario_detalle on detalle_horarioid = asignahorario_horarioid)h on h.asignahorario_alumnoid = P.pago_alumnoid
 																												where P.pago_rubroid = 'RPE' 
 																																and P.pago_estado not in ('E','J') 
-																																and P.pago_fecha BETWEEN ' ".$fecha_inicio." ' and ' ".$fecha_fin."') Pagos   
+																																and P.pago_fecha BETWEEN :p5 and :p6) Pagos   
 																group by Pagos.sedeid, Pagos.lugarid)PA on PA.sedeid = Base.sede_id AND PA.lugarid = Base.lugar_id
 																
 								left join (select A.alumno_sedeid as sedeid, IFNULL(h.detalle_lugarid,0) AS lugarid, sum(IFNULL(T.transaccion_valor,0)) as VALOR_PAGADO, Count(1) as Numero
@@ -1216,8 +1319,8 @@
 																								left join asistencia_horario_detalle on detalle_horarioid = asignahorario_horarioid  
 																				)h on h.asignahorario_alumnoid = P.pago_alumnoid          
 																where transaccion_estado in ('C')        
-																and transaccion_fecha BETWEEN ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
-																and pago_fecha BETWEEN ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+																and transaccion_fecha BETWEEN :p7 and :p8
+																and pago_fecha BETWEEN :p9 and :p10
 																group by sedeid, lugarid
 												)Abonos on Abonos.sedeid = Base.sede_id AND Abonos.lugarid = Base.lugar_id 
 												
@@ -1226,7 +1329,7 @@
 																from alumno_pago P
 																where P.pago_rubroid = 'RPE' and P.pago_estado <> 'E'
 																GROUP BY P.pago_alumnoid
-																having  max(P.pago_fecha) < ' ".$fecha_inicio." '
+																having  max(P.pago_fecha) < :p11
 													)b
 												inner join sujeto_alumno A on A.alumno_id = b.pago_alumnoid
 												left join(SELECT distinct detalle_lugarid, asignahorario_alumnoid 
@@ -1254,7 +1357,7 @@
 														
 						order by Base.sede_id";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $fecha_fin, ':p2' => $fecha_fin, ':p3' => $fecha_fin, ':p4' => $fecha_fin, ':p5' => $fecha_inicio, ':p6' => $fecha_fin, ':p7' => $fecha_inicio, ':p8' => $fecha_fin, ':p9' => $fecha_inicio, ':p10' => $fecha_fin, ':p11' => $fecha_inicio]);
 			return $datos;			
 		}
 
@@ -1291,13 +1394,13 @@
 													where alumno_estado = 'A')T on asignahorario_alumnoid = alumno_id
 								left join asistencia_lugar on lugar_id = T.detalle_lugarid  
 								WHERE pago_rubroid = 'RPE' AND pago_estado != 'E' AND alumno_estado = 'A'
-											and pago_fecha between ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+											and pago_fecha between :p1 and :p2
 								
 							UNION ALL
 
 							select sede_nombre, IFNULL(lugar_nombre, 'NO ASIGNADO')LUGARENTRENAMIENTO, ALUMNO, CASE WHEN alumno_estado = 'A' THEN 'ACTIVO' WHEN alumno_estado = 'I' THEN 'INACTIVO' ELSE alumno_estado end ESTADOALUMNO, pago_fecha, SITUACION, '' PAGO_PERIODO, '' PAGO_CONCEPTO, '' PAGO_VALOR, '' PAGO_SALDO, '' ESTADOPAGO
 									from alumno_pago P
-									inner join (select alumno_id, alumno_identificacion, ALUMNO, detalle_lugarid, lugar_nombre, alumno_sedeid, sede_nombre, alumno_estado, FECHA_ULTPAGO, case when FECHA_ULTPAGO < ' ".$fecha_inicio."' THEN 'EN MORA' ELSE 'POR DEFINIR' end SITUACION
+									inner join (select alumno_id, alumno_identificacion, ALUMNO, detalle_lugarid, lugar_nombre, alumno_sedeid, sede_nombre, alumno_estado, FECHA_ULTPAGO, case when FECHA_ULTPAGO < :p3 THEN 'EN MORA' ELSE 'POR DEFINIR' end SITUACION
 													from (SELECT X.alumno_id, X.alumno_identificacion, CONCAT(alumno_primernombre, ' ', alumno_segundonombre, ' ', alumno_apellidopaterno,  ' ', alumno_apellidomaterno)ALUMNO, alumno_sedeid, sede_nombre, alumno_estado, detalle_lugarid, lugar_nombre, MAX(P.pago_fecha) AS FECHA_ULTPAGO
 																	FROM sujeto_alumno X
 																	left join general_sede on sede_id = alumno_sedeid
@@ -1311,12 +1414,12 @@
 																	LEFT JOIN alumno_pago P ON P.pago_alumnoid = X.alumno_id
 																	WHERE P.pago_rubroid = 'RPE' AND pago_estado != 'E' AND alumno_estado = 'A'                                        
 															group by X.alumno_id, X.alumno_identificacion, alumno_sedeid, sede_nombre, alumno_estado, detalle_lugarid, lugar_nombre, ALUMNO
-															having MAX(pago_fecha) < ' ".$fecha_inicio."') as FechaPagos
+															having MAX(pago_fecha) < :p4) as FechaPagos
 													) F on pago_fecha = F.FECHA_ULTPAGO and F.alumno_id = pago_alumnoid
 									WHERE P.pago_rubroid = 'RPE' AND pago_estado != 'E' 
 									ORDER BY FECHA_ULTPAGO DESC, SEDE, LUGARENTRENAMIENTO";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':p1' => $fecha_inicio, ':p2' => $fecha_fin, ':p3' => $fecha_inicio, ':p4' => $fecha_inicio]);
 			return $datos;			
 		}
 	}

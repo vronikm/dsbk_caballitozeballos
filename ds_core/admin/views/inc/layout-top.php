@@ -22,7 +22,7 @@ $vistaActual = $vistaActual ?? '';
     <title><?php echo APP_NAME; ?> | <?php echo $tituloVista; ?></title>
 
     <link rel="icon" type="image/png" href="<?php echo DS_HUB_URL; ?>ds_core/assets/img/logo_ds.png">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&display=fallback">
+    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
     <link rel="stylesheet" href="<?php echo DS_VENDOR_URL; ?>plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="<?php echo DS_VENDOR_URL; ?>css/adminlte.min.css">
     <link rel="stylesheet" href="<?php echo DS_VENDOR_URL; ?>css/sweetalert2.min.css">

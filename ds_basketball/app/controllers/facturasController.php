@@ -12,18 +12,22 @@
 		/*  funciones para el manejo de facturas */
 		public function listarSedeFacturas($sedeid, $rolid = null, $usuario = null){
 			$option="";
+			/* El parametro solo se pasa si la consulta lo usa: la rama de
+			   administrador no lleva :usuario y PDO rechaza los sobrantes. */
+			$parametros=[];
 
 			if($rolid != 1 && $rolid != 2){
 				$consulta_datos="SELECT S.sede_id, S.sede_nombre
 									FROM general_sede S
 									INNER JOIN seguridad_usuario_sede US ON US.usuariosede_sedeid = S.sede_id
 									INNER JOIN seguridad_usuario U ON U.usuario_id = US.usuariosede_usuarioid
-									WHERE U.usuario_usuario  = '".$usuario."'";
+									WHERE U.usuario_usuario = :usuario";
+				$parametros[':usuario'] = $usuario;
 			}else{
 				$consulta_datos="SELECT sede_id, sede_nombre FROM general_sede";
 			}
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				if($sedeid == $rows['sede_id']){
@@ -37,45 +41,63 @@
 		}
 
 		public function listarAlumnosFacturas($identificacion, $apellidopaterno, $primernombre, $anio, $sede){
-			if($identificacion!=""){
-				$identificacion .= '%';
-			}
-			if($primernombre!=""){
-				$primernombre .= '%';
-			}
-			if($apellidopaterno!=""){
-				$apellidopaterno .= '%';
-			}
+			/*
+			| Mismo criterio que en el buscador de pagos: los valores van
+			| ligados, no concatenados. El comodin se anade al parametro, no
+			| a la consulta, para que un apellido con apostrofo se busque tal
+			| cual lo escribio el usuario.
+			|
+			| Se conservan las mismas ramas que antes:
+			|   · con algun criterio de texto -> los tres LIKE en OR
+			|   · sin criterios pero con anio -> solo por anio de nacimiento
+			|   · sin nada                    -> todos
+			|   · sin sede                    -> no se lista nada
+			*/
 			$tabla="";
-			$consulta_datos="SELECT * FROM sujeto_alumno
-								WHERE (alumno_primernombre LIKE '".$primernombre."'
-								OR alumno_identificacion LIKE '".$identificacion."'
-								OR alumno_apellidopaterno LIKE '".$apellidopaterno."') ";
-			if($anio!=""){
-				$consulta_datos .= " and YEAR(alumno_fechanacimiento) = '".$anio."'";
-			}
+			$parametros = [];
 
-			if($identificacion=="" && $primernombre=="" && $apellidopaterno==""){
-				$consulta_datos="SELECT * FROM sujeto_alumno WHERE YEAR(alumno_fechanacimiento) = '".$anio."'";
-			}
+			$hayTexto = ($identificacion != "" || $primernombre != "" || $apellidopaterno != "");
 
-			if($identificacion=="" && $primernombre=="" && $apellidopaterno=="" && $anio == ""){
+			if($hayTexto){
+				$consulta_datos = "SELECT * FROM sujeto_alumno
+									WHERE (alumno_primernombre LIKE :primernombre
+									OR alumno_identificacion LIKE :identificacion
+									OR alumno_apellidopaterno LIKE :apellidopaterno) ";
+
+				/* El comodin solo se anade a lo que trae valor: un criterio
+				   vacio debe seguir sin coincidir con nada, como antes. */
+				$parametros[':primernombre']    = $primernombre    != "" ? $primernombre.'%'    : '';
+				$parametros[':identificacion']  = $identificacion  != "" ? $identificacion.'%'  : '';
+				$parametros[':apellidopaterno'] = $apellidopaterno != "" ? $apellidopaterno.'%' : '';
+
+				if($anio!=""){
+					$consulta_datos .= " and YEAR(alumno_fechanacimiento) = :anio";
+					$parametros[':anio'] = $anio;
+				}
+			}elseif($anio!=""){
+				$consulta_datos = "SELECT * FROM sujeto_alumno WHERE YEAR(alumno_fechanacimiento) = :anio";
+				$parametros[':anio'] = $anio;
+			}else{
 				$consulta_datos = "SELECT * FROM sujeto_alumno WHERE alumno_primernombre <> '' ";
 			}
 
 			if($sede!=""){
 				if($sede == 0){
-					$consulta_datos .= " and alumno_sedeid <> '".$sede."'";
+					$consulta_datos .= " and alumno_sedeid <> :sede";
 				}else{
-					$consulta_datos .= " and alumno_sedeid = '".$sede."'";
+					$consulta_datos .= " and alumno_sedeid = :sede";
 				}
+				$parametros[':sede'] = $sede;
 			}else{
+				/* Sin sede no se lista nada; se descartan los parametros
+				   recogidos porque la consulta que los usaba desaparece. */
 				$consulta_datos = "SELECT * FROM sujeto_alumno WHERE alumno_primernombre = '' ";
+				$parametros = [];
 			}
 
 			// Solo alumnos activos cuyo representante factura (repre_factura = 'S')
 			$consulta_datos .= " AND alumno_estado = 'A' AND alumno_repreid IN (SELECT repre_id FROM alumno_representante WHERE repre_factura = 'S')";
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				// Estado de facturacion del alumno (por prioridad):
@@ -87,7 +109,7 @@
 					$estado = $this->ejecutarConsulta(
 						"SELECT
 							(SELECT COUNT(*) FROM alumno_pago P
-								WHERE P.pago_alumnoid = ".$alumnoId." AND P.pago_estado = 'C'
+								WHERE P.pago_alumnoid = :alumno1 AND P.pago_estado = 'C'
 									AND NOT EXISTS (
 										SELECT 1 FROM facturas_electronicas_detalle FD
 										INNER JOIN facturas_electronicas FE ON FE.id = FD.factura_electronica_id
@@ -95,14 +117,14 @@
 									)
 							) AS pagos_pendientes,
 							(SELECT COUNT(*) FROM alumno_pago P2
-								WHERE P2.pago_alumnoid = ".$alumnoId."
+								WHERE P2.pago_alumnoid = :alumno2
 									AND EXISTS (
 										SELECT 1 FROM facturas_electronicas_detalle FD2
 										INNER JOIN facturas_electronicas FE2 ON FE2.id = FD2.factura_electronica_id
 										WHERE FD2.pago_id = P2.pago_id AND ".$this->estadoFacturaBloqueanteSql('FE2')."
 									)
 							) AS facturas"
-					)->fetch();
+					, [':alumno1' => $alumnoId, ':alumno2' => $alumnoId])->fetch();
 					$pagosPendientes = (int)($estado['pagos_pendientes'] ?? 0);
 					$tieneFacturas   = (int)($estado['facturas'] ?? 0);
 				}catch(\Throwable $e){
@@ -129,7 +151,7 @@
 						<td>'.$rows['alumno_apellidopaterno'].' '.$rows['alumno_apellidomaterno'].'</td>
 						<td>'.$rows['alumno_fechanacimiento'].'</td>
 						<td>
-							'.$this->siPuede('crear','facturasList','<a href="'.APP_URL.'facturasNew/'.$rows['alumno_id'].'/" class="btn float-right '.$botonpago.' btn-sm" target="_blank">Registrar factura</a>').'
+							'.$this->siPuede('crear','facturasList','<a href="'.APP_URL.'facturasNew/'.$rows['alumno_id'].'/" class="btn float-right '.$botonpago.' btn-sm" target="_blank"><i class="fas fa-file-invoice-dollar mr-1"></i>Registrar factura</a>').'
 						</td>
 					</tr>';
 			}
@@ -207,7 +229,7 @@
 									CONCAT(R.repre_primernombre, ' ', R.repre_segundonombre, ' ', R.repre_apellidopaterno, ' ', R.repre_apellidomaterno) AS representante
 								FROM sujeto_alumno A
 									INNER JOIN alumno_representante R ON R.repre_id = A.alumno_repreid
-								WHERE A.alumno_id = ".$alumnoid."
+								WHERE A.alumno_id = :alumno
 							) RE
 								LEFT JOIN (
 									SELECT
@@ -220,7 +242,7 @@
 									INNER JOIN alumno_pago P ON P.pago_alumnoid = AL.alumno_id
 									INNER JOIN general_tabla_catalogo C ON C.catalogo_valor = P.pago_rubroid
 									LEFT JOIN general_tabla_catalogo F ON F.catalogo_valor = P.pago_formapagoid
-									WHERE P.pago_estado = 'C' AND P.pago_fecharegistro BETWEEN '".$fecha_inicio."' AND '".$fecha_fin."'
+									WHERE P.pago_estado = 'C' AND P.pago_fecharegistro BETWEEN :desde AND :hasta
 										AND NOT EXISTS (
 											SELECT 1 FROM facturas_electronicas_detalle FD
 											INNER JOIN facturas_electronicas FE ON FE.id = FD.factura_electronica_id
@@ -228,7 +250,13 @@
 										)
 								) RP ON RP.repre_id = RE.repre_id";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			/* Id y fechas ligados: esta consulta no los validaba de ninguna
+			   forma y el id entraba sin comillas, donde escapar no sirve. */
+			$datos = $this->ejecutarConsulta($consulta_datos, [
+				':alumno' => (int)$alumnoid,
+				':desde'  => $fecha_inicio,
+				':hasta'  => $fecha_fin,
+			]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$detallePago = htmlspecialchars($this->limpiarTextoFactura($rows['detalle'] ?? ''), ENT_QUOTES, 'UTF-8');
@@ -277,7 +305,7 @@
 			$repreid=$this->limpiarCadena($_POST['repre_id']);
 
 			# Verificando existencia de representante #
-			$representante=$this->ejecutarConsulta("SELECT repre_id, repre_tipoidentificacion FROM alumno_representante WHERE repre_id='$repreid'");
+			$representante=$this->ejecutarConsulta("SELECT repre_id, repre_tipoidentificacion FROM alumno_representante WHERE repre_id = :repre", [':repre' => (int)$repreid]);
 			if($representante->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -1472,7 +1500,7 @@
 			$alumnoId = (int)($factura['alumno_id'] ?? 0);
 			if($alumnoId > 0){
 				try{
-					$sedeRow = $this->ejecutarConsulta("SELECT S.sede_foto FROM sujeto_alumno A INNER JOIN general_sede S ON S.sede_id = A.alumno_sedeid WHERE A.alumno_id = ".$alumnoId." LIMIT 1")->fetch();
+					$sedeRow = $this->ejecutarConsulta("SELECT S.sede_foto FROM sujeto_alumno A INNER JOIN general_sede S ON S.sede_id = A.alumno_sedeid WHERE A.alumno_id = :alumno LIMIT 1", [':alumno' => $alumnoId])->fetch();
 					$sedeFoto = trim((string)($sedeRow['sede_foto'] ?? ''));
 					if($sedeFoto !== ''){
 						$logoHtml = '<img src="'.$h(APP_URL.'app/views/imagenes/fotos/sedes/'.$sedeFoto).'" alt="Logo sede" style="max-height:80px;max-width:220px;display:block;margin-bottom:8px">';
@@ -1533,7 +1561,7 @@
 			$alumnoId = (int)($factura['alumno_id'] ?? 0);
 			if($alumnoId > 0){
 				try{
-					$row = $this->ejecutarConsulta("SELECT S.sede_foto FROM sujeto_alumno A INNER JOIN general_sede S ON S.sede_id = A.alumno_sedeid WHERE A.alumno_id = ".$alumnoId." LIMIT 1")->fetch();
+					$row = $this->ejecutarConsulta("SELECT S.sede_foto FROM sujeto_alumno A INNER JOIN general_sede S ON S.sede_id = A.alumno_sedeid WHERE A.alumno_id = :alumno LIMIT 1", [':alumno' => $alumnoId])->fetch();
 					$foto = trim((string)($row['sede_foto'] ?? ''));
 					if($foto !== ''){
 						$cand = dirname(__DIR__, 2).'/app/views/imagenes/fotos/sedes/'.$foto;
@@ -1677,21 +1705,37 @@
 		public function contarFacturasGeneradas($alumnoid, $fecha_inicio, $fecha_fin){
 			$alumnoid = (int)$alumnoid;
 			// Rango de fechas valido -> filtra; vacio/invalido -> cuenta todas
-			$filtroFecha = (preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$fecha_inicio) && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$fecha_fin))
-				? " AND FE.fecha_emision BETWEEN '".$fecha_inicio."' AND '".$fecha_fin."'" : "";
-			$consulta = "SELECT COUNT(*) AS total FROM sujeto_alumno A INNER JOIN alumno_representante R ON R.repre_id = A.alumno_repreid INNER JOIN facturas_electronicas FE ON FE.representante_id = R.repre_id WHERE A.alumno_id = ".$alumnoid." AND FE.estado_sri <> 'ANULADA'".$filtroFecha;
-			$datos = $this->ejecutarConsulta($consulta)->fetch();
+			$parametros = [':alumno' => $alumnoid];
+			$filtroFecha = "";
+
+			if(preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$fecha_inicio)
+			   && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$fecha_fin)){
+				$filtroFecha = " AND FE.fecha_emision BETWEEN :desde AND :hasta";
+				$parametros[':desde'] = $fecha_inicio;
+				$parametros[':hasta'] = $fecha_fin;
+			}
+
+			$consulta = "SELECT COUNT(*) AS total FROM sujeto_alumno A INNER JOIN alumno_representante R ON R.repre_id = A.alumno_repreid INNER JOIN facturas_electronicas FE ON FE.representante_id = R.repre_id WHERE A.alumno_id = :alumno AND FE.estado_sri <> 'ANULADA'".$filtroFecha;
+			$datos = $this->ejecutarConsulta($consulta, $parametros)->fetch();
 			return (int)($datos['total'] ?? 0);
 		}
 
 		public function listarFacturasGeneradas($alumnoid, $fecha_inicio, $fecha_fin){
 			$alumnoid = (int)$alumnoid;
 			// Rango de fechas valido -> filtra; vacio/invalido -> lista todas (carga inicial)
-			$filtroFecha = (preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$fecha_inicio) && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$fecha_fin))
-				? " AND FE.fecha_emision BETWEEN '".$fecha_inicio."' AND '".$fecha_fin."'" : "";
+			$parametros = [':alumno' => $alumnoid];
+			$filtroFecha = "";
+
+			if(preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$fecha_inicio)
+			   && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$fecha_fin)){
+				$filtroFecha = " AND FE.fecha_emision BETWEEN :desde AND :hasta";
+				$parametros[':desde'] = $fecha_inicio;
+				$parametros[':hasta'] = $fecha_fin;
+			}
+
 			$tabla = '';
-			$consulta = "SELECT FE.id, FE.fecha_emision, FE.establecimiento, FE.punto_emision, FE.secuencial, FE.total, FE.estado_sri, FE.clave_acceso, FE.cliente_razon_social, FE.cliente_email, FE.numero_autorizacion, FE.mensaje_error FROM sujeto_alumno A INNER JOIN alumno_representante R ON R.repre_id = A.alumno_repreid INNER JOIN facturas_electronicas FE ON FE.representante_id = R.repre_id WHERE A.alumno_id = ".$alumnoid." AND FE.estado_sri <> 'ANULADA'".$filtroFecha." ORDER BY FE.fecha_emision DESC, FE.id DESC";
-			$datos = $this->ejecutarConsulta($consulta)->fetchAll();
+			$consulta = "SELECT FE.id, FE.fecha_emision, FE.establecimiento, FE.punto_emision, FE.secuencial, FE.total, FE.estado_sri, FE.clave_acceso, FE.cliente_razon_social, FE.cliente_email, FE.numero_autorizacion, FE.mensaje_error FROM sujeto_alumno A INNER JOIN alumno_representante R ON R.repre_id = A.alumno_repreid INNER JOIN facturas_electronicas FE ON FE.representante_id = R.repre_id WHERE A.alumno_id = :alumno AND FE.estado_sri <> 'ANULADA'".$filtroFecha." ORDER BY FE.fecha_emision DESC, FE.id DESC";
+			$datos = $this->ejecutarConsulta($consulta, $parametros)->fetchAll();
 			$contador = 1;
 			foreach($datos as $rows){
 				$numero = $rows['establecimiento'].'-'.$rows['punto_emision'].'-'.$rows['secuencial'];
@@ -2436,7 +2480,7 @@
 		public function obtenerArchivoFacturaElectronica($facturaId, $tipo='xml'){
 			$config = $this->sriConfig();
 			$facturaId = (int)$facturaId;
-			$stmt = $this->ejecutarConsulta("SELECT id, clave_acceso, xml_generado, xml_firmado, xml_autorizado, ride_html FROM facturas_electronicas WHERE id = ".$facturaId);
+			$stmt = $this->ejecutarConsulta("SELECT id, clave_acceso, xml_generado, xml_firmado, xml_autorizado, ride_html FROM facturas_electronicas WHERE id = :factura", [':factura' => $facturaId]);
 			if($stmt->rowCount()<=0){ return null; }
 			$factura = $stmt->fetch();
 			$tipo = strtolower((string)$tipo);
@@ -2471,2040 +2515,21 @@
 
 
 		/*----------  Controlador registrar alumno  ----------*/
-		public function registrarAlumnoControlador(){
-			/*---------------Variables para el registro del tab del alumno----------------*/
-			$alumno_repreid 			= $this->limpiarCadena($_POST['alumno_repreid']);
-			$alumno_identificacion 		= $this->limpiarCadena($_POST['alumno_identificacion']);
-			$alumno_apellidopaterno 	= $this->limpiarCadena($_POST['alumno_apellido1']);
-			$alumno_apellidomaterno 	= $this->limpiarCadena($_POST['alumno_apellido2']);
-			$alumno_tipoidentificacion 	= $this->limpiarCadena($_POST['alumno_tipoidentificacion']);
-			$alumno_primernombre 		= $this->limpiarCadena($_POST['alumno_nombre1']);
-			$alumno_segundonombre 		= $this->limpiarCadena($_POST['alumno_nombre2']);
-			$alumno_nacionalidadid		= $this->limpiarCadena($_POST['alumno_nacionalidadid']);
-			$alumno_fechanacimiento 	= $this->limpiarCadena($_POST['alumno_fechanacimiento']);
-			$alumno_direccion 			= $this->limpiarCadena($_POST['alumno_direccion']);
-			$alumno_fechaingreso		= $this->limpiarCadena($_POST['alumno_fechaingreso']);
-			$alumno_sedeid 				= $this->limpiarCadena($_POST['alumno_sedeid']);
-			$alumno_nombrecorto 		= ""; //$this->limpiarCadena($_POST['alumno_nombrecorto']);
-			$alumno_posicionid			= ""; //$this->limpiarCadena($_POST['alumno_posicionid']);
-			$alumno_numcamiseta 		= $_POST['alumno_numcamiseta'];
-			$alumno_estado 				= "A";
-			$alumno_genero 				= "";
-			$alumno_hermanos 			= "";
-
-			if ($alumno_numcamiseta == "" ){$alumno_numcamiseta = 0;}
-
-			if (isset($_POST['alumno_genero']) && isset($_POST['alumno_hermanos'])) {
-				$alumno_genero 				= $_POST['alumno_genero'];
-				$alumno_hermanos 			= $_POST['alumno_hermanos'];
-
-			}else{
-			$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"No ha completado los campos obligatorios del alumno",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-			}
-
-		    # Verificando campos obligatorios #
-		    if($alumno_identificacion=="" || $alumno_primernombre=="" || $alumno_apellidopaterno=="" || $alumno_fechanacimiento==""){
-			$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"No ha completado todos los campos que son obligatorios",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		    }
-
-		    # Verificando integridad de los datos #
-		    if($this->verificarDatos("[a-zA-ZÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“]{3,40}",$alumno_primernombre)){
-			$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"El nombre ingresado no coincide con el formato solicitado",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		    }
-
-            # Verificando identificacion #
-		    $check_alumno=$this->ejecutarConsulta("SELECT alumno_identificacion FROM sujeto_alumno WHERE alumno_identificacion='$alumno_identificacion'");
-		    if($check_alumno->rowCount()>0){
-			$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"La identificación ingresada ya se encuentra registrada, por favor verificar",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		    }
-
-		    # Directorio de imagenes #
-		$img_dir="../views/imagenes/fotos/alumno/";
-			$codigo=rand(0,100);
-
-		# Comprobar si se selecciono una imagen #
-		if($_FILES['alumno_foto']['name']!="" && $_FILES['alumno_foto']['size']>0){
-
-			# Creando directorio #
-		        if(!file_exists($img_dir)){
-		            if(!mkdir($img_dir,0777)){
-			$alerta=[
-							"tipo"=>"simple",
-							"titulo"=>"Ocurrió un error",
-							"texto"=>"No fue posible crear el directorio",
-							"icono"=>"error"
-						];
-						return json_encode($alerta);
-		            }
-		        }
-
-		        # Verificando formato de imagenes #
-		        if(mime_content_type($_FILES['alumno_foto']['tmp_name'])!="image/jpeg" && mime_content_type($_FILES['alumno_foto']['tmp_name'])!="image/png"){
-			$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error",
-						"texto"=>"La imagen que ha seleccionado es de un formato no permitido",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-		        }
-
-		        # Verificando peso de imagen #
-		        if(($_FILES['alumno_foto']['size']/1024)>4000){
-			$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error",
-						"texto"=>"La imagen que ha seleccionado supera el peso permitido 4MB",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-		        }
-
-		        # Nombre de la foto #
-		        $foto=str_ireplace(" ","_",$alumno_identificacion);
-		        $foto=$foto."_".$codigo;
-
-		        # Extension de la imagen #
-		        switch(mime_content_type($_FILES['alumno_foto']['tmp_name'])){
-		            case 'image/jpeg':
-		                $foto=$foto.".jpg";
-		            break;
-		            case 'image/png':
-		                $foto=$foto.".png";
-		            break;
-		        }
-				$maxWidth = 800;
-			$maxHeight = 600;
-
-				chmod($img_dir,0777);
-				$inputFile = ($_FILES['alumno_foto']['tmp_name']);
-			$outputFile = $img_dir.$foto;
-
-				# Moviendo imagen al directorio #
-				//if(!move_uploaded_file($_FILES['alumno_foto']['tmp_name'],$img_dir.$foto)){
-				if ($this->resizeImageGD($inputFile, $maxWidth, $maxHeight, $outputFile)) {
-
-				}else{
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error",
-						"texto"=>"No es posible subir la imagen al sistema en este momento",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-		}else{
-			$foto="";
-		}
-
-			/*---------------Registro del tab Cedula del alumno----------------*/
-
-			# Directorio de imagenes #
-			$img_cedula="../views/imagenes/cedulas/";
-
-			# Comprobar si seleccionÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ el Anverso de la cÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©dula #
-			if($_FILES['alumno_cedulaA']['name']!="" && $_FILES['alumno_cedulaA']['size']>0){
-
-				# Creando directorio #
-				if(!file_exists($img_cedula)){
-					if(!mkdir($img_cedula,0777)){
-						$alerta=[
-							"tipo"=>"simple",
-							"titulo"=>"Ocurrió un error",
-							"texto"=>"No fue posible crear el directorio para almacenar las imágenes de la cédula",
-							"icono"=>"error"
-						];
-						return json_encode($alerta);
-					}
-				}
-
-				# Verificando formato de imagenes #
-				if(mime_content_type($_FILES['alumno_cedulaA']['tmp_name'])!="image/jpeg" && mime_content_type($_FILES['alumno_cedulaA']['tmp_name'])!="image/png"){
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error",
-						"texto"=>"La imagen que ha seleccionado es de un formato no permitido",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				# Verificando peso de imagen #
-				if(($_FILES['alumno_cedulaA']['size']/1024)>4000){
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error",
-						"texto"=>"La imagen que ha seleccionado supera el peso permitido 4MB",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				# Nombre de la foto #
-				$cedulaA=str_ireplace(" ","_",$alumno_identificacion);
-				$cedulaA=$cedulaA."_A".$codigo;
-
-				# Extension de la imagen #
-				switch(mime_content_type($_FILES['alumno_cedulaA']['tmp_name'])){
-					case 'image/jpeg':
-						$cedulaA=$cedulaA.".jpg";
-					break;
-					case 'image/png':
-						$cedulaA=$cedulaA.".png";
-					break;
-				}
-				$maxWidth = 800;
-				$maxHeight = 600;
-
-				chmod($img_cedula,0777);
-				$inputFile = ($_FILES['alumno_cedulaA']['tmp_name']);
-				$outputFile = $img_cedula.$cedulaA;
-
-				# Moviendo imagen al directorio #
-				//if(!move_uploaded_file($_FILES['alumno_foto']['tmp_name'],$img_dir.$foto)){
-				if ($this->resizeImageGD($inputFile, $maxWidth, $maxHeight, $outputFile)) {
-
-				}else{
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error",
-						"texto"=>"No es posible subir la imagen al sistema en este momento",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-			}else{
-				$cedulaA="";
-			}
-
-			# Comprobar si seleccionÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ el reverso de la cÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©dula #
-			if($_FILES['alumno_cedulaR']['name']!="" && $_FILES['alumno_cedulaR']['size']>0){
-
-				# Creando directorio #
-				if(!file_exists($img_cedula)){
-					if(!mkdir($img_cedula,0777)){
-						$alerta=[
-							"tipo"=>"simple",
-							"titulo"=>"Ocurrió un error",
-							"texto"=>"No fue posible crear el directorio para almacenar las imágenes de la cédula",
-							"icono"=>"error"
-						];
-						return json_encode($alerta);
-					}
-				}
-
-				# Verificando formato de imagenes #
-				if(mime_content_type($_FILES['alumno_cedulaR']['tmp_name'])!="image/jpeg" && mime_content_type($_FILES['alumno_cedulaR']['tmp_name'])!="image/png"){
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error",
-						"texto"=>"La imagen que ha seleccionado es de un formato no permitido",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				# Verificando peso de imagen #
-				if(($_FILES['alumno_cedulaR']['size']/1024)>4000){
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error",
-						"texto"=>"La imagen que ha seleccionado supera el peso permitido 4MB",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				# Nombre de la foto #
-				$cedulaR=str_ireplace(" ","_",$alumno_identificacion);
-				$cedulaR=$cedulaR."_R".$codigo;
-
-				# Extension de la imagen #
-				switch(mime_content_type($_FILES['alumno_cedulaR']['tmp_name'])){
-					case 'image/jpeg':
-						$cedulaR=$cedulaR.".jpg";
-					break;
-					case 'image/png':
-						$cedulaR=$cedulaR.".png";
-					break;
-				}
-				$maxWidth = 800;
-				$maxHeight = 600;
-
-				chmod($img_cedula,0777);
-				$inputFile = ($_FILES['alumno_cedulaR']['tmp_name']);
-				$outputFile = $img_cedula.$cedulaR;
-
-				# Moviendo imagen al directorio #
-				//if(!move_uploaded_file($_FILES['alumno_foto']['tmp_name'],$img_dir.$foto)){
-				if ($this->resizeImageGD($inputFile, $maxWidth, $maxHeight, $outputFile)) {
-
-				}else{
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error",
-						"texto"=>"No es posible subir la imagen al sistema en este momento",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-			}else{
-				$cedulaR="";
-			}
-
-		    $alumno_datos_reg=[
-				[
-					"campo_nombre"=>"alumno_repreid",
-					"campo_marcador"=>":Repreid",
-					"campo_valor"=>$alumno_repreid
-				],
-				[
-					"campo_nombre"=>"alumno_sedeid",
-					"campo_marcador"=>":Sedeid",
-					"campo_valor"=>$alumno_sedeid
-				],
-				[
-					"campo_nombre"=>"alumno_posicionid",
-					"campo_marcador"=>":Posicionid",
-					"campo_valor"=>$alumno_posicionid
-				],
-				[
-					"campo_nombre"=>"alumno_nacionalidadid",
-					"campo_marcador"=>":Nacionalidadid",
-					"campo_valor"=>$alumno_nacionalidadid
-				],
-				[
-					"campo_nombre"=>"alumno_tipoidentificacion",
-					"campo_marcador"=>":Tipoidentificacion",
-					"campo_valor"=>$alumno_tipoidentificacion
-				],
-				[
-					"campo_nombre"=>"alumno_identificacion",
-					"campo_marcador"=>":Identificacion",
-					"campo_valor"=>$alumno_identificacion
-				],
-				[
-					"campo_nombre"=>"alumno_primernombre",
-					"campo_marcador"=>":Primernombre",
-					"campo_valor"=>$alumno_primernombre
-				],
-				[
-					"campo_nombre"=>"alumno_segundonombre",
-					"campo_marcador"=>":Segundonombre",
-					"campo_valor"=>$alumno_segundonombre
-				],
-				[
-					"campo_nombre"=>"alumno_apellidopaterno",
-					"campo_marcador"=>":Apellidopaterno",
-					"campo_valor"=>$alumno_apellidopaterno
-				],
-				[
-					"campo_nombre"=>"alumno_apellidomaterno",
-					"campo_marcador"=>":Apellidomaterno",
-					"campo_valor"=>$alumno_apellidomaterno
-				],
-				[
-					"campo_nombre"=>"alumno_nombrecorto",
-					"campo_marcador"=>":Nombrecorto",
-					"campo_valor"=>$alumno_nombrecorto
-				],
-				[
-					"campo_nombre"=>"alumno_direccion",
-					"campo_marcador"=>":Direccion",
-					"campo_valor"=>$alumno_direccion
-				],
-				[
-					"campo_nombre"=>"alumno_fechanacimiento",
-					"campo_marcador"=>":Fechanacimiento",
-					"campo_valor"=>$alumno_fechanacimiento
-				],
-				[
-					"campo_nombre"=>"alumno_fechaingreso",
-					"campo_marcador"=>":Fechaingreso",
-					"campo_valor"=>$alumno_fechaingreso
-				],
-				[
-					"campo_nombre"=>"alumno_genero",
-					"campo_marcador"=>":Genero",
-					"campo_valor"=>$alumno_genero
-				],
-				[
-					"campo_nombre"=>"alumno_hermanos",
-					"campo_marcador"=>":Hermanos",
-					"campo_valor"=>$alumno_hermanos
-				],
-				[
-					"campo_nombre"=>"alumno_estado",
-					"campo_marcador"=>":Activo",
-					"campo_valor"=>$alumno_estado
-				],
-				[
-					"campo_nombre"=>"alumno_imagen",
-					"campo_marcador"=>":Foto",
-					"campo_valor"=>$foto
-				],
-				[
-					"campo_nombre"=>"alumno_numcamiseta",
-					"campo_marcador"=>":Camiseta",
-					"campo_valor"=>$alumno_numcamiseta
-				],
-				[
-					"campo_nombre"=>"alumno_cedulaA",
-					"campo_marcador"=>":CedulaA",
-					"campo_valor"=>$cedulaA
-				],
-				[
-					"campo_nombre"=>"alumno_cedulaR",
-					"campo_marcador"=>":CedulaR",
-					"campo_valor"=>$cedulaR
-				]
-			];
-
-			$registrar_alumno=$this->guardarDatos("sujeto_alumno",$alumno_datos_reg);
-
-			/*---------------Inicio de registro de InformaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de los tabs*/
-			if($registrar_alumno->rowCount()==1){
-				$alerta=[
-					"tipo"=>"limpiar",
-					"titulo"=>"Alumno registrado",
-					"texto"=>"El alumno ".$alumno_identificacion." | ".$alumno_primernombre." ".$alumno_apellidopaterno." se registró correctamente",
-					"icono"=>"success"
-				];
-
-				$infomedic_tiposangre 	= $this->limpiarCadena($_POST['infomedic_tiposangre']);
-				$infomedic_peso		  	= $this->limpiarCadena($_POST['infomedic_peso']);
-				$infomedic_talla 	  	= $this->limpiarCadena($_POST['infomedic_talla']);
-				$infomedic_enfermedad 	= $this->limpiarCadena($_POST['infomedic_enfermedad']);
-				$infomedic_medicamentos = $this->limpiarCadena($_POST['infomedic_medicamentos']);
-				$infomedic_alergia1 	= $this->limpiarCadena($_POST['infomedic_alergia1']);
-				$infomedic_alergia2 	= $this->limpiarCadena($_POST['infomedic_alergia2']);
-				$infomedic_cirugias 	= $this->limpiarCadena($_POST['infomedic_cirugias']);
-				$infomedic_observacion	= $this->limpiarCadena($_POST['infomedic_observacion']);
-
-				if ($infomedic_peso ==""){$infomedic_peso = 0;}
-				if ($infomedic_talla ==""){$infomedic_talla = 0;}
-
-				if(isset($_POST['infomedic_covid'])){ $infomedic_covid  = $_POST['infomedic_covid']; }else {$infomedic_covid="";}
-				if(isset($_POST['infomedic_vacunas'])){ $infomedic_vacunas  = $_POST['infomedic_vacunas']; }else {$infomedic_vacunas="";}
-
-				/*---------------Obtengo campo alumnoid para todas las tablas*/
-				$check_alumno=$this->ejecutarConsulta("SELECT alumno_id FROM sujeto_alumno WHERE alumno_identificacion='$alumno_identificacion'");
-
-				if($check_alumno->rowCount()==1){
-					$alumno=$check_alumno->fetchAll();
-					foreach( $alumno as $rows ){
-						$alumnoid = $rows['alumno_id'];
-					}
-				}
-
-				/*---------------Registro del tab InformaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n MÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©dica del alumno*/
-				if($infomedic_tiposangre!="" || $infomedic_peso>0 || $infomedic_talla>0 || $infomedic_enfermedad!=""||
-					$infomedic_medicamentos!="" || $infomedic_alergia1!="" || $infomedic_alergia2!="" || $infomedic_cirugias!="" ||
-					$infomedic_observacion!=""){
-
-					$infomedic_reg=[
-						[
-							"campo_nombre"=>"infomedic_alumnoid",
-							"campo_marcador"=>":Alumnoid",
-							"campo_valor"=>$alumnoid
-						],
-						[
-							"campo_nombre"=>"infomedic_fecha",
-							"campo_marcador"=>":Fechacreacion",
-							"campo_valor"=>date("Y-m-d H:i:s")
-						],
-						[
-							"campo_nombre"=>"infomedic_tiposangre",
-							"campo_marcador"=>":Tiposangre",
-							"campo_valor"=>$infomedic_tiposangre
-						],
-						[
-							"campo_nombre"=>"infomedic_peso",
-							"campo_marcador"=>":Peso",
-							"campo_valor"=>$infomedic_peso
-						],
-						[
-							"campo_nombre"=>"infomedic_talla",
-							"campo_marcador"=>":Talla",
-							"campo_valor"=>$infomedic_talla
-						],
-						[
-							"campo_nombre"=>"infomedic_enfermedad",
-							"campo_marcador"=>":Enfermedad",
-							"campo_valor"=>$infomedic_enfermedad
-						],
-						[
-							"campo_nombre"=>"infomedic_medicamentos",
-							"campo_marcador"=>":Medicamentos",
-							"campo_valor"=>$infomedic_medicamentos
-						],
-						[
-							"campo_nombre"=>"infomedic_alergia1",
-							"campo_marcador"=>":AlergiaMedicamentos",
-							"campo_valor"=>$infomedic_alergia1
-						],
-						[
-							"campo_nombre"=>"infomedic_alergia2",
-							"campo_marcador"=>":AlergiaObjetos",
-							"campo_valor"=>$infomedic_alergia2
-						],
-						[
-							"campo_nombre"=>"infomedic_cirugias",
-							"campo_marcador"=>":Cirugias",
-							"campo_valor"=>$infomedic_cirugias
-						],
-						[
-							"campo_nombre"=>"infomedic_observacion",
-							"campo_marcador"=>":Observacion",
-							"campo_valor"=>$infomedic_observacion
-						],
-						[
-							"campo_nombre"=>"infomedic_covid",
-							"campo_marcador"=>":VacunasCovid",
-							"campo_valor"=>$infomedic_covid
-						],
-						[
-							"campo_nombre"=>"infomedic_vacunas",
-							"campo_marcador"=>":Vacunas",
-							"campo_valor"=>$infomedic_vacunas
-						]
-					];
-
-					$this->guardarDatos("alumno_infomedic",$infomedic_reg);
-				}
-
-				/*---------------Fin de registro del tab InformaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n MÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©dica del alumno*/
-
-				/*---------------Registro del tab Contacto Emergencia del alumno------------*/
-				$cemer_nombre 		= $this->limpiarCadena($_POST['cemer_nombre']);
-				$cemer_celular 		= $this->limpiarCadena($_POST['cemer_celular']);
-				$cemer_parentesco	= $this->limpiarCadena($_POST['cemer_parentesco']);
-
-				if($cemer_nombre!="" || $cemer_celular!=""){
-					$cemergencia_reg=[
-						[
-							"campo_nombre"=>"cemer_alumnoid",
-							"campo_marcador"=>":Alumnoid",
-							"campo_valor"=>$alumnoid
-						],
-						[
-							"campo_nombre"=>"cemer_nombre",
-							"campo_marcador"=>":NombreContactoEmer",
-							"campo_valor"=>$cemer_nombre
-						],
-						[
-							"campo_nombre"=>"cemer_celular",
-							"campo_marcador"=>":CelularContactoEmer",
-							"campo_valor"=>$cemer_celular
-						],
-						[
-							"campo_nombre"=>"cemer_parentesco",
-							"campo_marcador"=>":ParentescoContactoEmer",
-							"campo_valor"=>$cemer_parentesco
-						]
-					];
-
-					$this->guardarDatos("alumno_cemergencia",$cemergencia_reg);
-				}
-				/*---------------Fin de registro del tab Contacto Emergencia del alumno------*/
-
-				/*---------------Actulizar horario de entrenamiento---------------------*/
-				$horario_id = $this->limpiarCadena($_POST['horarioid']);
-
-				if($horario_id!="" || $alumnoid!=""){
-
-					$asignacion_horario_reg = [
-						[
-							"campo_nombre" => "asignahorario_horarioid",
-							"campo_marcador" => ":Horarioid",
-							"campo_valor" => $horario_id
-						],
-						[
-							"campo_nombre" => "asignahorario_alumnoid",
-							"campo_marcador" => ":Alumnoid",
-							"campo_valor" => $alumnoid
-						]
-					];
-
-					$this->guardarDatos("asistencia_asignahorario",$asignacion_horario_reg);
-				}
-
-
-				/*---------------Fin de actualizacion de horariop de entrenamiento------*/
-			}else{
-				if(is_file($img_dir.$foto)){
-					chmod($img_dir.$foto,0777);
-					unlink($img_dir.$foto);
-				}
-
-				$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"No se pudo registrar la información del alumno, por favor intente nuevamente",
-					"icono"=>"error"
-				];
-			}
-			return json_encode($alerta);
-		}
-
 		/*----------  Matriz de alumnos con opciones Ver, Actualizar, Eliminar  ----------*/
 
 
 		/*----------  Obtener el tipo de documento guardado  ----------*/
-		public function listarOptionTipoIdentificacion($tipoidentificacion){
-			$option="";
-
-			$consulta_datos="SELECT C.catalogo_valor, C.catalogo_descripcion
-								FROM general_tabla_catalogo C
-								INNER JOIN general_tabla T on T.tabla_id = C.catalogo_tablaid
-								WHERE T.tabla_nombre = 'tipo_documento'";
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				if($tipoidentificacion == $rows['catalogo_valor']){
-					$option.='<option value='.$rows['catalogo_valor'].' selected="selected">'.$rows['catalogo_descripcion'].'</option>';
-				}else{
-					$option.='<option value='.$rows['catalogo_valor'].'>'.$rows['catalogo_descripcion'].'</option>';
-				}
-			}
-			return $option;
-		}
-
 		/*----------  Obtener la nacionalidad guardada  ----------*/
-		public function listarOptionNacionalidad($alumno_nacionalidadid){
-			$option="";
-
-			$consulta_datos="SELECT C.catalogo_valor, C.catalogo_descripcion
-								FROM general_tabla_catalogo C
-								INNER JOIN general_tabla T on T.tabla_id = C.catalogo_tablaid
-								WHERE T.tabla_nombre = 'nacionalidad'";
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				if($alumno_nacionalidadid == $rows['catalogo_valor']){
-					$option.='<option value='.$rows['catalogo_valor'].' selected="selected">'.$rows['catalogo_descripcion'].'</option>';
-				}else{
-					$option.='<option value='.$rows['catalogo_valor'].'>'.$rows['catalogo_descripcion'].'</option>';
-				}
-			}
-			return $option;
-		}
-
 		/*----------  Obtener la sede guardada  ----------*/
-		public function listarSedeAlumno($alumno_sedeid){
-			$option="";
-
-			$consulta_datos="SELECT sede_id, sede_nombre FROM general_sede";
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				if($alumno_sedeid == $rows['sede_id']){
-					$option.='<option value='.$rows['sede_id'].' selected="selected">'.$rows['sede_nombre'].'</option>';
-				}else{
-					$option.='<option value='.$rows['sede_id'].'>'.$rows['sede_nombre'].'</option>';
-				}
-			}
-			return $option;
-		}
-
 		/*----------  Obtener la posiciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de juego guardada  ----------*/
-		public function listarAlumnosPDF($categoriaid,$sedeid){
-			$consulta_datos=("SELECT sede_nombre, alumno_identificacion, alumno_primernombre, alumno_segundonombre,
-									alumno_apellidopaterno, alumno_apellidomaterno, alumno_fechanacimiento
-								FROM sujeto_alumno, general_sede
-								WHERE alumno_estado = 'A'
-									AND alumno_sedeid = sede_id");
-
-			if($categoriaid!=0){
-				$consulta_datos .= " and YEAR(alumno_fechanacimiento) = ".$categoriaid;
-			}
-
-			if($sedeid!=0){
-				$consulta_datos .= " and alumno_sedeid = ".$sedeid;
-			}
-
-			$consulta_datos.= " ORDER BY alumno_fechanacimiento";
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			return $datos;
-		}
-
-		public function listarOptionParentesco($cemer_parentesco){
-			$option="";
-
-			$consulta_datos="SELECT C.catalogo_valor, C.catalogo_descripcion
-								FROM general_tabla_catalogo C
-								INNER JOIN general_tabla T on T.tabla_id = C.catalogo_tablaid
-								WHERE T.tabla_nombre = 'parentesco'";
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				if($cemer_parentesco == $rows['catalogo_valor']){
-					$option.='<option value='.$rows['catalogo_valor'].' selected="selected">'.$rows['catalogo_descripcion'].'</option>';
-				}else{
-					$option.='<option value='.$rows['catalogo_valor'].'>'.$rows['catalogo_descripcion'].'</option>';
-				}
-			}
-			return $option;
-		}
-
 		/*----------  Controlador eliminar alumno  ----------*/
-		public function actualizarEstadoAlumnoControlador(){
-
-			$alumno_id=$this->limpiarCadena($_POST['alumno_id']);
-
-			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM sujeto_alumno WHERE alumno_id='$alumno_id'");
-		    if($datos->rowCount()<=0){
-		        $alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"El alumno no se encuentra en el sistema",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		    }else{
-			$datos=$datos->fetch();
-		    }
-			if($datos['alumno_estado']=='A'){
-				$estadoA = 'I';
-			}else{
-				$estadoA = 'A';
-			}
-            $alumno_datos_up=[
-				[
-					"campo_nombre"=>"alumno_estado",
-					"campo_marcador"=>":Estado",
-					"campo_valor"=> $estadoA
-				]
-			];
-			$condicion=[
-				"condicion_campo"=>"alumno_id",
-				"condicion_marcador"=>":Alumnoid",
-				"condicion_valor"=>$alumno_id
-			];
-
-			if($this->actualizarDatos("sujeto_alumno",$alumno_datos_up,$condicion)){
-
-				$alerta=[
-					"tipo"=>"recargar",
-					"titulo"=>"Estado actualizado correctamente",
-					"texto"=>"El estado del alumno ".$datos['alumno_primernombre']." | ".$datos['alumno_apellidopaterno']." fue actualizado correctamente",
-					"icono"=>"success"
-				];
-			}else{
-				$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error inesperado",
-					"texto"=>"No hemos podido actualizar el estado del alumno ".$datos['alumno_primernombre']." ".$datos['alumno_apellidopaterno'].", por favor intente nuevamente",
-					"icono"=>"error"
-				];
-			}
-			return json_encode($alerta);
-		}
-
 		/*----------  Controlador eliminar alumno  ----------*/
-		public function eliminarAlumnoControlador(){
-
-			$alumno_id=$this->limpiarCadena($_POST['alumno_id']);
-
-			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM sujeto_alumno WHERE alumno_id='$alumno_id'");
-		    if($datos->rowCount()<=0){
-		        $alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"El alumno no se encuentra en el sistema",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		    }else{
-			$datos=$datos->fetch();
-		    }
-			if($datos['alumno_estado']=='A' || $datos['alumno_estado']=='I'){
-				$estadoA = 'E';
-			}else{
-				$estadoA = 'X';
-			}
-            $alumno_datos_up=[
-				[
-					"campo_nombre"=>"alumno_estado",
-					"campo_marcador"=>":Estado",
-					"campo_valor"=> $estadoA
-				]
-			];
-			$condicion=[
-				"condicion_campo"=>"alumno_id",
-				"condicion_marcador"=>":Alumnoid",
-				"condicion_valor"=>$alumno_id
-			];
-
-			if($this->actualizarDatos("sujeto_alumno",$alumno_datos_up,$condicion)){
-
-				$alerta=[
-					"tipo"=>"recargar",
-					"titulo"=>"El alumno fue eliminado correctamente",
-					"texto"=>"El alumno ".$datos['alumno_primernombre']." | ".$datos['alumno_apellidopaterno']." fue eliminado correctamente",
-					"icono"=>"success"
-				];
-			}else{
-				$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error inesperado",
-					"texto"=>"No hemos podido eliminar el alumno ".$datos['alumno_primernombre']." ".$datos['alumno_apellidopaterno'].", por favor intente nuevamente",
-					"icono"=>"error"
-				];
-			}
-			return json_encode($alerta);
-		}
-
 		/*----------  Controlador actualizar alumno  ----------*/
-		public function actualizarAlumnoControlador(){
-
-			$alumnoid=$this->limpiarCadena($_POST['alumno_id']);
-
-			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM sujeto_alumno WHERE alumno_id ='$alumnoid'");
-		    if($datos->rowCount()<=0){
-		        $alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"El alumno no se encuentra en el sistema",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		    }else{
-			$datos=$datos->fetch();
-		    }
-
-			/*---------------Variables para el registro del tab del alumno----------------*/
-			$alumno_identificacion 		= $this->limpiarCadena($_POST['alumno_identificacion']);
-			$alumno_apellidopaterno 	= $this->limpiarCadena($_POST['alumno_apellido1']);
-			$alumno_apellidomaterno 	= $this->limpiarCadena($_POST['alumno_apellido2']);
-			$alumno_tipoidentificacion 	= $this->limpiarCadena($_POST['alumno_tipoidentificacion']);
-			$alumno_primernombre 		= $this->limpiarCadena($_POST['alumno_nombre1']);
-			$alumno_segundonombre 		= $this->limpiarCadena($_POST['alumno_nombre2']);
-			$alumno_nacionalidadid		= $this->limpiarCadena($_POST['alumno_nacionalidadid']);
-			$alumno_fechanacimiento 	= $this->limpiarCadena($_POST['alumno_fechanacimiento']);
-			$alumno_direccion 			= $this->limpiarCadena($_POST['alumno_direccion']);
-			$alumno_fechaingreso		= $this->limpiarCadena($_POST['alumno_fechaingreso']);
-			$alumno_sedeid 				= $this->limpiarCadena($_POST['alumno_sedeid']);
-			$alumno_nombrecorto 		= ""; //$this->limpiarCadena($_POST['alumno_nombrecorto']);
-			$alumno_posicionid			= ""; //$this->limpiarCadena($_POST['alumno_posicionid']);
-			$alumno_numcamiseta 		= $_POST['alumno_numcamiseta'];
-			$alumno_genero 				= "";
-			$alumno_hermanos 			= "";
-
-			if ($alumno_numcamiseta == ""){$alumno_numcamiseta = 0;}
-
-			if (isset($_POST['alumno_genero']) && isset($_POST['alumno_hermanos'])) {
-				$alumno_genero 				= $_POST['alumno_genero'];
-				$alumno_hermanos 			= $_POST['alumno_hermanos'];
-
-			}else{
-			$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"No ha completado los campos obligatorios del alumno",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-			}
-
-		    # Verificando campos obligatorios #
-		    if($alumno_identificacion=="" || $alumno_primernombre=="" || $alumno_apellidopaterno=="" || $alumno_fechanacimiento==""){
-			$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Error",
-					"texto"=>"No ha completado todos los campos que son obligatorios",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		    }
-
-		    # Verificando integridad de los datos #
-		    if($this->verificarDatos("[a-zA-ZÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“]{3,40}",$alumno_primernombre)){
-			$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Error",
-					"texto"=>"El campo nombre no coincide con el formato solicitado",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		    }
-
-			$alumno_datos_reg=[
-				[
-					"campo_nombre"=>"alumno_sedeid",
-					"campo_marcador"=>":Sedeid",
-					"campo_valor"=>$alumno_sedeid
-				],
-				[
-					"campo_nombre"=>"alumno_posicionid",
-					"campo_marcador"=>":Posicionid",
-					"campo_valor"=>$alumno_posicionid
-				],
-				[
-					"campo_nombre"=>"alumno_nacionalidadid",
-					"campo_marcador"=>":Nacionalidadid",
-					"campo_valor"=>$alumno_nacionalidadid
-				],
-				[
-					"campo_nombre"=>"alumno_tipoidentificacion",
-					"campo_marcador"=>":Tipoidentificacion",
-					"campo_valor"=>$alumno_tipoidentificacion
-				],
-				[
-					"campo_nombre"=>"alumno_identificacion",
-					"campo_marcador"=>":Identificacion",
-					"campo_valor"=>$alumno_identificacion
-				],
-				[
-					"campo_nombre"=>"alumno_primernombre",
-					"campo_marcador"=>":Primernombre",
-					"campo_valor"=>$alumno_primernombre
-				],
-				[
-					"campo_nombre"=>"alumno_segundonombre",
-					"campo_marcador"=>":Segundonombre",
-					"campo_valor"=>$alumno_segundonombre
-				],
-				[
-					"campo_nombre"=>"alumno_apellidopaterno",
-					"campo_marcador"=>":Apellidopaterno",
-					"campo_valor"=>$alumno_apellidopaterno
-				],
-				[
-					"campo_nombre"=>"alumno_apellidomaterno",
-					"campo_marcador"=>":Apellidomaterno",
-					"campo_valor"=>$alumno_apellidomaterno
-				],
-				[
-					"campo_nombre"=>"alumno_nombrecorto",
-					"campo_marcador"=>":Nombrecorto",
-					"campo_valor"=>$alumno_nombrecorto
-				],
-				[
-					"campo_nombre"=>"alumno_direccion",
-					"campo_marcador"=>":Direccion",
-					"campo_valor"=>$alumno_direccion
-				],
-				[
-					"campo_nombre"=>"alumno_fechanacimiento",
-					"campo_marcador"=>":Fechanacimiento",
-					"campo_valor"=>$alumno_fechanacimiento
-				],
-				[
-					"campo_nombre"=>"alumno_fechaingreso",
-					"campo_marcador"=>":Fechaingreso",
-					"campo_valor"=>$alumno_fechaingreso
-				],
-				[
-					"campo_nombre"=>"alumno_genero",
-					"campo_marcador"=>":Genero",
-					"campo_valor"=>$alumno_genero
-				],
-				[
-					"campo_nombre"=>"alumno_hermanos",
-					"campo_marcador"=>":Hermanos",
-					"campo_valor"=>$alumno_hermanos
-				],
-				[
-					"campo_nombre"=>"alumno_numcamiseta",
-					"campo_marcador"=>":Camiseta",
-					"campo_valor"=>$alumno_numcamiseta
-				]
-			];
-
-			# Directorio de fotos #
-			$codigorand=rand(0,100);
-			$img_dir="../views/imagenes/fotos/alumno/";
-
-			# Directorio de imagenes cedula#
-			$dir_cedula="../views/imagenes/cedulas/";
-
-		# Comprobar si se selecciono una imagen #
-		if($_FILES['alumno_foto']['name']!="" && $_FILES['alumno_foto']['size']>0){
-
-				# Creando directorio #
-				if(!file_exists($img_dir)){
-					if(!mkdir($img_dir,0777)){
-						$alerta=[
-							"tipo"=>"simple",
-							"titulo"=>"Error",
-							"texto"=>"No se creó el directorio",
-							"icono"=>"error"
-						];
-						return json_encode($alerta);
-						//exit();
-					}
-				}
-
-				# Verificando formato de imagenes #
-				if(mime_content_type($_FILES['alumno_foto']['tmp_name'])!="image/jpeg" && mime_content_type($_FILES['alumno_foto']['tmp_name'])!="image/png"){
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Error",
-						"texto"=>"La imagen que ha seleccionado es de un formato no permitido ",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-					//exit();
-				}
-
-				# Verificando peso de imagen #
-				if(($_FILES['alumno_foto']['size']/1024)>4000){
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Error",
-						"texto"=>"La imagen que ha seleccionado supera el peso permitido 4MB",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-					//exit();
-				}
-
-				#nombre de la foto
-				$foto=str_ireplace(" ","_",$alumno_identificacion);
-				$foto=$foto."_".$codigorand;
-
-
-				# Extension de la imagen #
-				switch(mime_content_type($_FILES['alumno_foto']['tmp_name'])){
-					case 'image/jpeg':
-						$foto=$foto.".jpg";
-					break;
-					case 'image/png':
-						$foto=$foto.".png";
-					break;
-				}
-				$maxWidth = 800;
-			$maxHeight = 600;
-
-				chmod($img_dir,0777);
-				$inputFile = ($_FILES['alumno_foto']['tmp_name']);
-			$outputFile = $img_dir.$foto;
-
-				# Moviendo imagen al directorio #
-				//if(!move_uploaded_file($_FILES['alumno_foto']['tmp_name'],$img_dir.$foto)){
-				if ($this->resizeImageGD($inputFile, $maxWidth, $maxHeight, $outputFile)) {
-
-				}else{
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Error",
-						"texto"=>"No es posible subir la imagen al sistema en este momento",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				# Eliminando imagen anterior #
-				if(is_file($img_dir.$datos['alumno_imagen']) && $datos['alumno_imagen']!=$foto){
-					chmod($img_dir.$datos['alumno_imagen'], 0777);
-					unlink($img_dir.$datos['alumno_imagen']);
-				}
-
-				$alumno_datos_reg[] = [
-					"campo_nombre" => "alumno_imagen",
-					"campo_marcador" => ":Foto",
-					"campo_valor" => $foto
-				];
-			}
-
-			if($_FILES['alumno_cedulaA']['name']!="" && $_FILES['alumno_cedulaA']['size']>0){
-
-				# Creando directorio #
-				if(!file_exists($dir_cedula)){
-					if(!mkdir($dir_cedula,0777)){
-						$alerta=[
-							"tipo"=>"simple",
-							"titulo"=>"Error",
-							"texto"=>"No se creó el directorio",
-							"icono"=>"error"
-						];
-						return json_encode($alerta);
-					}
-				}
-
-				# Verificando formato de imagenes #
-				if(mime_content_type($_FILES['alumno_cedulaA']['tmp_name'])!="image/jpeg" && mime_content_type($_FILES['alumno_cedulaA']['tmp_name'])!="image/png"){
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Error",
-						"texto"=>"La imagen que ha seleccionado es de un formato no permitido ",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				# Verificando peso de imagen #
-				if(($_FILES['alumno_cedulaA']['size']/1024)>4000){
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Error",
-						"texto"=>"La imagen que ha seleccionado supera el peso permitido 4MB",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				#nombre de la imagen cedula
-				$CedulaA=str_ireplace(" ","_",$alumno_identificacion);
-				$CedulaA=$CedulaA."_A".$codigorand=rand(0,100);
-
-				# Extension de la imagen #
-				switch(mime_content_type($_FILES['alumno_cedulaA']['tmp_name'])){
-					case 'image/jpeg':
-						$CedulaA=$CedulaA.".jpg";
-					break;
-					case 'image/png':
-						$CedulaA=$CedulaA.".png";
-					break;
-				}
-				$maxWidth = 800;
-			$maxHeight = 600;
-
-				chmod($img_dir,0777);
-				$inputFile = ($_FILES['alumno_cedulaA']['tmp_name']);
-			$outputFile = $dir_cedula.$CedulaA;
-
-				# Moviendo imagen al directorio #
-				//if(!move_uploaded_file($_FILES['alumno_foto']['tmp_name'],$img_dir.$foto)){
-				if ($this->resizeImageGD($inputFile, $maxWidth, $maxHeight, $outputFile)) {
-
-				}else{
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Error",
-						"texto"=>"No es posible subir la imagen de la cedula al sistema en este momento",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				# Eliminando imagen anterior #
-				if(is_file($dir_cedula.$datos['alumno_cedulaA']) && $datos['alumno_cedulaA']!=$CedulaA){
-					chmod($dir_cedula.$datos['alumno_cedulaA'], 0777);
-					unlink($dir_cedula.$datos['alumno_cedulaA']);
-				}
-
-				$alumno_datos_reg[] = [
-					"campo_nombre" => "alumno_cedulaA",
-					"campo_marcador" => ":CedulaA",
-					"campo_valor" => $CedulaA
-				];
-			}
-
-			if($_FILES['alumno_cedulaR']['name']!="" && $_FILES['alumno_cedulaR']['size']>0){
-
-				# Creando directorio #
-				if(!file_exists($dir_cedula)){
-					if(!mkdir($dir_cedula,0777)){
-						$alerta=[
-							"tipo"=>"simple",
-							"titulo"=>"Error",
-							"texto"=>"No se creó el directorio",
-							"icono"=>"error"
-						];
-						return json_encode($alerta);
-					}
-				}
-
-				# Verificando formato de imagenes #
-				if(mime_content_type($_FILES['alumno_cedulaR']['tmp_name'])!="image/jpeg" && mime_content_type($_FILES['alumno_cedulaR']['tmp_name'])!="image/png"){
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Error",
-						"texto"=>"La imagen que ha seleccionado es de un formato no permitido ",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				# Verificando peso de imagen #
-				if(($_FILES['alumno_cedulaR']['size']/1024)>4000){
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Error",
-						"texto"=>"La imagen que ha seleccionado supera el peso permitido 4MB",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				#nombre imagen cedula reverso
-				$CedulaR=str_ireplace(" ","_",$alumno_identificacion);
-				$CedulaR=$CedulaR."_R".$codigorand;
-
-				# Extension de la imagen #
-				switch(mime_content_type($_FILES['alumno_cedulaR']['tmp_name'])){
-					case 'image/jpeg':
-						$CedulaR=$CedulaR.".jpg";
-					break;
-					case 'image/png':
-						$CedulaR=$CedulaR.".png";
-					break;
-				}
-				$maxWidth = 800;
-			$maxHeight = 600;
-
-				chmod($img_dir,0777);
-				$inputFile = ($_FILES['alumno_cedulaR']['tmp_name']);
-			$outputFile = $dir_cedula.$CedulaR;
-
-				# Moviendo imagen al directorio #
-				//if(!move_uploaded_file($_FILES['alumno_foto']['tmp_name'],$img_dir.$foto)){
-				if ($this->resizeImageGD($inputFile, $maxWidth, $maxHeight, $outputFile)) {
-
-				}else{
-					$alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Error",
-						"texto"=>"No es posible subir la imagen de la cedula al sistema en este momento",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-				}
-
-				# Eliminando imagen anterior #
-				if(is_file($dir_cedula.$datos['alumno_cedulaR']) && $datos['alumno_cedulaR']!=$CedulaR){
-					chmod($dir_cedula.$datos['alumno_cedulaR'], 0777);
-					unlink($dir_cedula.$datos['alumno_cedulaR']);
-				}
-
-				$alumno_datos_reg[] = [
-					"campo_nombre" => "alumno_cedulaR",
-					"campo_marcador" => ":CedulaR",
-					"campo_valor" => $CedulaR
-				];
-			}
-
-			$condicion=[
-				"condicion_campo"=>"alumno_id",
-				"condicion_marcador"=>":Alumnoid",
-				"condicion_valor"=>$alumnoid
-			];
-
-			if($this->actualizarDatos("sujeto_alumno",$alumno_datos_reg,$condicion)){
-
-				$alerta=[
-					"tipo"=>"recargar",
-					"titulo"=>"Alumno actualizado",
-					"texto"=>"El alumno ".$alumno_identificacion." | ".$alumno_primernombre." ".$alumno_apellidopaterno." se actualizó correctamente",
-					"icono"=>"success"
-				];
-
-				/*---------------Inicio de registro de InformaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de los tabs*/
-				$infomedic_tiposangre 	= $this->limpiarCadena($_POST['infomedic_tiposangre']);
-				$infomedic_peso		  	= $this->limpiarCadena($_POST['infomedic_peso']);
-				$infomedic_talla 	  	= $this->limpiarCadena($_POST['infomedic_talla']);
-				$infomedic_enfermedad 	= $this->limpiarCadena($_POST['infomedic_enfermedad']);
-				$infomedic_medicamentos = $this->limpiarCadena($_POST['infomedic_medicamentos']);
-				$infomedic_alergia1 	= $this->limpiarCadena($_POST['infomedic_alergia1']);
-				$infomedic_alergia2 	= $this->limpiarCadena($_POST['infomedic_alergia2']);
-				$infomedic_cirugias 	= $this->limpiarCadena($_POST['infomedic_cirugias']);
-				$infomedic_observacion	= $this->limpiarCadena($_POST['infomedic_observacion']);
-
-				if(isset($_POST['infomedic_covid'])){ $infomedic_covid  = $_POST['infomedic_covid']; }else {$infomedic_covid="";}
-				if(isset($_POST['infomedic_vacunas'])){ $infomedic_vacunas  = $_POST['infomedic_vacunas']; }else {$infomedic_vacunas="";}
-
-
-	if ($infomedic_peso ==""){$infomedic_peso = 0;}
-				if ($infomedic_talla ==""){$infomedic_talla = 0;}
-
-				$infomedic=$this->ejecutarConsulta("SELECT * FROM alumno_infomedic WHERE infomedic_alumnoid='$alumnoid'");
-				if($infomedic->rowCount()>0){
-
-
-					$infomedic_reg=[
-						[
-							"campo_nombre"=>"infomedic_alumnoid",
-							"campo_marcador"=>":Alumnoid",
-							"campo_valor"=>$alumnoid
-						],
-						[
-							"campo_nombre"=>"infomedic_fecha",
-							"campo_marcador"=>":Fechacreacion",
-							"campo_valor"=>date("Y-m-d H:i:s")
-						],
-						[
-							"campo_nombre"=>"infomedic_tiposangre",
-							"campo_marcador"=>":Tiposangre",
-							"campo_valor"=>$infomedic_tiposangre
-						],
-						[
-							"campo_nombre"=>"infomedic_peso",
-							"campo_marcador"=>":Peso",
-							"campo_valor"=>$infomedic_peso
-						],
-						[
-							"campo_nombre"=>"infomedic_talla",
-							"campo_marcador"=>":Talla",
-							"campo_valor"=>$infomedic_talla
-						],
-						[
-							"campo_nombre"=>"infomedic_enfermedad",
-							"campo_marcador"=>":Enfermedad",
-							"campo_valor"=>$infomedic_enfermedad
-						],
-						[
-							"campo_nombre"=>"infomedic_medicamentos",
-							"campo_marcador"=>":Medicamentos",
-							"campo_valor"=>$infomedic_medicamentos
-						],
-						[
-							"campo_nombre"=>"infomedic_alergia1",
-							"campo_marcador"=>":AlergiaMedicamentos",
-							"campo_valor"=>$infomedic_alergia1
-						],
-						[
-							"campo_nombre"=>"infomedic_alergia2",
-							"campo_marcador"=>":AlergiaObjetos",
-							"campo_valor"=>$infomedic_alergia2
-						],
-						[
-							"campo_nombre"=>"infomedic_cirugias",
-							"campo_marcador"=>":Cirugias",
-							"campo_valor"=>$infomedic_cirugias
-						],
-						[
-							"campo_nombre"=>"infomedic_observacion",
-							"campo_marcador"=>":Observacion",
-							"campo_valor"=>$infomedic_observacion
-						],
-						[
-							"campo_nombre"=>"infomedic_covid",
-							"campo_marcador"=>":VacunasCovid",
-							"campo_valor"=>$infomedic_covid
-						],
-						[
-							"campo_nombre"=>"infomedic_vacunas",
-							"campo_marcador"=>":Vacunas",
-							"campo_valor"=>$infomedic_vacunas
-						]
-					];
-
-					$condicion=[
-						"condicion_campo"=>"infomedic_alumnoid",
-						"condicion_marcador"=>":Alumnoid",
-						"condicion_valor"=>$alumnoid
-					];
-
-					$this->actualizarDatos("alumno_infomedic",$infomedic_reg,$condicion);
-
-				}else{
-					if($infomedic_tiposangre!="" || $infomedic_peso>0 || $infomedic_talla>0 || $infomedic_enfermedad!=""||
-					$infomedic_medicamentos!="" || $infomedic_alergia1!="" || $infomedic_alergia2!="" || $infomedic_cirugias!="" ||
-					$infomedic_observacion!=""){
-						//if (!is_int($infomedic_peso) && !is_float($infomedic_peso)){$infomedic_peso = 0;}
-						//if (!is_int($infomedic_talla) && !is_float($infomedic_talla)){$infomedic_talla = 0;}
-
-						$infomedic_reg=[
-							[
-								"campo_nombre"=>"infomedic_alumnoid",
-								"campo_marcador"=>":Alumnoid",
-								"campo_valor"=>$alumnoid
-							],
-							[
-								"campo_nombre"=>"infomedic_fecha",
-								"campo_marcador"=>":Fechacreacion",
-								"campo_valor"=>date("Y-m-d H:i:s")
-							],
-							[
-								"campo_nombre"=>"infomedic_tiposangre",
-								"campo_marcador"=>":Tiposangre",
-								"campo_valor"=>$infomedic_tiposangre
-							],
-							[
-								"campo_nombre"=>"infomedic_peso",
-								"campo_marcador"=>":Peso",
-								"campo_valor"=>$infomedic_peso
-							],
-							[
-								"campo_nombre"=>"infomedic_talla",
-								"campo_marcador"=>":Talla",
-								"campo_valor"=>$infomedic_talla
-							],
-							[
-								"campo_nombre"=>"infomedic_enfermedad",
-								"campo_marcador"=>":Enfermedad",
-								"campo_valor"=>$infomedic_enfermedad
-							],
-							[
-								"campo_nombre"=>"infomedic_medicamentos",
-								"campo_marcador"=>":Medicamentos",
-								"campo_valor"=>$infomedic_medicamentos
-							],
-							[
-								"campo_nombre"=>"infomedic_alergia1",
-								"campo_marcador"=>":AlergiaMedicamentos",
-								"campo_valor"=>$infomedic_alergia1
-							],
-							[
-								"campo_nombre"=>"infomedic_alergia2",
-								"campo_marcador"=>":AlergiaObjetos",
-								"campo_valor"=>$infomedic_alergia2
-							],
-							[
-								"campo_nombre"=>"infomedic_cirugias",
-								"campo_marcador"=>":Cirugias",
-								"campo_valor"=>$infomedic_cirugias
-							],
-							[
-								"campo_nombre"=>"infomedic_observacion",
-								"campo_marcador"=>":Observacion",
-								"campo_valor"=>$infomedic_observacion
-							],
-							[
-								"campo_nombre"=>"infomedic_covid",
-								"campo_marcador"=>":VacunasCovid",
-								"campo_valor"=>$infomedic_covid
-							],
-							[
-								"campo_nombre"=>"infomedic_vacunas",
-								"campo_marcador"=>":Vacunas",
-								"campo_valor"=>$infomedic_vacunas
-							]
-						];
-
-						$this->guardarDatos("alumno_infomedic",$infomedic_reg);
-					}
-
-				}
-				/*---------------Fin de registro del tab InformaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n MÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©dica del alumno*/
-
-
-				/*---------------Registro del tab Contacto Emergencia del alumno------------*/
-				$cemer_nombre 		= $this->limpiarCadena($_POST['cemer_nombre']);
-				$cemer_celular 		= $this->limpiarCadena($_POST['cemer_celular']);
-				$cemer_parentesco	= $this->limpiarCadena($_POST['cemer_parentesco']);
-
-				$cmer=$this->ejecutarConsulta("SELECT * FROM alumno_cemergencia WHERE cemer_alumnoid='$alumnoid'");
-				if($cmer->rowCount()>0){
-
-					$cemergencia_reg=[
-						[
-							"campo_nombre"=>"cemer_alumnoid",
-							"campo_marcador"=>":Alumnoid",
-							"campo_valor"=>$alumnoid
-						],
-						[
-							"campo_nombre"=>"cemer_nombre",
-							"campo_marcador"=>":NombreContactoEmer",
-							"campo_valor"=>$cemer_nombre
-						],
-						[
-							"campo_nombre"=>"cemer_celular",
-							"campo_marcador"=>":CelularContactoEmer",
-							"campo_valor"=>$cemer_celular
-						],
-						[
-							"campo_nombre"=>"cemer_parentesco",
-							"campo_marcador"=>":ParentescoContactoEmer",
-							"campo_valor"=>$cemer_parentesco
-						]
-					];
-
-					$condicion=[
-						"condicion_campo"=>"cemer_alumnoid",
-						"condicion_marcador"=>":Alumnoid",
-						"condicion_valor"=>$alumnoid
-					];
-
-					$this->actualizarDatos("alumno_cemergencia",$cemergencia_reg,$condicion);
-
-				}else{
-					if($cemer_nombre!="" || $cemer_celular!=""){
-
-						$cemergencia_reg=[
-							[
-								"campo_nombre"=>"cemer_alumnoid",
-								"campo_marcador"=>":Alumnoid",
-								"campo_valor"=>$alumnoid
-							],
-							[
-								"campo_nombre"=>"cemer_nombre",
-								"campo_marcador"=>":NombreContactoEmer",
-								"campo_valor"=>$cemer_nombre
-							],
-							[
-								"campo_nombre"=>"cemer_celular",
-								"campo_marcador"=>":CelularContactoEmer",
-								"campo_valor"=>$cemer_celular
-							],
-							[
-								"campo_nombre"=>"cemer_parentesco",
-								"campo_marcador"=>":ParentescoContactoEmer",
-								"campo_valor"=>$cemer_parentesco
-							]
-						];
-
-						$condicion=[
-							"condicion_campo"=>"cemer_alumnoid",
-							"condicion_marcador"=>":Alumnoid",
-							"condicion_valor"=>$alumnoid
-						];
-						$this->guardarDatos("alumno_cemergencia",$cemergencia_reg);
-					}
-
-				}
-				/*---------------Fin de registro del tab Contacto Emergencia del alumno------*/
-
-				/*---------------Actulizar horario de entrenamiento---------------------*/
-				$horario_id = $this->limpiarCadena($_POST['horarioid']);
-
-				$cmer=$this->ejecutarConsulta("SELECT * FROM asistencia_asignahorario WHERE asignahorario_alumnoid = '$alumnoid'");
-				if($cmer->rowCount()>0){
-
-					$asignacion_horario_reg = [
-						[
-							"campo_nombre" => "asignahorario_horarioid",
-							"campo_marcador" => ":Horarioid",
-							"campo_valor" => $horario_id
-						],
-						[
-							"campo_nombre" => "asignahorario_alumnoid",
-							"campo_marcador" => ":Alumnoid",
-							"campo_valor" => $alumnoid
-						]
-					];
-
-					$condicion=[
-						"condicion_campo"=>"asignahorario_alumnoid",
-						"condicion_marcador"=>":Alumnoid",
-						"condicion_valor"=>$alumnoid
-					];
-
-					$this->actualizarDatos("asistencia_asignahorario",$asignacion_horario_reg,$condicion);
-
-				}else{
-					if($horario_id!="" || $alumnoid!=""){
-
-						$asignacion_horario_reg = [
-							[
-								"campo_nombre" => "asignahorario_horarioid",
-								"campo_marcador" => ":Horarioid",
-								"campo_valor" => $horario_id
-							],
-							[
-								"campo_nombre" => "asignahorario_alumnoid",
-								"campo_marcador" => ":Alumnoid",
-								"campo_valor" => $alumnoid
-							]
-						];
-
-						$this->guardarDatos("asistencia_asignahorario",$asignacion_horario_reg);
-					}
-
-				}
-				/*---------------Fin de actualizacion de horariop de entrenamiento------*/
-
-			}else{
-				$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Alumno no actualizado",
-					"texto"=>"No fue posible actualizar los datos del alumno ".$alumno_identificacion." | ".$alumno_primernombre." ".$alumno_apellidopaterno.", por favor intente nuevamente",
-					"icono"=>"success"
-				];
-			}
-			return json_encode($alerta);
-		}
-
 		/*----------  Controlador eliminar foto alumno  ----------*/
-		public function eliminarFotoAlumnoControlador(){
-
-			$id=$this->limpiarCadena($_POST['usuario_id']);
-
-			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario_id='$id'");
-		    if($datos->rowCount()<=0){
-		        $alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"El usuario no se encuentra en el sistema",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		        //exit();
-		    }else{
-			$datos=$datos->fetch();
-		    }
-
-		    # Directorio de imagenes #
-		$img_dir="../views/imagenes/fotos/";
-
-		chmod($img_dir,0777);
-
-		if(is_file($img_dir.$datos['usuario_foto'])){
-
-		        chmod($img_dir.$datos['usuario_foto'],0777);
-
-		        if(!unlink($img_dir.$datos['usuario_foto'])){
-		            $alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error",
-						"texto"=>"Error al intentar eliminar la foto del usuario, por favor intente nuevamente",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-			//exit();
-		        }
-		    }else{
-			$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"No se encuentra la foto del usuario en el sistema",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		        //exit();
-		    }
-
-		    $usuario_datos_up=[
-				[
-					"campo_nombre"=>"usuario_foto",
-					"campo_marcador"=>":Foto",
-					"campo_valor"=>""
-				],
-				[
-					"campo_nombre"=>"usuario_actualizado",
-					"campo_marcador"=>":Actualizado",
-					"campo_valor"=>date("Y-m-d H:i:s")
-				]
-			];
-
-			$condicion=[
-				"condicion_campo"=>"usuario_id",
-				"condicion_marcador"=>":ID",
-				"condicion_valor"=>$id
-			];
-
-			if($this->actualizarDatos("usuario",$usuario_datos_up,$condicion)){
-
-				if($id==$_SESSION['id']){
-					$_SESSION['foto']="";
-				}
-
-				$alerta=[
-					"tipo"=>"recargar",
-					"titulo"=>"Foto eliminada",
-					"texto"=>"La foto del usuario ".$datos['usuario_nombre']." ".$datos['usuario_apellido']." se elimino correctamente",
-					"icono"=>"success"
-				];
-			}else{
-				$alerta=[
-					"tipo"=>"recargar",
-					"titulo"=>"Foto eliminada",
-					"texto"=>"No fue posible actualizar algunos datos del usuario ".$datos['usuario_nombre']." ".$datos['usuario_apellido'].", sin embargo la foto ha sido eliminada correctamente",
-					"icono"=>"warning"
-				];
-			}
-
-			return json_encode($alerta);
-		}
-
 		/*----------  Controlador actualizar foto alumno  ----------*/
-		public function actualizarFotoAlumnoControlador(){
-
-			$id=$this->limpiarCadena($_POST['usuario_id']);
-
-			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario_id='$id'");
-		    if($datos->rowCount()<=0){
-		        $alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"No hemos encontrado el usuario en el sistema",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		        //exit();
-		    }else{
-			$datos=$datos->fetch();
-		    }
-
-		    # Directorio de imagenes #
-		$img_dir="../views/imagenes/fotos/";
-
-		# Comprobar si se selecciono una imagen #
-		if($_FILES['usuario_foto']['name']=="" && $_FILES['usuario_foto']['size']<=0){
-			$alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"No ha seleccionado una foto para el usuario",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-		        //exit();
-		}
-
-		# Creando directorio #
-	        if(!file_exists($img_dir)){
-	            if(!mkdir($img_dir,0777)){
-	                $alerta=[
-						"tipo"=>"simple",
-						"titulo"=>"Ocurrió un error inesperado",
-						"texto"=>"No se creó el directorio",
-						"icono"=>"error"
-					];
-					return json_encode($alerta);
-	                //exit();
-	            }
-	        }
-
-	        # Verificando formato de imagenes #
-	        if(mime_content_type($_FILES['usuario_foto']['tmp_name'])!="image/jpeg" && mime_content_type($_FILES['usuario_foto']['tmp_name'])!="image/png"){
-	            $alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"La imagen que ha seleccionado es de un formato no permitido",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-	            //exit();
-	        }
-
-	        # Verificando peso de imagen #
-	        if(($_FILES['usuario_foto']['size']/1024)>250){
-	            $alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"La imagen que ha seleccionado supera el peso permitido",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-	            //exit();
-	        }
-
-	        # Nombre de la foto #
-	        if($datos['usuario_foto']!=""){
-		        $foto=explode(".", $datos['usuario_foto']);
-		        $foto=$foto[0];
-	        }else{
-		$foto=str_ireplace(" ","_",$datos['usuario_nombre']);
-		$foto=$foto."_".rand(0,100);
-	        }
-
-
-	        # Extension de la imagen #
-	        switch(mime_content_type($_FILES['usuario_foto']['tmp_name'])){
-	            case 'image/jpeg':
-	                $foto=$foto.".jpg";
-	            break;
-	            case 'image/png':
-	                $foto=$foto.".png";
-	            break;
-	        }
-
-	        chmod($img_dir,0777);
-
-	        # Moviendo imagen al directorio #
-	        if(!move_uploaded_file($_FILES['usuario_foto']['tmp_name'],$img_dir.$foto)){
-	            $alerta=[
-					"tipo"=>"simple",
-					"titulo"=>"Ocurrió un error",
-					"texto"=>"No podemos subir la imagen al sistema en este momento",
-					"icono"=>"error"
-				];
-				return json_encode($alerta);
-	            //exit();
-	        }
-
-	        # Eliminando imagen anterior #
-	        if(is_file($img_dir.$datos['usuario_foto']) && $datos['usuario_foto']!=$foto){
-		        chmod($img_dir.$datos['usuario_foto'], 0777);
-		        unlink($img_dir.$datos['usuario_foto']);
-		    }
-
-		    $usuario_datos_up=[
-				[
-					"campo_nombre"=>"usuario_foto",
-					"campo_marcador"=>":Foto",
-					"campo_valor"=>$foto
-				],
-				[
-					"campo_nombre"=>"usuario_actualizado",
-					"campo_marcador"=>":Actualizado",
-					"campo_valor"=>date("Y-m-d H:i:s")
-				]
-			];
-
-			$condicion=[
-				"condicion_campo"=>"usuario_id",
-				"condicion_marcador"=>":ID",
-				"condicion_valor"=>$id
-			];
-
-			if($this->actualizarDatos("usuario",$usuario_datos_up,$condicion)){
-
-				if($id==$_SESSION['id']){
-					$_SESSION['foto']=$foto;
-				}
-
-				$alerta=[
-					"tipo"=>"recargar",
-					"titulo"=>"Foto actualizada",
-					"texto"=>"La foto del usuario ".$datos['usuario_nombre']." ".$datos['usuario_apellido']." se actualizo correctamente",
-					"icono"=>"success"
-				];
-			}else{
-
-				$alerta=[
-					"tipo"=>"recargar",
-					"titulo"=>"Foto actualizada",
-					"texto"=>"No hemos podido actualizar algunos datos del usuario ".$datos['usuario_nombre']." ".$datos['usuario_apellido']." , sin embargo la foto ha sido actualizada",
-					"icono"=>"warning"
-				];
-			}
-
-			return json_encode($alerta);
-		}
-
-
 		# Consultar datos del representante para la vista vincular alumno
-		public function datosRepresentante($alumnoid){
-			$consulta_repre = "SELECT repre_identificacion IDENTIFICACION,
-									concat(repre_primernombre, ' ', repre_segundonombre, ' ', repre_apellidopaterno, ' ', repre_apellidomaterno) AS REPRESENTANTE,
-									catalogo_descripcion PARENTESCO, repre_direccion, repre_correo, repre_celular, repre_factura
-									FROM sujeto_alumno, alumno_representante, general_tabla, general_tabla_catalogo
-									WHERE alumno_repreid = repre_id
-										and tabla_id = catalogo_tablaid
-										and repre_parentesco = catalogo_valor
-										and alumno_id =  ".$alumnoid;
-			$datos = $this->ejecutarConsulta($consulta_repre);
-			return $datos;
-		}
-
 		/* ==================================== Roles ==================================== */
-
-		public function listarOptionSede($rolid = null, $usuario = null ){
-			$option="";
-
-			if($rolid != 1 && $rolid != 2){
-				$consulta_datos="SELECT S.sede_id, S.sede_nombre
-									FROM general_sede S
-									INNER JOIN seguridad_usuario_sede US ON US.usuariosede_sedeid = S.sede_id
-									INNER JOIN seguridad_usuario U ON U.usuario_id = US.usuariosede_usuarioid
-									WHERE U.usuario_usuario  = '".$usuario."'";
-			}else{
-				$consulta_datos="SELECT sede_id, sede_nombre FROM general_sede";
-			}
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				$option.='<option value='.$rows['sede_id'].'>'.$rows['sede_nombre'].'</option>';
-			}
-			return $option;
-		}
-
-
-
-		public function listarCatalogoTipoDocumento(){
-			$option="";
-
-			$consulta_datos="SELECT C.catalogo_valor, C.catalogo_descripcion
-								FROM general_tabla_catalogo C
-								INNER JOIN general_tabla T on T.tabla_id = C.catalogo_tablaid
-								WHERE T.tabla_nombre = 'tipo_documento'";
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				$option.='<option value='.$rows['catalogo_valor'].'>'.$rows['catalogo_descripcion'].'</option>';
-			}
-			return $option;
-		}
-
-		public function listarCatalogoNacionalidad(){
-			$option="";
-
-			$consulta_datos="SELECT C.catalogo_valor, C.catalogo_descripcion
-								FROM general_tabla_catalogo C
-								INNER JOIN general_tabla T on T.tabla_id = C.catalogo_tablaid
-								WHERE T.tabla_nombre = 'nacionalidad'";
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				$option.='<option value='.$rows['catalogo_valor'].'>'.$rows['catalogo_descripcion'].'</option>';
-			}
-			return $option;
-		}
-
-		public function listarCatalogoParentesco(){
-			$option="";
-
-			$consulta_datos="SELECT C.catalogo_valor, C.catalogo_descripcion
-								FROM general_tabla_catalogo C
-								INNER JOIN general_tabla T on T.tabla_id = C.catalogo_tablaid
-								WHERE T.tabla_nombre = 'parentesco'";
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				$option.='<option value='.$rows['catalogo_valor'].'>'.$rows['catalogo_descripcion'].'</option>';
-			}
-			return $option;
-		}
-
-		public function informacionSede($sedeid){
-			$consulta_datos="SELECT * FROM general_sede WHERE sede_id  = $sedeid";
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			return $datos;
-		}
 
 		//horarios
 
-		public function generarHorarioProfile($horario_id = null){
-			$tabla="";
-			$consulta_datos = "SELECT
-								'Horario' AS Categoria,
-								MAX(CASE WHEN detalle_dia = 1 THEN CONCAT(hora_inicio, ' - ', hora_fin) END) AS Lunes,
-								MAX(CASE WHEN detalle_dia = 2 THEN CONCAT(hora_inicio, ' - ', hora_fin) END) AS Martes,
-								MAX(CASE WHEN detalle_dia = 3 THEN CONCAT(hora_inicio, ' - ', hora_fin) END) AS Miercoles,
-								MAX(CASE WHEN detalle_dia = 4 THEN CONCAT(hora_inicio, ' - ', hora_fin) END) AS Jueves,
-								MAX(CASE WHEN detalle_dia = 5 THEN CONCAT(hora_inicio, ' - ', hora_fin) END) AS Viernes
-							FROM asistencia_horario
-							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id
-							LEFT JOIN asistencia_hora ON hora_id = detalle_horaid
-							WHERE horario_id = ".$horario_id."
-							GROUP BY Categoria
-
-							UNION ALL
-
-							SELECT
-								'Cancha' AS Categoria,
-								MAX(CASE WHEN detalle_dia = 1 THEN lugar_nombre END) AS Lunes,
-								MAX(CASE WHEN detalle_dia = 2 THEN lugar_nombre END) AS Martes,
-								MAX(CASE WHEN detalle_dia = 3 THEN lugar_nombre END) AS Miercoles,
-								MAX(CASE WHEN detalle_dia = 4 THEN lugar_nombre END) AS Jueves,
-								MAX(CASE WHEN detalle_dia = 5 THEN lugar_nombre END) AS Viernes
-							FROM asistencia_horario
-							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id
-							LEFT JOIN asistencia_lugar ON lugar_id = detalle_lugarid
-							WHERE horario_id = ".$horario_id."
-							GROUP BY Categoria
-
-							UNION ALL
-
-							SELECT
-								'Profesor' AS Categoria,
-								MAX(CASE WHEN detalle_dia = 1 THEN empleado_nombre END) AS Lunes,
-								MAX(CASE WHEN detalle_dia = 2 THEN empleado_nombre END) AS Martes,
-								MAX(CASE WHEN detalle_dia = 3 THEN empleado_nombre END) AS Miercoles,
-								MAX(CASE WHEN detalle_dia = 4 THEN empleado_nombre END) AS Jueves,
-								MAX(CASE WHEN detalle_dia = 5 THEN empleado_nombre END) AS Viernes
-							FROM asistencia_horario
-							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id
-							LEFT JOIN sujeto_empleado ON empleado_id = detalle_profesorid
-							WHERE horario_id = ".$horario_id."
-							GROUP BY Categoria";
-
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				$tabla.="	<tr style='font-size: 14px'>
-								<th>".$rows['Categoria']."</th>
-								<td>".$rows['Lunes']."</td>
-								<td>".$rows['Martes']."</td>
-								<td>".$rows['Miercoles']."</td>
-								<td>".$rows['Jueves']."</td>
-								<td>".$rows['Viernes']."</td>
-							</tr>";
-			}
-			return $tabla;
-		}
-
-		public function HorarioID($alumnoid){
-			$consulta_datos="SELECT asignahorario_horarioid FROM asistencia_asignahorario WHERE asignahorario_alumnoid = $alumnoid";
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			return $datos;
-		}
-
-		public function listarhorariosProfile($horarioid = null, $sedeid = null){
-			$option="";
-
-			$consulta_datos="SELECT AH.horario_id, CONCAT(AH.horario_detalle, ' | ',HORA.hora_inicio, ' - ', HORA.hora_fin ) AS HORARIO
-								FROM asistencia_horario AH
-									INNER JOIN(
-										SELECT detalle_horarioid, detalle_horaid, H.hora_inicio, H.hora_fin
-										FROM asistencia_horario_detalle D
-										INNER JOIN asistencia_hora H on H.hora_id = D.detalle_horaid
-										GROUP BY detalle_horarioid, detalle_horaid, H.hora_inicio, H.hora_fin
-									)HORA ON HORA.detalle_horarioid = AH.horario_id
-
-								WHERE AH.horario_estado = 'A' AND AH.horario_sedeid = $sedeid";
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				if($horarioid == $rows['horario_id']){
-					$option.='<option value='.$rows['horario_id'].' selected="selected">'.$rows['HORARIO'].'</option>';
-				}else{
-					$option.='<option value='.$rows['horario_id'].'>'.$rows['HORARIO'].'</option>';
-				}
-			}
-			return $option;
-		}
-
-		public function listarhorarios(){
-			$option="";
-
-			$consulta_datos="SELECT AH.horario_id, CONCAT(AH.horario_detalle, ' | ',HORA.hora_inicio, ' - ', HORA.hora_fin ) AS HORARIO
-								FROM asistencia_horario AH
-									INNER JOIN(
-										SELECT detalle_horarioid, detalle_horaid, H.hora_inicio, H.hora_fin
-										FROM asistencia_horario_detalle D
-										INNER JOIN asistencia_hora H on H.hora_id = D.detalle_horaid
-										GROUP BY detalle_horarioid, detalle_horaid, H.hora_inicio, H.hora_fin
-									)HORA ON HORA.detalle_horarioid = AH.horario_id
-
-								WHERE AH.horario_estado = 'A'";
-
-			$datos = $this->ejecutarConsulta($consulta_datos);
-			$datos = $datos->fetchAll();
-			foreach($datos as $rows){
-				$detallePago = htmlspecialchars($this->limpiarTextoFactura($rows['detalle'] ?? ''), ENT_QUOTES, 'UTF-8');
-				$alumnoPago = htmlspecialchars($this->limpiarTextoFactura($rows['alumno'] ?? ''), ENT_QUOTES, 'UTF-8');
-				$codigoPago = htmlspecialchars((string)($rows['codigo'] ?? ''), ENT_QUOTES, 'UTF-8');
-				$fechaPago = htmlspecialchars((string)($rows['pago_fecharegistro'] ?? ''), ENT_QUOTES, 'UTF-8');
-				$valorPago = number_format((float)($rows['pago_valor'] ?? 0), 2, '.', '');
-				$option.='<option value='.$rows['horario_id'].'>'.$rows['HORARIO'].'</option>';
-			}
-			return $option;
-		}
 	}

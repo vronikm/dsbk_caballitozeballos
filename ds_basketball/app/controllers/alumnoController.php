@@ -67,7 +67,7 @@
 		    }	    
 
             # Verificando identificacion #
-		    $check_alumno=$this->ejecutarConsulta("SELECT alumno_identificacion FROM sujeto_alumno WHERE alumno_identificacion='$alumno_identificacion'");
+		    $check_alumno=$this->ejecutarConsulta("SELECT alumno_identificacion FROM sujeto_alumno WHERE alumno_identificacion = :ident", [':ident' => $alumno_identificacion]);
 		    if($check_alumno->rowCount()>0){
 		    	$alerta=[
 					"tipo"=>"simple",
@@ -451,7 +451,7 @@
 				if(isset($_POST['infomedic_vacunas'])){ $infomedic_vacunas  = $_POST['infomedic_vacunas']; }else {$infomedic_vacunas="";}
 
 				/*---------------Obtengo campo alumnoid para todas las tablas*/
-				$check_alumno=$this->ejecutarConsulta("SELECT alumno_id FROM sujeto_alumno WHERE alumno_identificacion='$alumno_identificacion'");
+				$check_alumno=$this->ejecutarConsulta("SELECT alumno_id FROM sujeto_alumno WHERE alumno_identificacion = :ident", [':ident' => $alumno_identificacion]);
 		
 				if($check_alumno->rowCount()==1){
 					$alumno=$check_alumno->fetchAll(); 					
@@ -615,20 +615,26 @@
 			$tabla="";
 			$condiciones = [];
 			$busqueda = [];
+			/* Se llena a la par que las condiciones. Las ramas que
+			   reemplazan la consulta entera lo vacian. */
+			$parametros = [];
 
 			// Identificación
 			if ($identificacion != "") {
-				$busqueda[] = "alumno_identificacion LIKE '".$identificacion."%'";
+				$busqueda[] = "alumno_identificacion LIKE :ident";
+				$parametros[':ident'] = $identificacion . '%';
 			}
 
 			// Nombre
 			if ($primernombre != "") {
-				$busqueda[] = "alumno_primernombre LIKE '".$primernombre."%'";
+				$busqueda[] = "alumno_primernombre LIKE :nombre";
+				$parametros[':nombre'] = $primernombre . '%';
 			}
 
 			// Apellido
 			if ($apellidopaterno != "") {
-				$busqueda[] = "alumno_apellidopaterno LIKE '".$apellidopaterno."%'";
+				$busqueda[] = "alumno_apellidopaterno LIKE :apellido";
+				$parametros[':apellido'] = $apellidopaterno . '%';
 			}
 
 			// Agrupar búsqueda por nombre/identificación/apellido
@@ -638,13 +644,16 @@
 
 			// Filtro por año (usar rango en lugar de YEAR para índices)
 			if ($anio != "") {
-				$condiciones[] = "alumno_fechanacimiento BETWEEN '".$anio."-01-01' AND '".$anio."-12-31'";
+				$condiciones[] = "alumno_fechanacimiento BETWEEN :anioIni AND :anioFin";
+				$parametros[':anioIni'] = $anio . '-01-01';
+				$parametros[':anioFin'] = $anio . '-12-31';
 			}
 
 			// Si no hay ningún filtro de identificación, nombre o apellido
 			if ($identificacion == "" && $primernombre == "" && $apellidopaterno == "") {
 				if ($anio == "") {					
 					$condiciones = ["alumno_primernombre <> ''"];
+					$parametros = [];
 				}
 			}
 
@@ -653,10 +662,12 @@
 				if ($sede == 0) {
 					$condiciones[] = "alumno_sedeid <> 0";
 				} else {
-					$condiciones[] = "alumno_sedeid = '".$sede."'";
+					$condiciones[] = "alumno_sedeid = :sede";
+					$parametros[':sede'] = (int)$sede;
 				}
 			} else {
 				$condiciones = ["alumno_primernombre = ''"]; // sin sede -> nunca traerá resultados
+				$parametros = [];
 			}
 
 			// Condición fija
@@ -665,7 +676,7 @@
 			// Construir SQL final
 			$consulta_datos = "SELECT *, TIMESTAMPDIFF(YEAR, alumno_fechanacimiento, CURDATE()) AS EDAD FROM sujeto_alumno WHERE " . implode(" AND ", $condiciones);
 			
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 
 			/* La interfaz sólo ofrece lo que el rol puede hacer en esta
@@ -693,18 +704,18 @@
 							<form class="FormularioAjax" action="'.APP_URL.'app/ajax/alumnoAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_alumno" value="eliminar">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;">Eliminar</button>
+								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>';
 				}
 
 				if($puedeEditar){
 					$acciones.='
-							<a href="'.APP_URL.'alumnoUpdate/'.$rows['alumno_id'].'/" target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;">Actualizar</a>';
+							<a href="'.APP_URL.'alumnoUpdate/'.$rows['alumno_id'].'/" target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;" title="Actualizar" aria-label="Actualizar"><i class="fas fa-pen"></i></a>';
 				}
 
 				/* Ver es lectura: quien llega a la pantalla ya tiene permiso. */
 				$acciones.='
-							<a href="'.APP_URL.'alumnoProfile/'.$rows['alumno_id'].'/" target="_blank" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;">Ver</a>';
+							<a href="'.APP_URL.'alumnoProfile/'.$rows['alumno_id'].'/" target="_blank" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;" title="Ver" aria-label="Ver"><i class="fas fa-eye"></i></a>';
 
 				if($puedeEditar){
 					$acciones.='
@@ -795,18 +806,21 @@
 								FROM sujeto_alumno, general_sede
 								WHERE alumno_estado = 'A'
 									AND alumno_sedeid = sede_id");	
+			$parametros = [];
 
 			if($categoriaid!=0){
-				$consulta_datos .= " and YEAR(alumno_fechanacimiento) = ".$categoriaid; 
+				$consulta_datos .= " and YEAR(alumno_fechanacimiento) = :categoria"; 
+				$parametros[':categoria'] = (int)$categoriaid;
 			}
 
 			if($sedeid!=0){
-				$consulta_datos .= " and alumno_sedeid = ".$sedeid; 
+				$consulta_datos .= " and alumno_sedeid = :sede"; 
+				$parametros[':sede'] = (int)$sedeid;
 			}
 
 			$consulta_datos.= " ORDER BY alumno_fechanacimiento";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);		
 			return $datos;
 		}
 
@@ -817,7 +831,7 @@
 			$alumno_id=$this->limpiarCadena($_POST['alumno_id']);
 
 			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM sujeto_alumno WHERE alumno_id='$alumno_id'");
+		    $datos=$this->ejecutarConsulta("SELECT * FROM sujeto_alumno WHERE alumno_id = :id", [':id' => (int)$alumno_id]);
 		    if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -872,7 +886,7 @@
 			$alumno_id=$this->limpiarCadena($_POST['alumno_id']);
 
 			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM sujeto_alumno WHERE alumno_id='$alumno_id'");
+		    $datos=$this->ejecutarConsulta("SELECT * FROM sujeto_alumno WHERE alumno_id = :id", [':id' => (int)$alumno_id]);
 		    if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -1300,7 +1314,7 @@
             	if ($infomedic_peso ==""){$infomedic_peso = 0;}
 				if ($infomedic_talla ==""){$infomedic_talla = 0;}
                 
-				$infomedic=$this->ejecutarConsulta("SELECT * FROM alumno_infomedic WHERE infomedic_alumnoid='$alumnoid'");
+				$infomedic=$this->ejecutarConsulta("SELECT * FROM alumno_infomedic WHERE infomedic_alumnoid = :alumno", [':alumno' => (int)$alumnoid]);
 				if($infomedic->rowCount()>0){
 					$infomedic_reg=[
 						["campo_nombre"=>"infomedic_alumnoid","campo_marcador"=>":Alumnoid","campo_valor"=>$alumnoid],
@@ -1355,7 +1369,7 @@
 				$cemer_celular 		= $this->limpiarCadena($_POST['cemer_celular']);
 				$cemer_parentesco	= $this->limpiarCadena($_POST['cemer_parentesco']);				
 
-				$cmer=$this->ejecutarConsulta("SELECT * FROM alumno_cemergencia WHERE cemer_alumnoid='$alumnoid'");
+				$cmer=$this->ejecutarConsulta("SELECT * FROM alumno_cemergencia WHERE cemer_alumnoid = :alumno", [':alumno' => (int)$alumnoid]);
 				if($cmer->rowCount()>0){
 
 					$cemergencia_reg=[
@@ -1396,7 +1410,7 @@
 				/*---------------Actulizar horario de entrenamiento---------------------*/
 				$horario_id = $this->limpiarCadena($_POST['horarioid']);
 				if($horario_id != null){
-					$cmer=$this->ejecutarConsulta("SELECT * FROM asistencia_asignahorario WHERE asignahorario_alumnoid = '$alumnoid'");
+					$cmer=$this->ejecutarConsulta("SELECT * FROM asistencia_asignahorario WHERE asignahorario_alumnoid = :alumno", [':alumno' => (int)$alumnoid]);
 					if($cmer->rowCount()>0){					
 										
 						$asignacion_horario_reg = [
@@ -1488,7 +1502,7 @@
 			$id=$this->limpiarCadena($_POST['usuario_id']);
 
 			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario_id='$id'");
+		    $datos=$this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario_id = :id", [':id' => (int)$id]);
 		    if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -1581,7 +1595,7 @@
 			$id=$this->limpiarCadena($_POST['usuario_id']);
 
 			# Verificando usuario #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario_id='$id'");
+		    $datos=$this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario_id = :id", [':id' => (int)$id]);
 		    if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -1742,8 +1756,8 @@
 									LEFT JOIN sujeto_alumno on alumno_repreid = repre_id
 									LEFT JOIN general_tabla_catalogo ON repre_parentesco = catalogo_valor
 									LEFT JOIN general_tabla ON tabla_id = catalogo_tablaid        
-									WHERE alumno_id =  ".$alumnoid;			
-			$datos = $this->ejecutarConsulta($consulta_repre);		
+									WHERE alumno_id = :alumno";			
+			$datos = $this->ejecutarConsulta($consulta_repre, [':alumno' => (int)$alumnoid]);		
 			return $datos;
 		}
 
@@ -1757,12 +1771,14 @@
 									FROM general_sede S
 									INNER JOIN seguridad_usuario_sede US ON US.usuariosede_sedeid = S.sede_id
 									INNER JOIN seguridad_usuario U ON U.usuario_id = US.usuariosede_usuarioid
-									WHERE U.usuario_usuario  = '".$usuario."'";
+									WHERE U.usuario_usuario = :usuario";
+				$parametros = [':usuario' => $usuario];
 			}else{
 				$consulta_datos="SELECT sede_id, sede_nombre FROM general_sede";
+				$parametros = [];
 			}				
 					
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$option.='<option value='.$rows['sede_id'].'>'.$rows['sede_nombre'].'</option>';					
@@ -1778,12 +1794,14 @@
 									FROM general_sede S
 									INNER JOIN seguridad_usuario_sede US ON US.usuariosede_sedeid = S.sede_id
 									INNER JOIN seguridad_usuario U ON U.usuario_id = US.usuariosede_usuarioid
-									WHERE U.usuario_usuario  = '".$usuario."'";
+									WHERE U.usuario_usuario = :usuario";
+				$parametros = [':usuario' => $usuario];
 			}else{
 				$consulta_datos="SELECT sede_id, sede_nombre FROM general_sede";
+				$parametros = [];
 			}						
 					
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, $parametros);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				if($sedeid == $rows['sede_id']){
@@ -1828,7 +1846,10 @@
 			return $option;
 		}
 		
-		public function listarCatalogoParentesco($cemer_parentesco){
+		/* En el formulario de alta no hay parentesco previo que preseleccionar,
+		   asi que el argumento es opcional: pedirlo obligaba a la vista a pasar
+		   una variable inexistente y eso imprimia un aviso de PHP. */
+		public function listarCatalogoParentesco($cemer_parentesco = ''){
 			$option ='<option value=0> Seleccione una opción</option>';
 
 			$consulta_datos="SELECT C.catalogo_valor, C.catalogo_descripcion 
@@ -1850,8 +1871,8 @@
 		}		
 
 		public function informacionSede($sedeid){		
-			$consulta_datos="SELECT * FROM general_sede WHERE sede_id  = $sedeid";
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$consulta_datos="SELECT * FROM general_sede WHERE sede_id = :sede";
+			$datos = $this->ejecutarConsulta($consulta_datos, [':sede' => (int)$sedeid]);		
 			return $datos;
 		}
 
@@ -1869,7 +1890,7 @@
 							FROM asistencia_horario 
 							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id 
 							LEFT JOIN asistencia_hora ON hora_id = detalle_horaid 
-							WHERE horario_id = ".$horario_id."
+							WHERE horario_id = :h1
 							GROUP BY Categoria
 							
 							UNION ALL
@@ -1884,7 +1905,7 @@
 							FROM asistencia_horario 
 							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id 
 							LEFT JOIN asistencia_lugar ON lugar_id = detalle_lugarid
-							WHERE horario_id = ".$horario_id."
+							WHERE horario_id = :h2
 							GROUP BY Categoria
 							
 							UNION ALL
@@ -1899,11 +1920,11 @@
 							FROM asistencia_horario 
 							INNER JOIN asistencia_horario_detalle ON detalle_horarioid = horario_id 
 							LEFT JOIN sujeto_empleado ON empleado_id = detalle_profesorid	 
-							WHERE horario_id = ".$horario_id."
+							WHERE horario_id = :h3
 							GROUP BY Categoria";
 		
 							
-			$datos = $this->ejecutarConsulta($consulta_datos);
+			$datos = $this->ejecutarConsulta($consulta_datos, [':h1' => (int)$horario_id, ':h2' => (int)$horario_id, ':h3' => (int)$horario_id]);
 			$datos = $datos->fetchAll();
 			foreach($datos as $rows){
 				$tabla.="	<tr style='font-size: 14px'>					
@@ -1919,8 +1940,8 @@
 		}
 
 		public function HorarioID($alumnoid){		
-			$consulta_datos="SELECT asignahorario_horarioid FROM asistencia_asignahorario WHERE asignahorario_alumnoid = $alumnoid";
-			$datos = $this->ejecutarConsulta($consulta_datos);		
+			$consulta_datos="SELECT asignahorario_horarioid FROM asistencia_asignahorario WHERE asignahorario_alumnoid = :alumno";
+			$datos = $this->ejecutarConsulta($consulta_datos, [':alumno' => (int)$alumnoid]);		
 			return $datos;
 		}
 

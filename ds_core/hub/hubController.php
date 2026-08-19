@@ -139,6 +139,34 @@ class hubController
     {
         $avisos = [];
 
+        /* Intentos de acceso fallidos.
+           Va primero a proposito: es lo unico de esta lista que puede estar
+           ocurriendo AHORA MISMO. El sistema ya anotaba los intentos, pero
+           no se lo contaba a nadie; sin este aviso la bitacora solo sirve
+           para reconstruir un incidente despues de que pase.
+
+           Solo lo ve el Super Administrador: al resto no le corresponde y
+           delataria que cuentas se estan tanteando. */
+        if (es_superadministrador()) {
+            $intentos = intentos_resumen(24);
+
+            if ($intentos['alarma']) {
+                $detalle = $intentos['fallos'] . ' intentos fallidos en 24 h, desde '
+                         . $intentos['ips'] . ' ' . ($intentos['ips'] === 1 ? 'dirección' : 'direcciones');
+
+                if ($intentos['inexistentes'] > 0) {
+                    $detalle .= ', ' . $intentos['inexistentes'] . ' contra cuentas que no existen';
+                }
+
+                $avisos[] = [
+                    'titulo' => 'Posible ataque al inicio de sesión',
+                    'meta'   => $detalle,
+                    'estado' => 'danger',
+                    'url'    => DS_HUB_URL . 'ds_core/admin/usuarioList/',
+                ];
+            }
+        }
+
         $pendientes = (int)$this->escalar("SELECT COUNT(1) FROM alumno_pago WHERE pago_saldo > 0");
         if ($pendientes > 0) {
             $avisos[] = [

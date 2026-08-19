@@ -12,13 +12,13 @@
 
 		/*----------  Obtener total alumnos activos  ----------*/
 		public function obtenerAlumnosActivos($sedeid){
-			$alumnosActivos=$this->ejecutarConsulta("SELECT count(*) totalActivos FROM sujeto_alumno WHERE alumno_estado='A' and alumno_sedeid = $sedeid");
+			$alumnosActivos=$this->ejecutarConsulta("SELECT count(*) totalActivos FROM sujeto_alumno WHERE alumno_estado='A' and alumno_sedeid = :sede", [':sede' => (int)$sedeid]);
 		    return $alumnosActivos;
 		}
 
 		/*----------  Obtener total alumnos inactivos  ----------*/
 		public function obtenerAlumnosInactivos($sedeid){
-			$alumnosInactivos=$this->ejecutarConsulta("SELECT count(*) totalInactivos FROM sujeto_alumno WHERE alumno_estado='I' and alumno_sedeid = $sedeid");
+			$alumnosInactivos=$this->ejecutarConsulta("SELECT count(*) totalInactivos FROM sujeto_alumno WHERE alumno_estado='I' and alumno_sedeid = :sede", [':sede' => (int)$sedeid]);
 		    return $alumnosInactivos;
 		}
 
@@ -32,17 +32,17 @@
 																	SELECT COUNT(*) totalCancelado 
 																		FROM alumno_pago, sujeto_alumno 
 																		WHERE pago_alumnoid = alumno_id 
-																			AND alumno_sedeid = ".$sede_id." 
-																			AND pago_fecharegistro between '".$fecha_inicio."' and '". $fecha_fin."'
+																			AND alumno_sedeid = :sede1 
+																			AND pago_fecharegistro between :ini1 and :fin1
 																			AND pago_estado <> 'E'
 																	UNION ALL
 																	SELECT COUNT(*) totalCancelado
 																		FROM alumno_pago, alumno_pago_transaccion, sujeto_alumno 
 																		WHERE pago_alumnoid = alumno_id 
 																			AND pago_id = transaccion_pagoid 
-																			AND alumno_sedeid = ".$sede_id." 
-																			AND transaccion_fecharegistro between '".$fecha_inicio."' and '". $fecha_fin."'
-																			AND transaccion_estado<> 'E') AS DATOS");
+																			AND alumno_sedeid = :sede2 
+																			AND transaccion_fecharegistro between :ini2 and :fin2
+																			AND transaccion_estado<> 'E') AS DATOS", [':sede1' => (int)$sede_id, ':ini1' => $fecha_inicio, ':fin1' => $fecha_fin, ':sede2' => (int)$sede_id, ':ini2' => $fecha_inicio, ':fin2' => $fecha_fin]);
 			return $pagosCancelados;
 		}
 
@@ -67,7 +67,7 @@
 																		SUM(pago_saldo) AS SALDO
 																	FROM alumno_pago
 																		INNER JOIN sujeto_alumno ON alumno_id = pago_alumnoid
-																	WHERE pago_estado = 'P' AND pago_saldo > 0 AND alumno_sedeid = ".$sedeid." 
+																	WHERE pago_estado = 'P' AND pago_saldo > 0 AND alumno_sedeid = :sede1 
 																	GROUP BY pago_alumnoid
 																) P ON P.pago_alumnoid = A.alumno_id
 																LEFT JOIN (
@@ -89,14 +89,14 @@
 																			LEFT JOIN alumno_pago ON pago_alumnoid = alumno_id 
 																			LEFT JOIN alumno_pago_descuento ON descuento_alumnoid = alumno_id AND descuento_estado = 'S'
 																			LEFT JOIN general_sede ON sede_id = alumno_sedeid
-																		WHERE pago_rubroid = 'RPE' AND alumno_estado <> 'I' AND alumno_sedeid = ".$sedeid."
+																		WHERE pago_rubroid = 'RPE' AND alumno_estado <> 'I' AND alumno_sedeid = :sede2
 																		GROUP BY 
 																			pago_alumnoid
 																	) BASE
 																) PEN ON PEN.pago_alumnoid = A.alumno_id
 																WHERE A.alumno_estado <> 'E'
 																	AND PEN.TOTAL > 0 OR P.SALDO > 0 
-															) AS subconsulta;");
+															) AS subconsulta;", [':sede1' => (int)$sedeid, ':sede2' => (int)$sedeid]);
 			return $pagosPendientes;
 		}
 
@@ -111,11 +111,11 @@
 												from asistencia_asignahorario
 														inner join asistencia_horario_detalle on detalle_horarioid = asignahorario_horarioid
 														inner join sujeto_alumno on alumno_id = asignahorario_alumnoid                                                                  
-												where alumno_estado = 'A' and alumno_fechaingreso <= ' ".$fecha_fin."'
+												where alumno_estado = 'A' and alumno_fechaingreso <= :f1
 										)l
 												inner join asistencia_lugar on lugar_id = l.detalle_lugarid
 												inner join general_sede on lugar_sedeid = sede_id 
-												left join alumno_pago_descuento d on d.descuento_alumnoid = l.asignahorario_alumnoid and descuento_estado = 'S' and descuento_fecha <= ' ".$fecha_fin."'
+												left join alumno_pago_descuento d on d.descuento_alumnoid = l.asignahorario_alumnoid and descuento_estado = 'S' and descuento_fecha <= :f2
 										group by sede_id, sede_nombre, lugar_id ,lugar_nombre
 										
 										union 
@@ -123,10 +123,10 @@
 										select SLE.sede_id, SLE.sede_nombre, 0,'SIN LUGAR DE ENTRENAMIENTO' lugar_nombre, count(1) as ALUMNOS_ENTRENAN, sum(SLE.pension_estimada) PENSIONES_ESTIMADAS
 												FROM(select sede_id, sede_nombre, 0,'SIN LUGAR DE ENTRENAMIENTO' lugar_nombre, IFNULL(descuento_valor,s.sede_pension) pension_estimada
 																from sujeto_alumno a
-																left join alumno_pago_descuento d on d.descuento_alumnoid = a.alumno_id and descuento_estado = 'S' and descuento_fecha <= ' ".$fecha_fin."'              
+																left join alumno_pago_descuento d on d.descuento_alumnoid = a.alumno_id and descuento_estado = 'S' and descuento_fecha <= :f3              
 																left join general_sede s on s.sede_id = a.alumno_sedeid
 																where a.alumno_id not in (select asignahorario_alumnoid from asistencia_asignahorario)
-																and a.alumno_estado = 'A' and a.alumno_fechaingreso <= ' ".$fecha_fin."') SLE
+																and a.alumno_estado = 'A' and a.alumno_fechaingreso <= :f4) SLE
 												group by SLE.sede_id, SLE.sede_nombre
 								)Base
 								
@@ -145,7 +145,7 @@
 																												left join asistencia_horario_detalle on detalle_horarioid = asignahorario_horarioid)h on h.asignahorario_alumnoid = P.pago_alumnoid
 																												where P.pago_rubroid = 'RPE' 
 																																and P.pago_estado not in ('E','J') 
-																																and P.pago_fecha BETWEEN ' ".$fecha_inicio." ' and ' ".$fecha_fin."') Pagos   
+																																and P.pago_fecha BETWEEN :i1 and :f5) Pagos   
 																group by Pagos.sedeid, Pagos.lugarid)PA on PA.sedeid = Base.sede_id AND PA.lugarid = Base.lugar_id
 																
 								left join (select A.alumno_sedeid as sedeid, IFNULL(h.detalle_lugarid,0) AS lugarid, sum(IFNULL(T.transaccion_valor,0)) as VALOR_PAGADO, Count(1) as Numero
@@ -157,8 +157,8 @@
 																								left join asistencia_horario_detalle on detalle_horarioid = asignahorario_horarioid  
 																				)h on h.asignahorario_alumnoid = P.pago_alumnoid          
 																where transaccion_estado in ('C')        
-																and transaccion_fecha BETWEEN ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
-																and pago_fecha BETWEEN ' ".$fecha_inicio." ' and ' ".$fecha_fin."'
+																and transaccion_fecha BETWEEN :i2 and :f6
+																and pago_fecha BETWEEN :i3 and :f7
 																group by sedeid, lugarid
 												)Abonos on Abonos.sedeid = Base.sede_id AND Abonos.lugarid = Base.lugar_id 
 												
@@ -167,7 +167,7 @@
 																from alumno_pago P
 																where P.pago_rubroid = 'RPE' and P.pago_estado <> 'E'
 																GROUP BY P.pago_alumnoid
-																having  max(P.pago_fecha) < ' ".$fecha_inicio." '
+																having  max(P.pago_fecha) < :i4
 													)b
 												inner join sujeto_alumno A on A.alumno_id = b.pago_alumnoid
 												left join(SELECT distinct detalle_lugarid, asignahorario_alumnoid 
@@ -195,7 +195,7 @@
 														
 						order by Base.sede_id";
 
-			$datos = $this->ejecutarConsulta($consulta_datos);			
+			$datos = $this->ejecutarConsulta($consulta_datos, [':f1' => $fecha_fin, ':f2' => $fecha_fin, ':f3' => $fecha_fin, ':f4' => $fecha_fin, ':i1' => $fecha_inicio, ':f5' => $fecha_fin, ':i2' => $fecha_inicio, ':f6' => $fecha_fin, ':i3' => $fecha_inicio, ':f7' => $fecha_fin, ':i4' => $fecha_inicio]);			
 			return $datos;		
 		}
 		public function obtenerRepresentantes(){

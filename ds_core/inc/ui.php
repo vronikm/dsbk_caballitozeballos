@@ -48,6 +48,11 @@ if (!function_exists('ds_icono')) {
             'subir'     => 'fas fa-upload',
             'enviar'    => 'fas fa-paper-plane',
             'probar'    => 'fas fa-vial',
+            /* Dominio deportivo y economico */
+            'vincular'  => 'fas fa-link',
+            'pago'      => 'fas fa-dollar-sign',
+            'factura'   => 'fas fa-file-invoice-dollar',
+            'equipo'    => 'fas fa-users',
         ];
 
         return $iconos[$accion] ?? 'far fa-circle';
@@ -107,13 +112,60 @@ if (!function_exists('ds_icono')) {
             $html .= '<span class="ds-acciones__nota">' . $nota . '</span>';
         }
 
-        $html .= ds_boton('volver', $volver, ['href' => $urlVolver, 'estilo' => 'secondary']);
+        /* Volver.
+           Con $urlVolver vacía se retrocede en el historial. No es lo
+           ideal —el destino depende de por dónde se llegó— pero es lo que
+           hacían las pantallas de Basketball con btn_back.php, y cambiarlo
+           por una URL fija exige decidir el listado de cada una. Se
+           conserva el comportamiento y se unifica sólo el aspecto. */
+        /* Hay pantallas que no se "vuelven": se abren con target="_blank"
+           desde un listado y la salida natural es cerrar la pestaña. Antes
+           quedaban fuera del estándar por eso. Con salirJs el botón es el
+           mismo —mismo sitio, mismo tamaño, mismo icono— y sólo cambia lo
+           que hace al pulsarlo. */
+        $salirJs = trim((string)($opciones['salirJs'] ?? ''));
+
+        if ($salirJs !== '') {
+            $html .= str_replace('<button type="button"',
+                '<button type="button" onclick="'
+                    . htmlspecialchars($salirJs, ENT_QUOTES, 'UTF-8') . ';return false;"',
+                ds_boton('volver', $volver, ['type' => 'button', 'estilo' => 'secondary']));
+        } elseif ($urlVolver === '') {
+            /* El onclick va en el propio botón en vez de en un script
+               aparte: así la función es autosuficiente y no hay que
+               acordarse de cargar nada en cada una de las 86 vistas. */
+            $html .= str_replace('<button type="button"',
+                '<button type="button" onclick="history.back();return false;"',
+                ds_boton('volver', $volver, ['type' => 'button', 'estilo' => 'secondary']));
+        } else {
+            $html .= ds_boton('volver', $volver, ['href' => $urlVolver, 'estilo' => 'secondary']);
+        }
+
+        /* Limpiar: un reset del formulario. Va entre Volver y Guardar
+           porque no confirma nada, pero tampoco abandona la pantalla. */
+        if (($opciones['limpiar'] ?? false) === true) {
+            $html .= ds_boton('quitar', 'Limpiar', ['type' => 'reset', 'estilo' => 'secondary']);
+        }
 
         if (($opciones['soloLectura'] ?? false) !== true) {
             $html .= ds_boton('guardar', $guardar, ['estilo' => 'primary', 'type' => 'submit']);
         }
 
         return $html . '</div>';
+    }
+
+    /**
+     * Botón de una barra de búsqueda.
+     *
+     * Va aparte de ds_boton() porque vive dentro de un input-group y
+     * necesita form-control para estirarse a la altura de los campos. Sin
+     * eso queda un botón flotando a media altura junto a los selectores.
+     */
+    function ds_boton_buscar(string $texto = 'Buscar'): string
+    {
+        return '<button type="submit" class="form-control btn btn-primary">'
+             . '<i class="' . ds_icono('ver') . ' mr-1"></i> '
+             . htmlspecialchars($texto, ENT_QUOTES, 'UTF-8') . '</button>';
     }
 
     /** Celda de acciones de una tabla: iconos del mismo tamaño, a la derecha. */
@@ -160,5 +212,35 @@ if (!function_exists('ds_icono')) {
     function ds_ancho_form(): string
     {
         return 'col-lg-9';
+    }
+
+    /**
+     * Identificador obligatorio tomado de la URL.
+     *
+     * Muchas pantallas se abren con un id detrás (pagosRecibo/1054/) y
+     * daban por hecho que estaría. Al entrar sin él, el id vacío llegaba a
+     * la consulta, la cláusula quedaba truncada y la página moría
+     * mostrando el SQL y la ruta del servidor: además de romperse, contaba
+     * de más a quien mirara.
+     *
+     * Aquí se corta antes: si no hay un id numérico se vuelve al listado
+     * de donde se venía, sin ejecutar nada.
+     *
+     * Devuelve el id como cadena de dígitos; conviértalo con (int) al
+     * pasarlo a la consulta.
+     */
+    function ds_id_de_url(array $url, int $posicion, string $destino): string
+    {
+        $valor = isset($url[$posicion]) ? trim((string)$url[$posicion]) : '';
+
+        /* El cero se descarta como el vacío: ninguna tabla lo usa como
+           clave, y colarlo sólo lleva a una consulta sin resultados que la
+           vista interpreta como registro existente. */
+        if ($valor === '' || !ctype_digit($valor) || (int)$valor === 0) {
+            header('Location: ' . $destino);
+            exit();
+        }
+
+        return $valor;
     }
 }

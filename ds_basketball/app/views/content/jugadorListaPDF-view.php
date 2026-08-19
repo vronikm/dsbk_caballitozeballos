@@ -11,7 +11,7 @@
     $filename = "app/views/dist/img/temp/";
 
     $insLista = new jugadorController();	
-	$equipo_id = $insLista->limpiarCadena($url[1]);
+	$equipo_id = ds_id_de_url($url, 1, APP_URL . 'jugadorLista/');
     $datos=$insLista->BuscarEquipo($equipo_id);
 
     if($datos->rowCount()==1){
