@@ -889,6 +889,86 @@ class competenciaController extends leagueController
         return $this->respuesta('recargar', 'Torneo guardado', 'Se guardó «' . $nombre . '».');
     }
 
+    /**
+     * Publica o retira un torneo del portal público.
+     *
+     * Va aparte de guardarTorneo() a proposito: publicar no es editar un
+     * campo mas. Es la decision de abrir al mundo unos datos que incluyen
+     * nombres de menores, y merece su propia accion, su propio permiso y
+     * su propio registro de auditoria con quien y cuando.
+     */
+    public function publicarTorneo(): string
+    {
+        /* Se exige el permiso de ELIMINAR sobre torneos, que es el mas
+           restrictivo de los cuatro: abrir datos al publico es al menos
+           tan delicado como borrarlos, y asi no hereda el permiso de
+           quien solo edita nombres. */
+        if (!puede_eliminar('torneoList')) {
+            return $this->denegado('publicar torneos en el portal');
+        }
+
+        $id       = (int)($_POST['torneo_id'] ?? 0);
+        $publicar = ($_POST['publicar'] ?? '') === 'S';
+
+        $torneo = $this->fila(
+            "SELECT torneo_id, torneo_nombre, torneo_publico, torneo_slug
+               FROM dsl_torneo WHERE torneo_id = :id",
+            [':id' => $id]
+        );
+
+        if (!$torneo) {
+            return $this->respuesta('simple', 'No encontrado', 'El torneo no existe.', 'error');
+        }
+
+        /* El slug puede faltar en torneos creados antes de la migracion:
+           se genera al publicar, que es cuando hace falta. */
+        $slug = (string)($torneo['torneo_slug'] ?? '');
+        if ($slug === '') {
+            $slug = $this->slug($torneo['torneo_nombre']) . '-' . $id;
+        }
+
+        $ok = $this->escribir(
+            "UPDATE dsl_torneo SET torneo_publico = :p, torneo_slug = :s WHERE torneo_id = :id",
+            [':p' => $publicar ? 'S' : 'N', ':s' => $slug, ':id' => $id]
+        );
+
+        if ($ok < 0) {
+            return $this->respuesta('simple', 'No se pudo cambiar',
+                'La base de datos rechazó el cambio.', 'error');
+        }
+
+        $this->auditar('torneo', $id, 'editar',
+            ['publico' => $torneo['torneo_publico']],
+            ['publico' => $publicar ? 'S' : 'N', 'slug' => $slug],
+            $publicar ? 'Publicado en el portal' : 'Retirado del portal');
+
+        return $this->respuesta('recargar',
+            $publicar ? 'Torneo publicado' : 'Torneo retirado',
+            $publicar
+                ? 'Ya es visible en el portal público. El enlace es /publico/t/' . $slug . '/'
+                : 'Deja de ser visible en el portal público.');
+    }
+
+    /**
+     * Convierte un texto en una parte de URL legible.
+     *
+     * Se transliteran las vocales acentuadas y la ene en vez de
+     * descartarlas: «Categoría Única» debe dar «categoria-unica», no
+     * «categor-a-nica», que no se lee.
+     */
+    protected function slug(string $texto): string
+    {
+        $de = ['á','à','ä','â','é','è','ë','ê','í','ì','ï','î',
+               'ó','ò','ö','ô','ú','ù','ü','û','ñ','ç'];
+        $a  = ['a','a','a','a','e','e','e','e','i','i','i','i',
+               'o','o','o','o','u','u','u','u','n','c'];
+
+        $t = str_replace($de, $a, mb_strtolower(trim($texto), 'UTF-8'));
+        $t = preg_replace('/[^a-z0-9]+/', '-', $t);
+
+        return trim((string)$t, '-') ?: 'torneo';
+    }
+
     /*----------  Categoria  ----------*/
 
     public function guardarCategoria(): string
@@ -1823,9 +1903,10 @@ class competenciaController extends leagueController
      */
     public function plantilla(int $inscripcionid, bool $incluirBajas = false): array
     {
-        $sql = "SELECT PL.*, PE.persona_identificacion, PE.persona_nombres,
+        $sql = "SELECT PL.*, PE.persona_id, PE.persona_identificacion, PE.persona_nombres,
                        PE.persona_apellidos, PE.persona_fechanac, PE.persona_genero,
                        PE.persona_foto, PE.persona_alumnoid,
+                       PE.persona_publicarfoto, PE.persona_consentfecha,
                        TIMESTAMPDIFF(YEAR, PE.persona_fechanac,
                            COALESCE(C.categoria_fechacorte, CURDATE())) AS edad,
                        C.categoria_edadmin, C.categoria_edadmax, C.categoria_genero,
@@ -1985,6 +2066,83 @@ class competenciaController extends leagueController
 
         return $this->respuesta('recargar', 'Persona guardada',
             $apell . ' ' . $nombres . ' quedó registrada.');
+    }
+
+    /**
+     * Registra o retira la autorizacion para publicar la fotografia.
+     *
+     * POR QUE ES UNA ACCION APARTE
+     *
+     * Podria ser una casilla mas en el formulario de la persona, pero
+     * entonces se marcaria de pasada al corregir un apellido. Autorizar la
+     * publicacion de la imagen de un menor en un sitio abierto es una
+     * decision con consecuencias legales, y merece su propio gesto y su
+     * propio registro de quien y cuando.
+     *
+     * Se guarda la fecha y el usuario porque un consentimiento sin
+     * trazabilidad no sirve para demostrar que se obtuvo, que es
+     * justamente para lo que se pide.
+     */
+    public function consentimientoImagen(): string
+    {
+        if (!puede_editar('plantillaPanel')) {
+            return $this->denegado('registrar autorizaciones de imagen');
+        }
+
+        $id       = (int)($_POST['persona_id'] ?? 0);
+        $autoriza = ($_POST['autoriza'] ?? '') === 'S';
+
+        $persona = $this->fila(
+            "SELECT persona_id, persona_nombres, persona_apellidos,
+                    persona_foto, persona_publicarfoto
+               FROM dsl_persona WHERE persona_id = :id",
+            [':id' => $id]
+        );
+
+        if (!$persona) {
+            return $this->respuesta('simple', 'No encontrada',
+                'Esa persona no existe.', 'error');
+        }
+
+        /* Autorizar la publicacion de una foto que no existe no significa
+           nada, y deja el registro diciendo que hay algo publicable donde
+           no lo hay. */
+        if ($autoriza && empty($persona['persona_foto'])) {
+            return $this->respuesta('simple', 'No hay fotografía',
+                'Esta persona no tiene fotografía cargada, así que no hay nada '
+                . 'que autorizar. Suba primero la imagen.', 'error');
+        }
+
+        $ok = $this->escribir(
+            "UPDATE dsl_persona
+                SET persona_publicarfoto   = :p,
+                    persona_consentfecha   = :f,
+                    persona_consentusuario = :u
+              WHERE persona_id = :id",
+            [':p'  => $autoriza ? 'S' : 'N',
+             ':f'  => $autoriza ? date('Y-m-d H:i:s') : null,
+             ':u'  => $autoriza ? (usuario_actual_id() ?: null) : null,
+             ':id' => $id]
+        );
+
+        if ($ok < 0) {
+            return $this->respuesta('simple', 'No se pudo guardar',
+                'La base de datos rechazó el cambio.', 'error');
+        }
+
+        $this->auditar('persona', $id, 'editar',
+            ['publicarfoto' => $persona['persona_publicarfoto']],
+            ['publicarfoto' => $autoriza ? 'S' : 'N'],
+            $autoriza
+                ? 'Autorización de imagen registrada'
+                : 'Autorización de imagen retirada');
+
+        return $this->respuesta('recargar',
+            $autoriza ? 'Autorización registrada' : 'Autorización retirada',
+            $persona['persona_apellidos'] . ' ' . $persona['persona_nombres'] . ': '
+            . ($autoriza
+                ? 'su fotografía podrá mostrarse en el portal público.'
+                : 'su fotografía deja de mostrarse en el portal público.'));
     }
 
     /**

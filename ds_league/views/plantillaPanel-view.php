@@ -97,12 +97,13 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <th class="text-center">Dorsal</th>
                                 <th class="text-center">Edad</th>
                                 <th>Habilitación</th>
+                                <th>Imagen</th>
                                 <th class="ds-tabla-acciones"></th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php if (!$filas): ?>
-                            <tr><td colspan="7" class="text-center text-muted py-4">
+                            <tr><td colspan="8" class="text-center text-muted py-4">
                                 Todavía no hay nadie en esta plantilla.
                             </td></tr>
                         <?php else: foreach ($filas as $f):
@@ -145,6 +146,31 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         <br><small class="text-danger"><?php echo $h(implode('; ', $faltas)); ?></small>
                                     <?php else: ?>
                                         <span class="badge badge-secondary">Pendiente</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php /* Sólo tiene sentido preguntar por la
+                                             autorización si hay fotografía. */ ?>
+                                    <?php if (empty($f['persona_foto'])): ?>
+                                        <span class="text-muted" style="font-size:.82rem;">sin foto</span>
+                                    <?php else:
+                                        $autorizada = ($f['persona_publicarfoto'] ?? 'N') === 'S'; ?>
+                                        <?php if (!$baja && puede_editar('plantillaPanel')): ?>
+                                            <button type="button"
+                                                    class="btn btn-xs btn-<?php echo $autorizada ? 'success' : 'outline-secondary'; ?> js-consent"
+                                                    data-id="<?php echo (int)$f['persona_id']; ?>"
+                                                    data-nombre="<?php echo $h($f['persona_apellidos'] . ' ' . $f['persona_nombres']); ?>"
+                                                    data-auth="<?php echo $autorizada ? 'S' : 'N'; ?>"
+                                                    title="<?php echo $autorizada
+                                                        ? 'Autorizada el ' . $h((string)$f['persona_consentfecha'])
+                                                        : 'Sin autorización: en el portal se muestran las iniciales'; ?>">
+                                                <i class="fas fa-<?php echo $autorizada ? 'eye' : 'eye-slash'; ?> mr-1"></i>
+                                                <?php echo $autorizada ? 'Autorizada' : 'Reservada'; ?>
+                                            </button>
+                                        <?php else: ?>
+                                            <span class="badge badge-<?php echo $autorizada ? 'success' : 'secondary'; ?>">
+                                                <?php echo $autorizada ? 'Autorizada' : 'Reservada'; ?></span>
+                                        <?php endif; ?>
                                     <?php endif; ?>
                                 </td>
                                 <td class="ds-tabla-acciones">
@@ -291,6 +317,38 @@ require_once __DIR__ . "/inc/layout-top.php";
         });
     });
 
+    /* Autorización de imagen.
+       Se confirma con el texto completo porque autorizar la publicación de
+       la fotografía de un menor en un sitio abierto no es marcar una
+       casilla: tiene consecuencias y quien lo hace debe saber cuáles. */
+    document.querySelectorAll('.js-consent').forEach(function (b) {
+        b.addEventListener('click', function () {
+            var auth = b.getAttribute('data-auth') === 'S';
+            var nom  = b.getAttribute('data-nombre');
+
+            Swal.fire({
+                icon:  auth ? 'question' : 'warning',
+                title: auth ? '¿Retirar la autorización?' : '¿Autorizar la publicación?',
+                html:  auth
+                    ? 'La fotografía de <b>' + nom + '</b> dejará de mostrarse en el portal '
+                      + 'público. En su lugar se mostrarán las iniciales.'
+                    : '<div style="text-align:left">La fotografía de <b>' + nom + '</b> pasará '
+                      + 'a ser visible para cualquiera en el portal público.<br><br>'
+                      + 'Si es menor de edad, esta autorización debe provenir de quien ejerce '
+                      + 'su representación legal. Queda registrado quién y cuándo la concedió.</div>',
+                showCancelButton:  true,
+                confirmButtonText: auth ? 'Retirar' : 'Autorizar',
+                cancelButtonText:  'Cancelar',
+                confirmButtonColor: auth ? '#6c757d' : '#28a745'
+            }).then(function (r) {
+                if (r.isConfirmed) {
+                    enviar({ modulo_league: 'consentimientoImagen',
+                             persona_id: b.getAttribute('data-id'),
+                             autoriza:   auth ? 'N' : 'S' });
+                }
+            });
+        });
+    });
     document.querySelectorAll('.js-baja').forEach(function (b) {
         b.addEventListener('click', function () {
             Swal.fire({

@@ -218,6 +218,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                class="ds-link mr-auto ml-3"><i class="fas fa-random mr-1"></i>Sorteo de grupos</a>
             <a href="<?php echo APP_URL; ?>playoffPanel/<?php echo $categoriaId; ?>/"
                class="ds-link mr-auto"><i class="fas fa-sitemap mr-1"></i>Eliminatorias</a>
+            <a href="<?php echo APP_URL; ?>rankingPanel/<?php echo $categoriaId; ?>/"
+               class="ds-link mr-auto"><i class="fas fa-medal mr-1"></i>Líderes</a>
         <?php endif; ?>
         <?php if ($faseId > 0 && !$partidos && puede_crear('categoriaPanel')): ?>
         <form class="FormularioAjax" method="POST" action="<?php echo APP_URL; ?>ajax/leagueAjax.php"
@@ -314,6 +316,10 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <span class="badge badge-<?php echo $tono[$p['estado_tono']] ?? 'secondary'; ?>">
                                 <?php echo $h($p['estado_nombre']); ?>
                             </span>
+                            <a href="<?php echo APP_URL; ?>actaPartido/<?php echo (int)$p['partido_id']; ?>/"
+                               class="btn btn-xs btn-ver ml-1" title="Acta del partido">
+                                <i class="fas fa-clipboard-list"></i>
+                            </a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

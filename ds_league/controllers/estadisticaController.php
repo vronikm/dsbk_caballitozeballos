@@ -538,8 +538,6 @@ class estadisticaController extends competenciaController
      */
     public function guardarActa(): string
     {
-        if (!puede_editar('actaPartido')) { return $this->denegado('cargar el acta'); }
-
         $partido = (int)($_POST['partido_id'] ?? 0);
         $persona = (int)($_POST['persona_id'] ?? 0);
         $inscrip = (int)($_POST['inscripcion_id'] ?? 0);
@@ -548,6 +546,23 @@ class estadisticaController extends competenciaController
         if ($partido <= 0 || $persona <= 0 || $inscrip <= 0) {
             return $this->respuesta('simple', 'Faltan datos',
                 'Indique el partido y el jugador.', 'error');
+        }
+
+        /* ALCANCE POR FILA · D4
+           ---------------------------------------------------------------
+           puede_editar('actaPartido') NO basta: el rol de árbitro tiene esa
+           acción concedida para poder cargar el acta de SUS partidos, y con
+           sólo esa comprobación podría cargar la de cualquiera.
+
+           Se exige una de dos cosas: permiso de gestión sobre la categoría,
+           o estar designado a ESTE partido. Es la misma regla que
+           guardarResultado(), y va aquí porque el servidor no puede fiarse
+           de que la pantalla no se haya abierto a mano. */
+        $gestiona  = puede_editar('categoriaPanel');
+        $designado = $this->estaDesignado($partido, usuario_actual_id() ?: 0);
+
+        if (!$gestiona && !$designado) {
+            return $this->denegado('cargar el acta de este partido');
         }
 
         /* El jugador tiene que estar en la plantilla de ese equipo y sin
