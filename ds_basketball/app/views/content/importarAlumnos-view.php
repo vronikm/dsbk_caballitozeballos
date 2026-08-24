@@ -2,38 +2,27 @@
 	use app\controllers\alumnoController;
 	$insAlumnoImp = new alumnoController();
 ?>
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo APP_NAME; ?> | Importar Alumnos</title>
-	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2/css/select2.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js"></script>
-  </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
-	<div class="wrapper">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Importar Alumnos';
+	$extras      = array (0 => 'swal',);
+	require_once "app/views/inc/cabecera.php";
+?>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+	<div class="app-wrapper ds-core">
 
 	  <?php require_once "app/views/inc/navbar.php"; ?>
 	  <?php require_once "app/views/inc/main-sidebar.php"; ?>
 
-	  <div class="content-wrapper">
-		<div class="content-header">
+	  <div class="app-main">
+		<div class="app-content-header">
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
 						<h1 class="m-0">Importar Alumnos desde CSV</h1>
 					</div>
 					<div class="col-sm-6">
-						<ol class="breadcrumb float-sm-right">
+						<ol class="breadcrumb float-sm-end">
 							<li class="breadcrumb-item"><a href="#">Configuración</a></li>
 							<li class="breadcrumb-item active">Importar Alumnos</li>
 						</ol>
@@ -42,7 +31,7 @@
 			</div>
 		</div>
 
-		<section class="content">
+		<section class="app-content">
 			<div class="container-fluid">
 
 				<!-- Paso 1: subir archivo y analizar -->
@@ -55,16 +44,16 @@
 						<div class="card-body">
 							<div class="row">
 								<div class="col-md-4">
-									<div class="form-group">
+									<div class="mb-3">
 										<label>Sede destino</label>
-										<select class="form-control select2" name="alumno_sedeid" required>
+										<select class="form-control" name="alumno_sedeid" required>
 											<option value="">— Seleccione —</option>
 											<?php echo $insAlumnoImp->listarOptionSede($_SESSION['rol'], $_SESSION['usuario']); ?>
 										</select>
 									</div>
 								</div>
 								<div class="col-md-6">
-									<div class="form-group">
+									<div class="mb-3">
 										<label>Archivo CSV</label>
 										<input type="file" name="archivo_csv" class="form-control" accept=".csv,text/csv" required>
 										<small class="form-text text-muted">
@@ -73,7 +62,7 @@
 									</div>
 								</div>
 								<div class="col-md-2 d-flex align-items-end">
-									<button type="submit" class="btn btn-info btn-block">
+									<button type="submit" class="btn btn-info w-100">
 										<i class="fas fa-search"></i> Analizar
 									</button>
 								</div>
@@ -95,7 +84,7 @@
 						</div>
 						<div id="reporteContenido"></div>
 					</div>
-					<div class="card-footer text-right">
+					<div class="card-footer text-end">
 						<button type="button" class="btn btn-secondary" onclick="document.getElementById('cardReporte').style.display='none';">
 							<i class="fas fa-undo"></i> Cancelar
 						</button>
@@ -116,13 +105,12 @@
 	</div>
 
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/select2/js/select2.full.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 
 	<script>
 		$(function(){
-			$('.select2').select2({ theme: 'bootstrap4' });
 		});
 
 		// Paso 1: enviar análisis vía fetch (no usamos FormularioAjax porque queremos pintar el reporte en la página)

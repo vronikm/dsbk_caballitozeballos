@@ -1101,12 +1101,30 @@ class competenciaController extends leagueController
         $email    = trim((string)($_POST['equipo_email'] ?? ''));
         $quitar   = ($_POST['quitar_escudo'] ?? '') === '1';
 
+        /* Datos tributarios (migración 039). Opcionales: un equipo sin
+           ellos es un equipo que todavía no puede facturar, no un error.
+           Quien intente emitirle recibe un mensaje que dice qué falta. */
+        $idtipo   = trim((string)($_POST['equipo_idtipo'] ?? '04'));
+        $ident    = trim((string)($_POST['equipo_identificacion'] ?? ''));
+        $razon    = trim((string)($_POST['equipo_razonsocial'] ?? ''));
+        $direccion = trim((string)($_POST['equipo_direccion'] ?? ''));
+
         if ($nombre === '') {
             return $this->respuesta('simple', 'Faltan datos', 'El nombre es obligatorio.', 'error');
         }
         if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $this->respuesta('simple', 'Correo no válido',
                 'Revise la dirección de correo.', 'error');
+        }
+        if (!\in_array($idtipo, ['04', '05', '06', '07'], true)) { $idtipo = '04'; }
+
+        /* Se valida aquí y no al emitir: corregir un dígito con el equipo
+           delante es trivial, y descubrirlo cuando el SRI devuelve el
+           comprobante obliga a anularlo y reemitir con otro número. */
+        if ($ident !== '' && !sri_identificacion_valida($ident, $idtipo)) {
+            return $this->respuesta('simple', 'Identificación no válida',
+                'El número «' . $ident . '» no es una identificación válida para el tipo '
+                . 'elegido: el dígito verificador no cuadra.', 'error');
         }
 
         $antes = $id > 0
@@ -1130,14 +1148,19 @@ class competenciaController extends leagueController
         $sql = $id > 0
             ? "UPDATE dsl_equipo SET equipo_nombre = :n, equipo_corto = :c,
                       equipo_contacto = :ct, equipo_telefono = :t, equipo_email = :e,
-                      equipo_escudo = :esc
+                      equipo_escudo = :esc, equipo_idtipo = :it,
+                      equipo_identificacion = :ide, equipo_razonsocial = :rz,
+                      equipo_direccion = :dir
                 WHERE equipo_id = :id"
             : "INSERT INTO dsl_equipo (equipo_nombre, equipo_corto, equipo_contacto,
-                      equipo_telefono, equipo_email, equipo_escudo)
-               VALUES (:n, :c, :ct, :t, :e, :esc)";
+                      equipo_telefono, equipo_email, equipo_escudo,
+                      equipo_idtipo, equipo_identificacion, equipo_razonsocial,
+                      equipo_direccion)
+               VALUES (:n, :c, :ct, :t, :e, :esc, :it, :ide, :rz, :dir)";
 
         $par = [':n' => $nombre, ':c' => $corto, ':ct' => $contacto,
-                ':t' => $telefono, ':e' => $email, ':esc' => $escudo !== '' ? $escudo : null];
+                ':t' => $telefono, ':e' => $email, ':esc' => $escudo !== '' ? $escudo : null,
+                ':it' => $idtipo, ':ide' => $ident, ':rz' => $razon, ':dir' => $direccion];
         if ($id > 0) { $par[':id'] = $id; }
 
         $nuevoId = $this->escribir($sql, $par);

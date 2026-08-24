@@ -220,9 +220,14 @@ class hubController
 
         try {
             $this->conexion = new PDO(
-                "mysql:host=" . DB_SERVER . ";dbname=" . DB_NAME . ";charset=utf8",
+                /* utf8mb4: en MySQL «utf8» es utf8mb3, de tres bytes, y
+                   trunca lo que necesite cuatro. Ver migración 041. */
+                "mysql:host=" . DB_SERVER . ";dbname=" . DB_NAME . ";charset=utf8mb4",
                 DB_USER,
-                DB_PASS
+                DB_PASS,
+                /* Alinea collation_connection con la base. Ver DS_DB_INIT_COMANDO. */
+                defined('DS_DB_INIT_COMANDO')
+                    ? [PDO::MYSQL_ATTR_INIT_COMMAND => DS_DB_INIT_COMANDO] : []
             );
             $this->conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (\Throwable $e) {
@@ -271,5 +276,165 @@ class hubController
         if ($hora < 12) return 'Buenos días';
         if ($hora < 19) return 'Buenas tardes';
         return 'Buenas noches';
+    }
+
+    /*======================================================================
+      Segundo factor de la propia cuenta
+
+      POR QUÉ ESTO VIVE EN EL HUB Y NO EN CORE
+
+      Se escribió primero en Core, que es donde está la administración de
+      usuarios, y ahí estaba mal: sólo el rol 1 tiene concedido el módulo
+      core, de modo que los otros cuatro usuarios del sistema no habrían
+      podido proteger su propia cuenta. Justo al revés de lo que hace falta.
+
+      El Hub es la única puerta por la que pasa todo el mundo: exige sesión
+      y nada más. Proteger la cuenta de uno no es una función
+      administrativa.
+
+      Lo que SÍ se queda en Core es restablecer el factor de OTRA persona,
+      que sí es administrativo y sólo para el superadministrador.
+
+      NINGUNO DE ESTOS MÉTODOS ACEPTA UN ID DE USUARIO. Todos leen el de la
+      sesión. Es lo que impide que alguien configure el segundo factor de
+      una cuenta ajena pasando un parámetro.
+      ====================================================================*/
+
+    /** Alerta con el formato que espera el front del ecosistema. */
+    private function alerta(string $tipo, string $titulo, string $texto,
+                            string $icono = 'success'): string
+    {
+        return json_encode(
+            ['tipo' => $tipo, 'titulo' => $titulo, 'texto' => $texto, 'icono' => $icono],
+            JSON_UNESCAPED_UNICODE);
+    }
+
+    public function prepararSegundoFactor(): string
+    {
+        $yo = usuario_actual_id();
+        if ($yo <= 0) {
+            return $this->alerta('simple', 'Sin sesión', 'Vuelva a iniciar sesión.', 'error');
+        }
+
+        if (dosf_estado($yo) === 'A') {
+            return $this->alerta('simple', 'Ya está activo',
+                'Desactívelo primero si quiere vincular otro teléfono.', 'error');
+        }
+
+        if (dosf_preparar($yo) === '') {
+            return $this->alerta('simple', 'No se pudo preparar',
+                'La base de datos rechazó el cambio.', 'error');
+        }
+
+        return $this->alerta('recargar', 'Listo para vincular',
+            'Escanee el código con su aplicación de verificación.');
+    }
+
+    /** Confirma el codigo y activa. Devuelve los codigos de recuperacion. */
+    public function activarSegundoFactor(): string
+    {
+        $yo = usuario_actual_id();
+        if ($yo <= 0) {
+            return $this->alerta('simple', 'Sin sesión', 'Vuelva a iniciar sesión.', 'error');
+        }
+
+        $r = dosf_activar($yo, (string)($_POST['codigo'] ?? ''));
+
+        if (!$r['ok']) {
+            return $this->alerta('simple', 'No se pudo activar', $r['motivo'], 'error');
+        }
+
+        /* Los códigos viajan UNA vez, aquí. Después sólo existe su hash y
+           no hay forma de volver a mostrarlos: sólo de generar otros. */
+        $a = json_decode($this->alerta('simple', 'Verificación activada',
+                'Guarde los códigos de recuperación: no se volverán a mostrar.'), true);
+        $a['codigos'] = $r['codigos'];
+
+        return json_encode($a, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Desactiva el segundo factor.
+     *
+     * PIDE LA CONTRASEÑA cuando ya está activo. Sin eso, a quien encuentre
+     * una sesión abierta le bastaría con desactivarlo para quitarse el
+     * estorbo, y el segundo factor dejaría de proteger justo en el caso
+     * que debe cubrir.
+     */
+    public function desactivarSegundoFactor(): string
+    {
+        $yo = usuario_actual_id();
+        if ($yo <= 0) {
+            return $this->alerta('simple', 'Sin sesión', 'Vuelva a iniciar sesión.', 'error');
+        }
+
+        /* Una configuración a medias ('P') todavía NO protege nada:
+           cancelarla no baja la seguridad de nadie. */
+        $pendiente = dosf_estado($yo) === 'P';
+
+        if (!$pendiente && !$this->claveCorrecta($yo, (string)($_POST['clave'] ?? ''))) {
+            return $this->alerta('simple', 'Contraseña incorrecta',
+                'Para desactivar la verificación hay que confirmar la contraseña.', 'error');
+        }
+
+        $nota = $pendiente ? 'Configuración cancelada antes de activarse'
+                           : 'A petición del propio usuario';
+
+        if (!dosf_desactivar($yo, 'DESACTIVAR', $nota)) {
+            return $this->alerta('simple', 'No se pudo desactivar',
+                'La base de datos rechazó el cambio.', 'error');
+        }
+
+        return $this->alerta('recargar',
+            $pendiente ? 'Configuración cancelada' : 'Verificación desactivada',
+            $pendiente ? 'Puede empezar de nuevo cuando quiera.'
+                       : 'Su cuenta vuelve a entrar sólo con la contraseña.');
+    }
+
+    /** Juego nuevo de codigos de recuperacion. */
+    public function regenerarCodigosRecuperacion(): string
+    {
+        $yo = usuario_actual_id();
+        if ($yo <= 0) {
+            return $this->alerta('simple', 'Sin sesión', 'Vuelva a iniciar sesión.', 'error');
+        }
+
+        if (!$this->claveCorrecta($yo, (string)($_POST['clave'] ?? ''))) {
+            return $this->alerta('simple', 'Contraseña incorrecta',
+                'Confirme su contraseña para generar códigos nuevos.', 'error');
+        }
+
+        $codigos = dosf_regenerar_codigos($yo);
+
+        if (!$codigos) {
+            return $this->alerta('simple', 'No se pudo generar',
+                'La verificación en dos pasos no está activa.', 'error');
+        }
+
+        $a = json_decode($this->alerta('simple', 'Códigos nuevos',
+                'Los anteriores dejan de valer. Guarde éstos.'), true);
+        $a['codigos'] = $codigos;
+
+        return json_encode($a, JSON_UNESCAPED_UNICODE);
+    }
+
+    /** ¿Es esta la contrasena del usuario indicado? */
+    private function claveCorrecta(int $usuarioid, string $clave): bool
+    {
+        if ($clave === '') { return false; }
+
+        $con = $this->conectar();
+        if ($con === null) { return false; }
+
+        try {
+            $st = $con->prepare("SELECT usuario_clave FROM seguridad_usuario
+                                  WHERE usuario_id = :id");
+            $st->execute([':id' => $usuarioid]);
+            $hash = (string)$st->fetchColumn();
+
+            return $hash !== '' && password_verify($clave, $hash);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 }

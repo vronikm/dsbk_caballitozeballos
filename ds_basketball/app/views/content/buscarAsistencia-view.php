@@ -16,10 +16,10 @@
 
 		if($datos['pendiente']==1){
 			$pendiente = 'Pendiente';
-			$clase = '<a class="float-right text-danger">';
+			$clase = '<a class="float-end text-danger">';
 		}else{
 			$pendiente = 'Al día';
-			$clase = '<a class="float-right">';
+			$clase = '<a class="float-end">';
 		}
 	
 		$sede=$insAsistencia->informacionSede($datos['alumno_sedeid']);
@@ -113,6 +113,7 @@
 ?>
 
 
+<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8">
@@ -122,22 +123,22 @@
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font: Source Sans Pro -->
 	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/fontawesome6/css/all.min.css">
 	  <!-- fullCalendar -->
 	  <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fullcalendar/main.css">
 	<!-- DataTables -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 	<!-- Theme style -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/css/overlayscrollbars.min.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/css/adminlte.min.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
     
+	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
   </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
       <!-- Navbar -->
       <?php require_once "app/views/inc/navbar.php"; ?>
       <!-- /.navbar -->
@@ -147,17 +148,17 @@
       <!-- /.Main Sidebar Container -->  
 
       <!-- vista -->
-      <div class="content-wrapper">
+      <div class="app-main">
 
 		<!-- Content Header (Page header) -->
-		<div class="content-header">
+		<div class="app-content-header">
 			<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
 				<h1 class="m-0">Registro de asistencia</h1>
 				</div><!-- /.col -->
 				<div class="col-sm-6">
-				<ol class="breadcrumb float-sm-right">
+				<ol class="breadcrumb float-sm-end">
 					<li class="breadcrumb-item"><a href="#">Nuevo</a></li>
 					<li class="breadcrumb-item active">Dashboard v1</li>
 				</ol>
@@ -168,7 +169,7 @@
 		<!-- /.content-header -->
 
 		<!-- Section listado de alumnos -->
-		<section class="content">
+		<section class="app-content">
 			<form action="<?php echo APP_URL."buscarAsistencia/" ?>" method="POST" autocomplete="off" enctype="multipart/form-data" >			
 			<!-- card-body -->                
 			<div class="card-body">
@@ -178,7 +179,7 @@
 						<div class="card card-primary card-outline">
 							<div class="card-body box-profile">
 								<div class="text-center">
-									<img class="profile-user-img img-fluid img-circle"
+									<img class="profile-user-img img-fluid rounded-circle"
 										src="<?php echo $foto; ?>"
 										alt="User profile picture">
 								</div>
@@ -189,16 +190,16 @@
 
 								<ul class="list-group list-group-unbordered mb-3">
 									<li class="list-group-item">
-										<b>Sede</b> <a class="float-right"><?php echo $datos['sede_nombre']; ?></a>
+										<b>Sede</b> <a class="float-end"><?php echo $datos['sede_nombre']; ?></a>
 									</li>
 									<li class="list-group-item">
-										<b>Categoría</b> <a class="float-right"><?php echo $datos['anio']; ?></a>
+										<b>Categoría</b> <a class="float-end"><?php echo $datos['anio']; ?></a>
 									</li>
 									<li class="list-group-item">
-										<b>Estado alumno</b> <a class="float-right"><?php echo $datos['estado']; ?></a>
+										<b>Estado alumno</b> <a class="float-end"><?php echo $datos['estado']; ?></a>
 									</li>
 									<li class="list-group-item">
-										<b>Fecha de ingreso</b> <a class="float-right"><?php echo $datos['alumno_fechaingreso']; ?></a>
+										<b>Fecha de ingreso</b> <a class="float-end"><?php echo $datos['alumno_fechaingreso']; ?></a>
 									</li>
 									<li class="list-group-item">
 										<b>Estado pagos</b> 												
@@ -207,7 +208,7 @@
 										?>
 									</li>
 									<li class="list-group-item">
-										<b>ID</b> <a class="float-right"><?php echo $alumno; ?></a>
+										<b>ID</b> <a class="float-end"><?php echo $alumno; ?></a>
 									</li>
 								</ul>
 							</div>
@@ -255,31 +256,17 @@
 
     
 	<!-- jQuery -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 	<!-- jQuery UI -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery-ui/jquery-ui.min.js"></script>
 	<!-- DataTables  & Plugins -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables/jquery.dataTables.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jszip/jszip.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/pdfmake/pdfmake.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/pdfmake/vfs_fonts.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js" ></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js" ></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/main.js" ></script>	
 	<!-- fullCalendar 2.2.5 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/moment/moment.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/fullcalendar/main.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/fullcalendar/locales/es.js"></script>
 

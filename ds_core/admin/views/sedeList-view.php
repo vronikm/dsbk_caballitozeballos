@@ -32,7 +32,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         <h3 class="card-title mb-0"><?php echo count($sedes); ?> sede<?php echo count($sedes) === 1 ? '' : 's'; ?></h3>
         <?php if ($puedeCrear): ?>
             <a href="<?php echo APP_URL; ?>sedeForm/" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus mr-1"></i> Nueva sede
+                <i class="fas fa-plus me-1"></i> Nueva sede
             </a>
         <?php endif; ?>
     </div>
@@ -45,10 +45,10 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <th>Sede</th>
                         <th>Organización</th>
                         <th>Tipo</th>
-                        <th class="text-right">Inscripción</th>
-                        <th class="text-right">Pensión</th>
+                        <th class="text-end">Inscripción</th>
+                        <th class="text-end">Pensión</th>
                         <th>Uso</th>
-                        <th class="text-right">Acciones</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,8 +70,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php echo htmlspecialchars((string)$s['tipo_nombre'] ?: $s['sede_tipoingreso'], ENT_QUOTES, 'UTF-8'); ?>
                             </span>
                         </td>
-                        <td class="text-right">$<?php echo number_format((float)$s['sede_inscripcion'], 2); ?></td>
-                        <td class="text-right">$<?php echo number_format((float)$s['sede_pension'], 2); ?></td>
+                        <td class="text-end">$<?php echo number_format((float)$s['sede_inscripcion'], 2); ?></td>
+                        <td class="text-end">$<?php echo number_format((float)$s['sede_pension'], 2); ?></td>
                         <td>
                             <small class="d-block text-muted">
                                 <?php echo (int)$s['alumnos']; ?> alumnos · <?php echo (int)$s['empleados']; ?> empleados

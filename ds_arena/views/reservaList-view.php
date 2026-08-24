@@ -37,19 +37,19 @@ require_once __DIR__ . "/inc/layout-top.php";
         <h3 class="card-title mb-0">
             <?php echo count($reservas); ?> reserva<?php echo count($reservas) === 1 ? '' : 's'; ?>
             <?php if ($totalSaldo > 0): ?>
-                <small class="text-danger ml-2">· $<?php echo number_format($totalSaldo, 2); ?> por cobrar</small>
+                <small class="text-danger ms-2">· $<?php echo number_format($totalSaldo, 2); ?> por cobrar</small>
             <?php endif; ?>
         </h3>
 
         <?php if ($puedeCrear && $instalaciones): ?>
             <a href="<?php echo APP_URL; ?>reservaForm/" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus mr-1"></i> Nueva reserva
+                <i class="fas fa-plus me-1"></i> Nueva reserva
             </a>
         <?php endif; ?>
     </div>
 
     <div class="card-body border-bottom">
-        <form method="GET" action="<?php echo APP_URL; ?>reservaList/" class="form-row align-items-end">
+        <form method="GET" action="<?php echo APP_URL; ?>reservaList/" class="row g-2 align-items-end">
             <div class="col-md-3 mb-2">
                 <label class="mb-1 small">Instalación</label>
                 <select name="instalacion" class="form-control form-control-sm">
@@ -104,11 +104,11 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <th>Cliente</th>
                         <th>Instalación</th>
                         <th>Cuándo</th>
-                        <th class="text-right">Total</th>
-                        <th class="text-right">Abonado</th>
-                        <th class="text-right">Saldo</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-end">Abonado</th>
+                        <th class="text-end">Saldo</th>
                         <th>Estado</th>
-                        <th class="text-right">Acciones</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -139,8 +139,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 · <?php echo rtrim(rtrim(number_format((float)$r['reserva_horas'], 2), '0'), '.'); ?> h
                             </small>
                         </td>
-                        <td class="text-right">$<?php echo number_format($total, 2); ?></td>
-                        <td class="text-right">
+                        <td class="text-end">$<?php echo number_format($total, 2); ?></td>
+                        <td class="text-end">
                             <span class="text-success">$<?php echo number_format($abonado, 2); ?></span>
                             <?php if ($total > 0): ?>
                                 <div class="progress mt-1" style="height:4px;">
@@ -148,15 +148,15 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 </div>
                             <?php endif; ?>
                         </td>
-                        <td class="text-right">
+                        <td class="text-end">
                             <?php if ($saldo > 0): ?>
                                 <strong class="text-danger">$<?php echo number_format($saldo, 2); ?></strong>
                             <?php else: ?>
-                                <span class="badge badge-success">Pagada</span>
+                                <span class="badge text-bg-success">Pagada</span>
                             <?php endif; ?>
                         </td>
                         <td>
-                            <span class="badge badge-<?php echo $colores[$r['reserva_estado']] ?? 'secondary'; ?>">
+                            <span class="badge text-bg-<?php echo $colores[$r['reserva_estado']] ?? 'secondary'; ?>">
                                 <?php echo $estados[$r['reserva_estado']] ?? $r['reserva_estado']; ?>
                             </span>
                         </td>
@@ -201,10 +201,10 @@ require_once __DIR__ . "/inc/layout-top.php";
                 <?php if ($reservas): ?>
                     <tfoot>
                         <tr style="background:var(--core-suave);font-weight:700;">
-                            <td colspan="4" class="text-right">Totales</td>
-                            <td class="text-right">$<?php echo number_format($totalGeneral, 2); ?></td>
-                            <td class="text-right text-success">$<?php echo number_format($totalGeneral - $totalSaldo, 2); ?></td>
-                            <td class="text-right text-danger">$<?php echo number_format($totalSaldo, 2); ?></td>
+                            <td colspan="4" class="text-end">Totales</td>
+                            <td class="text-end">$<?php echo number_format($totalGeneral, 2); ?></td>
+                            <td class="text-end text-success">$<?php echo number_format($totalGeneral - $totalSaldo, 2); ?></td>
+                            <td class="text-end text-danger">$<?php echo number_format($totalSaldo, 2); ?></td>
                             <td colspan="2"></td>
                         </tr>
                     </tfoot>

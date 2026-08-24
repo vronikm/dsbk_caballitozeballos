@@ -57,7 +57,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
             <!-- Cambiar de módulo recarga la lista de vistas disponibles. -->
             <div class="card-body border-bottom">
-                <form method="GET" action="<?php echo APP_URL; ?>menuForm/" class="form-row align-items-end mb-0">
+                <form method="GET" action="<?php echo APP_URL; ?>menuForm/" class="row g-2 align-items-end mb-0">
                     <?php if ($id > 0): ?>
                         <input type="hidden" name="id" value="<?php echo $id; ?>">
                     <?php endif; ?>
@@ -85,19 +85,19 @@ require_once __DIR__ . "/inc/layout-top.php";
                 <div class="card-body">
 
                     <!-- Tipo: abre una pantalla, o sólo agrupa otras entradas -->
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label class="mb-1">Tipo de menú</label>
-                        <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons">
+                        <div class="btn-group btn-group-toggle d-flex" data-bs-toggle="buttons">
                             <label class="btn btn-outline-primary flex-fill <?php echo $esGrupo ? '' : 'active'; ?>">
                                 <input type="radio" name="tipo_menu" value="entrada" autocomplete="off"
                                        <?php echo $esGrupo ? '' : 'checked'; ?>
                                        <?php echo ($vistas && !$tieneHijos) ? '' : 'disabled'; ?>>
-                                <i class="fas fa-link mr-1"></i> Abre una pantalla
+                                <i class="fas fa-link me-1"></i> Abre una pantalla
                             </label>
                             <label class="btn btn-outline-primary flex-fill <?php echo $esGrupo ? 'active' : ''; ?>">
                                 <input type="radio" name="tipo_menu" value="grupo" autocomplete="off"
                                        <?php echo $esGrupo ? 'checked' : ''; ?>>
-                                <i class="fas fa-folder mr-1"></i> Grupo (sólo agrupa)
+                                <i class="fas fa-folder me-1"></i> Grupo (sólo agrupa)
                             </label>
                         </div>
                         <small class="text-muted d-block">
@@ -107,13 +107,13 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <?php if ($tieneHijos): ?>
                             <small class="d-block text-warning mt-1">
-                                <i class="fas fa-info-circle mr-1"></i>
+                                <i class="fas fa-info-circle me-1"></i>
                                 Este menú agrupa otras entradas, así que debe seguir siendo un grupo.
                                 Muévalas antes de convertirlo.
                             </small>
                         <?php elseif (!$vistas): ?>
                             <small class="d-block text-warning mt-1">
-                                <i class="fas fa-info-circle mr-1"></i>
+                                <i class="fas fa-info-circle me-1"></i>
                                 <?php if (!ds_vistas_modulo($modSel)): ?>
                                     <?php echo $modulos[$modSel]; ?> todavía no publica sus vistas en
                                     <code>config/vistas.php</code>, así que aquí sólo puede crear grupos.
@@ -125,8 +125,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <?php endif; ?>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6 solo-entrada">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-6 solo-entrada">
                             <label for="menu_vista">Vista <span class="text-danger">*</span></label>
                             <select class="form-control" id="menu_vista" name="menu_vista">
                                 <option value="">Seleccione…</option>
@@ -142,7 +142,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </small>
                         </div>
 
-                        <div class="form-group col-md-6">
+                        <div class="mb-3 col-md-6">
                             <label for="menu_nombre">Texto del menú <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="menu_nombre" name="menu_nombre"
                                    maxlength="50" required
@@ -150,8 +150,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6 solo-entrada">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-6 solo-entrada">
                             <label for="menu_padreid">Grupo</label>
                             <select class="form-control" id="menu_padreid" name="menu_padreid">
                                 <option value="0">Sin grupo (nivel superior)</option>
@@ -168,13 +168,13 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php endif; ?>
                         </div>
 
-                        <div class="form-group col-md-3">
+                        <div class="mb-3 col-md-3">
                             <label for="menu_orden">Orden</label>
                             <input type="number" class="form-control" id="menu_orden" name="menu_orden" min="0"
                                    value="<?php echo (int)($menu['menu_orden'] ?? 0); ?>">
                         </div>
 
-                        <div class="form-group col-md-3">
+                        <div class="mb-3 col-md-3">
                             <label for="menu_estado">Estado</label>
                             <select class="form-control" id="menu_estado" name="menu_estado">
                                 <option value="A" <?php echo ($menu['menu_estado'] ?? 'A') === 'A' ? 'selected' : ''; ?>>Activo</option>
@@ -183,12 +183,11 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="menu_icono">Icono</label>
                         <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i id="vistaPrevia" class="<?php echo htmlspecialchars((string)($menu['menu_icono'] ?? 'nav-icon far fa-circle'), ENT_QUOTES, 'UTF-8'); ?>"></i></span>
-                            </div>
+                                                        <span class="input-group-text"><i id="vistaPrevia" class="<?php echo htmlspecialchars((string)($menu['menu_icono'] ?? 'nav-icon far fa-circle'), ENT_QUOTES, 'UTF-8'); ?>"></i></span>
+                        
                             <input type="text" class="form-control" id="menu_icono" name="menu_icono" maxlength="50"
                                    value="<?php echo htmlspecialchars((string)($menu['menu_icono'] ?? 'nav-icon far fa-circle'), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>

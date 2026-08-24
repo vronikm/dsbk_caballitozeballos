@@ -44,7 +44,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <th>Usuarios</th>
                         <th>Vistas con permiso</th>
                         <th>Módulos</th>
-                        <th class="text-right">Acciones</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,7 +53,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <td>
                             <strong><?php echo htmlspecialchars($r['rol_nombre'], ENT_QUOTES, 'UTF-8'); ?></strong>
                             <?php if ($esSuper): ?>
-                                <span class="badge badge-warning ml-1">Acceso total</span>
+                                <span class="badge text-bg-warning ms-1">Acceso total</span>
                             <?php endif; ?>
                             <?php if ($r['rol_detalle']): ?>
                                 <small class="d-block text-muted"><?php echo htmlspecialchars($r['rol_detalle'], ENT_QUOTES, 'UTF-8'); ?></small>
@@ -73,14 +73,14 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <span class="badge-modulo badge-modulo--<?php echo $mod; ?>"><?php echo $modulos[$mod]; ?></span>
                             <?php endforeach; ?>
                         </td>
-                        <td class="text-right">
+                        <td class="text-end">
                             <a href="<?php echo APP_URL; ?>permisoRol/?rol=<?php echo (int)$r['rol_id']; ?>"
                                class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-key mr-1"></i> Permisos
+                                <i class="fas fa-key me-1"></i> Permisos
                             </a>
                             <a href="<?php echo APP_URL; ?>moduloRol/?rol=<?php echo (int)$r['rol_id']; ?>"
                                class="btn btn-sm btn-outline-secondary">
-                                <i class="fas fa-th-large mr-1"></i> Módulos
+                                <i class="fas fa-th-large me-1"></i> Módulos
                             </a>
                         </td>
                     </tr>

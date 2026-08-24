@@ -23,8 +23,8 @@ require_once __DIR__ . "/inc/layout-top.php";
         <h3 class="card-title mb-0"><?php echo count($clientes); ?> cliente<?php echo count($clientes) === 1 ? '' : 's'; ?></h3>
 
         <div class="d-flex align-items-center" style="gap:12px;">
-            <form method="GET" action="<?php echo APP_URL; ?>clienteList/" class="form-inline">
-                <input type="text" name="q" class="form-control form-control-sm mr-2"
+            <form method="GET" action="<?php echo APP_URL; ?>clienteList/" class="d-flex flex-wrap align-items-center gap-2">
+                <input type="text" name="q" class="form-control form-control-sm me-2"
                        placeholder="Nombre o identificación"
                        value="<?php echo htmlspecialchars($busqueda, ENT_QUOTES, 'UTF-8'); ?>">
                 <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="fas fa-search"></i></button>
@@ -32,7 +32,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
             <?php if ($puedeCrear): ?>
                 <a href="<?php echo APP_URL; ?>clienteForm/" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus mr-1"></i> Nuevo cliente
+                    <i class="fas fa-plus me-1"></i> Nuevo cliente
                 </a>
             <?php endif; ?>
         </div>
@@ -46,10 +46,10 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <th>Identificación</th>
                         <th>Cliente</th>
                         <th>Contacto</th>
-                        <th class="text-right">Monedero</th>
+                        <th class="text-end">Monedero</th>
                         <th>Reservas</th>
                         <th>Estado</th>
-                        <th class="text-right">Acciones</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +65,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <td><strong><?php echo htmlspecialchars($c['cliente_nombre'], ENT_QUOTES, 'UTF-8'); ?></strong></td>
                         <td>
                             <?php if ($c['cliente_celular']): ?>
-                                <small class="d-block"><i class="fas fa-phone text-muted mr-1"></i><?php echo htmlspecialchars($c['cliente_celular'], ENT_QUOTES, 'UTF-8'); ?></small>
+                                <small class="d-block"><i class="fas fa-phone text-muted me-1"></i><?php echo htmlspecialchars($c['cliente_celular'], ENT_QUOTES, 'UTF-8'); ?></small>
                             <?php endif; ?>
                             <?php if ($c['cliente_correo']): ?>
                                 <small class="d-block text-muted"><?php echo htmlspecialchars($c['cliente_correo'], ENT_QUOTES, 'UTF-8'); ?></small>
@@ -74,7 +74,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <small class="text-muted">—</small>
                             <?php endif; ?>
                         </td>
-                        <td class="text-right">
+                        <td class="text-end">
                             <?php if ($saldo > 0): ?>
                                 <strong class="text-success">$<?php echo number_format($saldo, 2); ?></strong>
                             <?php else: ?>
@@ -83,13 +83,13 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </td>
                         <td>
                             <?php if ((int)$c['reservas'] > 0): ?>
-                                <span class="badge badge-info"><?php echo (int)$c['reservas']; ?> vigente(s)</span>
+                                <span class="badge text-bg-info"><?php echo (int)$c['reservas']; ?> vigente(s)</span>
                             <?php else: ?>
                                 <span class="text-muted small">—</span>
                             <?php endif; ?>
                         </td>
                         <td>
-                            <span class="badge badge-<?php echo $c['cliente_estado'] === 'A' ? 'success' : 'secondary'; ?>">
+                            <span class="badge text-bg-<?php echo $c['cliente_estado'] === 'A' ? 'success' : 'secondary'; ?>">
                                 <?php echo $c['cliente_estado'] === 'A' ? 'Activo' : 'Inactivo'; ?>
                             </span>
                         </td>

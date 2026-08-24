@@ -26,7 +26,7 @@ if (!$categoria) {
     $vistaActual = 'playoffPanel';
     require_once __DIR__ . "/inc/layout-top.php";
     echo '<div class="callout callout-warning"><h6 class="mb-1">'
-       . '<i class="fas fa-exclamation-circle mr-2"></i>Categoría no encontrada</h6>'
+       . '<i class="fas fa-exclamation-circle me-2"></i>Categoría no encontrada</h6>'
        . '<p class="mb-0 text-muted">Elija una desde '
        . '<a href="' . APP_URL . 'categoriaList/">el listado</a>.</p></div>';
     require_once __DIR__ . "/inc/layout-bottom.php";
@@ -71,7 +71,7 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="col-lg-6">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-sitemap mr-2"></i>Crear la fase eliminatoria</h3>
+                <h3 class="card-title"><i class="fas fa-sitemap me-2"></i>Crear la fase eliminatoria</h3>
             </div>
             <?php if (puede_crear('playoffPanel')): ?>
             <form class="FormularioAjax" method="POST"
@@ -84,12 +84,12 @@ require_once __DIR__ . "/inc/layout-top.php";
                         los grupos. Se crea aquí y luego se siembra el cuadro con los
                         clasificados.
                     </p>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="fase_nombre">Nombre</label>
                         <input type="text" name="fase_nombre" id="fase_nombre" class="form-control"
                                maxlength="60" value="Semifinales" required>
                     </div>
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="fase_tipo">Formato</label>
                         <select name="fase_tipo" id="fase_tipo" class="form-control">
                             <option value="S">Series al mejor de N</option>
@@ -121,10 +121,10 @@ require_once __DIR__ . "/inc/layout-top.php";
 
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-sitemap mr-2"></i>Sembrar el cuadro</h3>
+                    <h3 class="card-title"><i class="fas fa-sitemap me-2"></i>Sembrar el cuadro</h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="fase_origen">Clasifican desde</label>
                         <select name="fase_origen" id="fase_origen" class="form-control" required>
                             <?php foreach ($origenes as $o): ?>
@@ -141,13 +141,13 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <?php endif; ?>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-6">
+                    <div class="row g-2">
+                        <div class="mb-3 col-6">
                             <label for="clasifican">Clasifican por grupo</label>
                             <input type="number" name="clasifican" id="clasifican" class="form-control"
                                    min="1" max="8" value="2" required>
                         </div>
-                        <div class="form-group col-6">
+                        <div class="mb-3 col-6">
                             <label for="mejor_de">Al mejor de</label>
                             <select name="mejor_de" id="mejor_de" class="form-control">
                                 <option value="1">1 · partido único</option>
@@ -169,7 +169,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-layer-group mr-2"></i>Fases</h3>
+                <h3 class="card-title"><i class="fas fa-layer-group me-2"></i>Fases</h3>
             </div>
             <div class="card-body p-0">
                 <table class="table table-sm mb-0">
@@ -213,7 +213,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         (se gana con <?php echo $umbral; ?>)
                     </span>
                 </h3>
-                <span class="badge badge-<?php echo $cerrada ? 'success' : 'secondary'; ?>">
+                <span class="badge text-bg-<?php echo $cerrada ? 'success' : 'secondary'; ?>">
                     <?php echo $cerrada ? 'Decidida' : 'En juego'; ?>
                 </span>
             </div>
@@ -242,7 +242,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 </div>
                 <?php if ($cerrada): ?>
                     <p class="text-center text-muted mb-0 mt-1" style="font-size:.85rem;">
-                        <i class="fas fa-trophy text-warning mr-1"></i>
+                        <i class="fas fa-trophy text-warning me-1"></i>
                         Pasa <strong><?php echo $h($s['ganador']); ?></strong>
                     </p>
                 <?php endif; ?>
@@ -286,7 +286,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </td>
                             <td><?php echo $h($p['visitante']); ?></td>
                             <td style="width:8rem;">
-                                <span class="badge badge-<?php echo $tono[$p['estado_tono']] ?? 'secondary'; ?>">
+                                <span class="badge text-bg-<?php echo $tono[$p['estado_tono']] ?? 'secondary'; ?>">
                                     <?php echo $h($p['estado_nombre']); ?>
                                 </span>
                             </td>

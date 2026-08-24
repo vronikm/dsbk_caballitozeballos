@@ -63,7 +63,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         <div class="col-lg-5">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-money-check-alt mr-2"></i>Reimpresión</h3>
+                    <h3 class="card-title"><i class="fas fa-money-check-alt me-2"></i>Reimpresión</h3>
                 </div>
                 <div class="card-body">
                     <p class="text-muted" style="font-size:.9rem;">
@@ -72,20 +72,24 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                     <!-- El campo oculto asegura que llegue un 0 si no se marca -->
                     <input type="hidden" name="cobrar_reimpresion" value="0">
-                    <div class="custom-control custom-switch mb-3">
-                        <input type="checkbox" class="custom-control-input"
+                    <?php /* Bootstrap 5 sustituye custom-control/custom-switch
+                             por form-check form-switch, y las clases internas
+                             pasan a form-check-input y form-check-label.
+                             font-weight-bold es ahora fw-bold. */ ?>
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" class="form-check-input" role="switch"
                                id="cobrar_reimpresion" name="cobrar_reimpresion" value="1"
                                <?php echo $politica['cobrar'] ? 'checked' : ''; ?>>
-                        <label class="custom-control-label font-weight-bold" for="cobrar_reimpresion">
+                        <label class="form-check-label fw-bold" for="cobrar_reimpresion">
                             Cobrar la reimpresión
                         </label>
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="valor_reimpresion">Valor del rubro</label>
                         <div class="input-group">
-                            <div class="input-group-prepend"><span class="input-group-text">$</span></div>
-                            <input type="number" class="form-control text-right" id="valor_reimpresion"
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control text-end" id="valor_reimpresion"
                                    name="valor_reimpresion" min="0.01" step="0.01" required
                                    value="<?php echo number_format($politica['valor'], 2, '.', ''); ?>">
                         </div>
@@ -95,7 +99,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-palette mr-2"></i>Estado</h3>
+                    <h3 class="card-title"><i class="fas fa-palette me-2"></i>Estado</h3>
                 </div>
                 <div class="card-body">
                     <dl class="row mb-0" style="font-size:.9rem;">
@@ -106,7 +110,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </dl>
                     <?php if (!$colores): ?>
                         <p class="text-warning mb-0 mt-2" style="font-size:.9rem;">
-                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            <i class="fas fa-exclamation-triangle me-1"></i>
                             No hay colores activos en el catálogo.
                         </p>
                     <?php endif; ?>
@@ -117,7 +121,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         <div class="col-lg-7">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Color por mes</h3>
+                    <h3 class="card-title"><i class="fas fa-calendar-alt me-2"></i>Color por mes</h3>
                 </div>
 
                 <div class="card-body p-0">
@@ -138,7 +142,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                     <td>
                                         <?php echo $nombre; ?>
                                         <?php if ($bloqueado): ?>
-                                            <span class="badge badge-warning ml-1">
+                                            <span class="badge text-bg-warning ms-1">
                                                 <i class="fas fa-lock"></i> Bloqueado
                                             </span>
                                             <br>

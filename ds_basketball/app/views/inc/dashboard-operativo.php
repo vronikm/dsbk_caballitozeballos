@@ -108,7 +108,7 @@ $h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 <div class="card card-outline card-primary">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-clipboard-list mr-2"></i>
+            <i class="fas fa-clipboard-list me-2"></i>
             <?php echo $vistaPropia ? 'Mis horarios y asistencia' : 'Horarios de mis sedes'; ?>
         </h3>
         <div class="card-tools text-muted" style="font-size:.85rem;">
@@ -121,7 +121,7 @@ $h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
         <?php if (!$horarios): ?>
 
             <div class="alert alert-info mb-0">
-                <i class="fas fa-info-circle mr-1"></i>
+                <i class="fas fa-info-circle me-1"></i>
                 <?php if ($empleadoSesion === 0): ?>
                     Su usuario no está vinculado a una ficha de empleado, así que no se pueden
                     determinar sus horarios. Solicite al administrador que haga la vinculación.
@@ -136,8 +136,8 @@ $h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 
             <div class="row">
                 <div class="col-md-3 col-6 mb-3">
-                    <div class="info-box shadow-sm rounded border">
-                        <span class="info-box-icon bg-info"><i class="fas fa-calendar-alt"></i></span>
+                    <div class="info-box">
+                        <span class="info-box-icon text-bg-info shadow-sm"><i class="fas fa-calendar-alt"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Horarios</span>
                             <span class="info-box-number"><?php echo count($horarios); ?></span>
@@ -145,8 +145,8 @@ $h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
                     </div>
                 </div>
                 <div class="col-md-3 col-6 mb-3">
-                    <div class="info-box shadow-sm rounded border">
-                        <span class="info-box-icon bg-primary"><i class="fas fa-users"></i></span>
+                    <div class="info-box">
+                        <span class="info-box-icon text-bg-primary shadow-sm"><i class="fas fa-users"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Alumnos a cargo</span>
                             <span class="info-box-number"><?php echo $totalAlumnos; ?></span>
@@ -154,8 +154,8 @@ $h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
                     </div>
                 </div>
                 <div class="col-md-3 col-6 mb-3">
-                    <div class="info-box shadow-sm rounded border">
-                        <span class="info-box-icon bg-success"><i class="fas fa-check"></i></span>
+                    <div class="info-box">
+                        <span class="info-box-icon text-bg-success shadow-sm"><i class="fas fa-check"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Días con asistencia</span>
                             <span class="info-box-number"><?php echo $conRegistro; ?></span>
@@ -163,8 +163,8 @@ $h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
                     </div>
                 </div>
                 <div class="col-md-3 col-6 mb-3">
-                    <div class="info-box shadow-sm rounded border">
-                        <span class="info-box-icon <?php echo $pendientes ? 'bg-warning' : 'bg-secondary'; ?>">
+                    <div class="info-box">
+                        <span class="info-box-icon shadow-sm <?php echo $pendientes ? 'text-bg-warning' : 'text-bg-secondary'; ?>">
                             <i class="fas fa-exclamation"></i>
                         </span>
                         <div class="info-box-content">
@@ -251,7 +251,7 @@ $h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
                                 <td><small><?php echo $h($fila['profesores'] ?? ''); ?></small></td>
                             <?php endif; ?>
                             <td class="text-center">
-                                <span class="badge badge-<?php echo (int)$fila['alumnos'] ? 'primary' : 'secondary'; ?>">
+                                <span class="badge text-bg-<?php echo (int)$fila['alumnos'] ? 'primary' : 'secondary'; ?>">
                                     <?php echo (int)$fila['alumnos']; ?>
                                 </span>
                             </td>
@@ -262,7 +262,7 @@ $h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
                                     <span class="text-muted">—</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="text-right">
+                            <td class="text-end">
                                 <a href="<?php echo APP_URL; ?>asistenciaVerHorario/<?php echo $id; ?>/"
                                    class="btn btn-xs btn-outline-secondary" target="_blank">
                                     <i class="fas fa-eye"></i> Ver

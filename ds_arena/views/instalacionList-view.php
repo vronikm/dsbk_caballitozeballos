@@ -43,8 +43,8 @@ require_once __DIR__ . "/inc/layout-top.php";
         </h3>
 
         <div class="d-flex align-items-center" style="gap:12px;">
-            <form method="GET" action="<?php echo APP_URL; ?>instalacionList/" class="form-inline">
-                <select name="sede" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
+            <form method="GET" action="<?php echo APP_URL; ?>instalacionList/" class="d-flex flex-wrap align-items-center gap-2">
+                <select name="sede" class="form-select form-select-sm me-2 w-auto" onchange="this.form.submit()">
                     <option value="0">Todas las sedes</option>
                     <?php foreach ($sedes as $s): ?>
                         <option value="<?php echo (int)$s['sede_id']; ?>" <?php echo $sedeSel === (int)$s['sede_id'] ? 'selected' : ''; ?>>
@@ -52,7 +52,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <select name="clase" class="form-control form-control-sm" onchange="this.form.submit()">
+                <select name="clase" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
                     <option value="">Canchas y residencias</option>
                     <option value="C" <?php echo $claseSel === 'C' ? 'selected' : ''; ?>>Sólo canchas</option>
                     <option value="R" <?php echo $claseSel === 'R' ? 'selected' : ''; ?>>Sólo residencias</option>
@@ -61,7 +61,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
             <?php if ($puedeCrear && $sedes): ?>
                 <a href="<?php echo APP_URL; ?>instalacionForm/" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus mr-1"></i> Nueva instalación
+                    <i class="fas fa-plus me-1"></i> Nueva instalación
                 </a>
             <?php endif; ?>
         </div>
@@ -76,10 +76,10 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <th>Instalación</th>
                         <th>Sede</th>
                         <th>Tipo</th>
-                        <th class="text-right">Valor hora</th>
+                        <th class="text-end">Valor hora</th>
                         <th>Disponibilidad</th>
                         <th>Estado</th>
-                        <th class="text-right">Acciones</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -117,7 +117,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php endif; ?>
                             <?php endif; ?>
                         </td>
-                        <td class="text-right">
+                        <td class="text-end">
                             <strong>$<?php echo number_format((float)$i['instalacion_valorhora'], 2); ?></strong>
                             <small class="d-block text-muted">por hora</small>
                         </td>
@@ -132,7 +132,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php endif; ?>
                         </td>
                         <td>
-                            <span class="badge badge-<?php echo $i['instalacion_estado'] === 'A' ? 'success' : 'secondary'; ?>">
+                            <span class="badge text-bg-<?php echo $i['instalacion_estado'] === 'A' ? 'success' : 'secondary'; ?>">
                                 <?php echo $i['instalacion_estado'] === 'A' ? 'Activa' : 'Inactiva'; ?>
                             </span>
                         </td>

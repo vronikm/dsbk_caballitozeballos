@@ -24,7 +24,7 @@ if (!$fase) {
     $vistaActual = 'sorteoPanel';
     require_once __DIR__ . "/inc/layout-top.php";
     echo '<div class="callout callout-warning"><h6 class="mb-1">'
-       . '<i class="fas fa-exclamation-circle mr-2"></i>Fase no encontrada</h6>'
+       . '<i class="fas fa-exclamation-circle me-2"></i>Fase no encontrada</h6>'
        . '<p class="mb-0 text-muted">Entre desde el panel de una categoría.</p></div>';
     require_once __DIR__ . "/inc/layout-bottom.php";
     return;
@@ -57,7 +57,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
 <?php if ($partidos > 0): ?>
 <div class="callout callout-warning">
-    <h6 class="mb-1"><i class="fas fa-lock mr-2"></i>La fase ya tiene calendario</h6>
+    <h6 class="mb-1"><i class="fas fa-lock me-2"></i>La fase ya tiene calendario</h6>
     <p class="mb-0 text-muted">
         Hay <?php echo $partidos; ?> partidos generados. Cambiar los grupos ahora dejaría
         encuentros programados que ya no corresponden, así que el sorteo queda bloqueado.
@@ -77,11 +77,11 @@ require_once __DIR__ . "/inc/layout-top.php";
 
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-random mr-2"></i>Nuevo sorteo</h3>
+                    <h3 class="card-title"><i class="fas fa-random me-2"></i>Nuevo sorteo</h3>
                 </div>
                 <div class="card-body">
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="grupos">Número de grupos</label>
                         <input type="number" name="grupos" id="grupos" class="form-control"
                                min="1" max="32" value="2" required>
@@ -90,7 +90,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </small>
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label>Cabezas de serie</label>
                         <div style="max-height:11rem;overflow-y:auto;border:1px solid #dee2e6;
                                     border-radius:4px;padding:.5rem;">
@@ -112,7 +112,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </small>
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="semilla">Semilla</label>
                         <input type="text" name="semilla" id="semilla" class="form-control text-monospace"
                                placeholder="Se genera automáticamente" inputmode="numeric">
@@ -122,7 +122,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </small>
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="observacion">Acta / observación</label>
                         <input type="text" name="observacion" id="observacion" class="form-control"
                                maxlength="300" placeholder="Ante quién se celebró, por ejemplo">
@@ -136,7 +136,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         <!-- ==================== Historial ==================== -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-history mr-2"></i>Sorteos celebrados</h3>
+                <h3 class="card-title"><i class="fas fa-history me-2"></i>Sorteos celebrados</h3>
             </div>
             <div class="card-body p-0">
                 <?php if (!$sorteos): ?>
@@ -151,8 +151,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <tr>
                                 <td>
                                     <strong><?php echo $h($s['sorteo_fecha']); ?></strong>
-                                    <span class="badge badge-<?php
-                                        echo $s['sorteo_estado'] === 'APLICADO' ? 'success' : 'secondary'; ?> ml-1">
+                                    <span class="badge text-bg-<?php
+                                        echo $s['sorteo_estado'] === 'APLICADO' ? 'success' : 'secondary'; ?> ms-1">
                                         <?php echo $h($s['sorteo_estado']); ?>
                                     </span>
                                     <br>
@@ -190,7 +190,7 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="col-lg-7 mb-3">
         <div class="card h-100">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-layer-group mr-2"></i>
+                <h3 class="card-title"><i class="fas fa-layer-group me-2"></i>
                     <?php echo $ultimo ? 'Grupos formados' : 'Sin sortear'; ?>
                 </h3>
             </div>
@@ -218,7 +218,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         <td>
                                             <?php echo $h($m['equipo_nombre']); ?>
                                             <?php if ((int)$m['resultado_bombo'] === 1): ?>
-                                                <i class="fas fa-star text-warning ml-1"
+                                                <i class="fas fa-star text-warning ms-1"
                                                    title="Cabeza de serie" style="font-size:.7rem;"></i>
                                             <?php endif; ?>
                                         </td>

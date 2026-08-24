@@ -35,7 +35,7 @@ require_once __DIR__ . "/inc/layout-top.php";
     </div>
     <div class="card-body">
 
-        <form method="GET" action="<?php echo APP_URL; ?>moduloRol/" class="form-row align-items-end mb-4">
+        <form method="GET" action="<?php echo APP_URL; ?>moduloRol/" class="row g-2 align-items-end mb-4">
             <div class="col-md-5 mb-2">
                 <label for="rol" class="mb-1">Rol</label>
                 <select name="rol" id="rol" class="form-control" onchange="this.form.submit()">
@@ -46,9 +46,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-7 mb-2 text-md-right">
+            <div class="col-md-7 mb-2 text-md-end">
                 <a href="<?php echo APP_URL; ?>permisoRol/?rol=<?php echo $rolSel; ?>" class="btn btn-outline-secondary">
-                    <i class="fas fa-key mr-1"></i> Permisos del rol
+                    <i class="fas fa-key me-1"></i> Permisos del rol
                 </a>
             </div>
         </form>
@@ -99,13 +99,13 @@ require_once __DIR__ . "/inc/layout-top.php";
                             Sin acceso al módulo, sus vistas quedan bloqueadas aunque el rol tenga permisos sobre ellas.
                         </p>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save mr-1"></i> Guardar módulos de
+                            <i class="fas fa-save me-1"></i> Guardar módulos de
                             <?php echo htmlspecialchars($rolActual['rol_nombre'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                         </button>
                     </div>
                 <?php else: ?>
                     <p class="text-muted mt-3 mb-0 small">
-                        <i class="fas fa-lock mr-1"></i> Su rol puede consultar pero no modificar esta asignación.
+                        <i class="fas fa-lock me-1"></i> Su rol puede consultar pero no modificar esta asignación.
                     </p>
                 <?php endif; ?>
             </form>

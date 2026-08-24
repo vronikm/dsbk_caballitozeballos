@@ -11,48 +11,40 @@
 	/* Devuelve el badge del estado de un consentimiento */
 	function badgeConsent($otorgado, $origen, $fecha, $usuario) {
 		if ($otorgado === null) {
-			return '<span class="badge badge-secondary">Sin registro</span>';
+			return '<span class="badge text-bg-secondary">Sin registro</span>';
 		}
 		if ($otorgado === 'N') {
-			return '<span class="badge badge-dark" title="Revocado el '.htmlspecialchars($fecha).'">Revocado</span>';
+			return '<span class="badge text-bg-dark" title="Revocado el '.htmlspecialchars($fecha).'">Revocado</span>';
 		}
 		$fuente = ($origen === 'FORMULARIO')
-				? '<span class="badge badge-info" title="Aceptado en línea el '.htmlspecialchars($fecha).'">Formulario</span>'
-				: '<span class="badge badge-warning" title="Registrado por '.htmlspecialchars($usuario ?? '').' el '.htmlspecialchars($fecha).'">Administrador</span>';
+				? '<span class="badge text-bg-info" title="Aceptado en línea el '.htmlspecialchars($fecha).'">Formulario</span>'
+				: '<span class="badge text-bg-warning" title="Registrado por '.htmlspecialchars($usuario ?? '').' el '.htmlspecialchars($fecha).'">Administrador</span>';
 
-		return '<span class="badge badge-success">Otorgado</span> '.$fuente;
+		return '<span class="badge text-bg-success">Otorgado</span> '.$fuente;
 	}
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo APP_NAME; ?> | Consentimientos LOPDP</title>
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-</head>
-<body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Consentimientos LOPDP';
+	$extras      = array (0 => 'datatables',);
+	require_once "app/views/inc/cabecera.php";
+?>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<div class="app-wrapper ds-core">
 
 	<?php require_once "app/views/inc/navbar.php"; ?>
 	<?php require_once "app/views/inc/main-sidebar.php"; ?>
 
-	<div class="content-wrapper">
+	<div class="app-main">
 
-		<div class="content-header">
+		<div class="app-content-header">
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
 						<h4 class="m-0">Consentimientos LOPDP</h4>
 					</div>
 					<div class="col-sm-6">
-						<ol class="breadcrumb float-sm-right">
+						<ol class="breadcrumb float-sm-end">
 							<li class="breadcrumb-item"><a href="<?php echo APP_URL.'dashboard/'; ?>">Dashboard</a></li>
 							<li class="breadcrumb-item active">Consentimientos</li>
 						</ol>
@@ -61,16 +53,16 @@
 			</div>
 		</div>
 
-		<section class="content">
+		<section class="app-content">
 			<div class="container-fluid">
 
 				<div class="callout callout-info">
 					<p class="mb-0">
 						<i class="fas fa-info-circle"></i>
 						Cada autorización indica <strong>de dónde proviene</strong>:
-						<span class="badge badge-info">Formulario</span> si el representante la aceptó en el
+						<span class="badge text-bg-info">Formulario</span> si el representante la aceptó en el
 						formulario de inscripción en línea, o
-						<span class="badge badge-warning">Administrador</span> si se registró desde el sistema
+						<span class="badge text-bg-warning">Administrador</span> si se registró desde el sistema
 						(por ejemplo, al recibir el formulario firmado en papel).
 					</p>
 				</div>
@@ -83,9 +75,8 @@
 								<div class="input-group input-group-sm" style="width:260px;">
 									<input type="text" name="q" class="form-control" placeholder="Buscar alumno o cédula"
 										   value="<?php echo htmlspecialchars($busqueda); ?>">
-									<div class="input-group-append">
-										<button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
-									</div>
+															<button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+					
 								</div>
 							</form>
 						</div>
@@ -143,7 +134,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title"><i class="fas fa-history"></i> Historial de consentimientos &mdash; <span id="histAlumno"></span></h5>
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 			</div>
 			<div class="modal-body" id="histContenido">
 				<p class="text-muted mb-0">Cargando...</p>
@@ -158,7 +149,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title"><i class="fas fa-pen"></i> Registrar consentimiento</h5>
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 			</div>
 			<div class="modal-body">
 				<p class="text-muted">
@@ -166,7 +157,7 @@
 				</p>
 				<input type="hidden" id="reg_alumno_id">
 
-				<div class="form-group">
+				<div class="mb-3">
 					<label>Consentimiento</label>
 					<select class="form-control" id="reg_tipo">
 						<option value="DATOS">Tratamiento de datos personales</option>
@@ -174,7 +165,7 @@
 					</select>
 				</div>
 
-				<div class="form-group">
+				<div class="mb-3">
 					<label>Acción</label>
 					<select class="form-control" id="reg_otorgado">
 						<option value="S">Otorgar</option>
@@ -182,7 +173,7 @@
 					</select>
 				</div>
 
-				<div class="form-group">
+				<div class="mb-3">
 					<label>Observación</label>
 					<textarea class="form-control" id="reg_observacion" rows="2" maxlength="200"
 							  placeholder="Ej: formulario firmado recibido en la sede el 12/08/2026"></textarea>
@@ -196,7 +187,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancelar</button>
 				<button type="button" class="btn btn-primary" id="btnGuardarConsent">Guardar</button>
 			</div>
 		</div>
@@ -204,16 +195,17 @@
 </div>
 
 <script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-$(function () {
+document.addEventListener('DOMContentLoaded', function () {
 
-	$('#tablaConsentimientos').DataTable({
+	new DataTable('#tablaConsentimientos', {
 		"pageLength": 25,
 		"order": [[0, "asc"]],
 		"autoWidth": false,

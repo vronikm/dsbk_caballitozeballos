@@ -113,6 +113,16 @@ class finanzaController extends competenciaController
         );
     }
 
+    /** ¿Este equipo esta inscrito en esta categoria? */
+    public function equipoJuegaEn(int $equipoid, int $categoriaid): bool
+    {
+        return (int)$this->escalar(
+            "SELECT COUNT(*) FROM dsl_inscripcion
+              WHERE inscripcion_equipoid = :e AND inscripcion_categoriaid = :c",
+            [':e' => $equipoid, ':c' => $categoriaid]
+        ) > 0;
+    }
+
     /** Partidos de la categoria, con los dos equipos. */
     public function partidosDeCategoria(int $categoriaid): array
     {
@@ -163,11 +173,11 @@ class finanzaController extends competenciaController
             $sql .= " AND S.dias_vencido > 0";
         }
         if (!empty($filtros['categoria'])) {
-            /* Las inscripciones de una categoria concreta. */
-            $sql .= " AND S.obligacion_origentipo = 'INSCRIPCION'
-                      AND S.obligacion_origenid IN (
-                          SELECT inscripcion_id FROM dsl_inscripcion
-                           WHERE inscripcion_categoriaid = :c)";
+            /* Por la columna, no deduciendo el origen: una multa a un
+               equipo o un carne de un jugador tienen origen EQUIPO o
+               PERSONA, y con el filtro deducido no aparecian en ninguna
+               pantalla. Ver migracion 038. */
+            $sql .= " AND S.obligacion_categoriaid = :c";
             $par[':c'] = (int)$filtros['categoria'];
         }
 
@@ -235,11 +245,7 @@ class finanzaController extends competenciaController
     /** Resumen de cobranza, para el panel. */
     public function resumenCobranza(int $categoriaid = 0): array
     {
-        $filtro = $categoriaid > 0
-            ? " AND S.obligacion_origentipo = 'INSCRIPCION'
-                AND S.obligacion_origenid IN (SELECT inscripcion_id FROM dsl_inscripcion
-                                               WHERE inscripcion_categoriaid = :c)"
-            : '';
+        $filtro = $categoriaid > 0 ? " AND S.obligacion_categoriaid = :c" : '';
         $par = $categoriaid > 0 ? [':c' => $categoriaid] : [];
 
         $f = $this->fila(
@@ -296,14 +302,27 @@ class finanzaController extends competenciaController
                 'La fecha de vencimiento ya pasó. Revísela.', 'error');
         }
 
-        /* De dónde salen el equipo y el nombre del deudor depende del
-           origen: una inscripción lleva al equipo, una multa también, y
-           un concepto de persona lleva a la persona. */
+        /* De dónde salen el equipo, la categoría y el nombre del deudor
+           depende del origen.
+
+           LA CATEGORÍA SE GUARDA, NO SE DEDUCE
+
+           El panel de cobranza trabaja por categoría. Deducirla del origen
+           sólo funciona para las inscripciones: una multa a un equipo o el
+           carné de un jugador tienen origen EQUIPO o PERSONA y quedaban
+           fuera de todos los listados, es decir, deuda que nadie ve ni
+           cobra. Y no basta con añadir más subconsultas: un equipo puede
+           jugar varias categorías a la vez, así que «la categoría de este
+           equipo» no es una sola y la multa saldría repetida en cada una.
+           Es una decisión de quien genera el cobro, y por eso se guarda.
+           Ver migración 038. */
         $equipoId = null; $personaId = null; $deudor = '';
+        $categoriaId = (int)($_POST['categoria_id'] ?? 0) ?: null;
 
         if ($origenTipo === 'INSCRIPCION') {
             $d = $this->fila(
-                "SELECT I.inscripcion_equipoid, Q.equipo_nombre, C.categoria_nombre
+                "SELECT I.inscripcion_equipoid, I.inscripcion_categoriaid,
+                        Q.equipo_nombre, C.categoria_nombre
                    FROM dsl_inscripcion I
                    JOIN dsl_equipo Q    ON Q.equipo_id = I.inscripcion_equipoid
                    JOIN dsl_categoria C ON C.categoria_id = I.inscripcion_categoriaid
@@ -313,8 +332,11 @@ class finanzaController extends competenciaController
                 return $this->respuesta('simple', 'No encontrada',
                     'Esa inscripción no existe.', 'error');
             }
-            $equipoId = (int)$d['inscripcion_equipoid'];
-            $deudor   = $d['equipo_nombre'] . ' · ' . $d['categoria_nombre'];
+            $equipoId    = (int)$d['inscripcion_equipoid'];
+            /* La inscripción ya dice de qué categoría es; lo que venga en
+               el formulario no manda sobre eso. */
+            $categoriaId = (int)$d['inscripcion_categoriaid'];
+            $deudor      = $d['equipo_nombre'] . ' · ' . $d['categoria_nombre'];
 
         } elseif ($origenTipo === 'EQUIPO') {
             $d = $this->fila("SELECT equipo_nombre FROM dsl_equipo WHERE equipo_id = :e",
@@ -325,15 +347,41 @@ class finanzaController extends competenciaController
             $equipoId = $origenId;
             $deudor   = $d['equipo_nombre'];
 
+            /* Aquí la categoría viene del formulario, y se comprueba que
+               el equipo juegue de verdad en ella: cargarle a la Sub-14 una
+               multa de la Sub-16 descuadra dos competencias a la vez. */
+            if ($categoriaId !== null && !$this->equipoJuegaEn($origenId, $categoriaId)) {
+                return $this->respuesta('simple', 'Equipo ajeno a la categoría',
+                    'Ese equipo no está inscrito en esta categoría.', 'error');
+            }
+
         } elseif ($origenTipo === 'PERSONA') {
             $d = $this->fila(
-                "SELECT persona_nombres, persona_apellidos FROM dsl_persona WHERE persona_id = :p",
-                [':p' => $origenId]);
+                "SELECT PE.persona_nombres, PE.persona_apellidos,
+                        (SELECT I.inscripcion_categoriaid
+                           FROM dsl_plantilla PL
+                           JOIN dsl_inscripcion I ON I.inscripcion_id = PL.plantilla_inscripcionid
+                          WHERE PL.plantilla_personaid = PE.persona_id
+                            /* Dos marcadores para el mismo valor: PDO sólo
+                               admite repetir un nombre con emulación de
+                               preparadas activada, y eso es una opción de
+                               conexión que nadie debería tener que
+                               mantener para que esta consulta funcione. */
+                            AND (:c1 IS NULL OR I.inscripcion_categoriaid = :c2)
+                          ORDER BY PL.plantilla_id DESC LIMIT 1) AS categoriaid
+                   FROM dsl_persona PE WHERE PE.persona_id = :p",
+                [':p' => $origenId, ':c1' => $categoriaId, ':c2' => $categoriaId]);
+
             if (!$d) {
                 return $this->respuesta('simple', 'No encontrada', 'Esa persona no existe.', 'error');
             }
-            $personaId = $origenId;
-            $deudor    = $d['persona_apellidos'] . ' ' . $d['persona_nombres'];
+            if ($d['categoriaid'] === null) {
+                return $this->respuesta('simple', 'Persona ajena a la categoría',
+                    'Esa persona no figura en ninguna plantilla de esta categoría.', 'error');
+            }
+            $personaId   = $origenId;
+            $categoriaId = (int)$d['categoriaid'];
+            $deudor      = $d['persona_apellidos'] . ' ' . $d['persona_nombres'];
 
         } elseif ($origenTipo === 'PARTIDO') {
             /* Un partido no debe dinero: lo deben los equipos que lo
@@ -345,8 +393,9 @@ class finanzaController extends competenciaController
             $d = $this->fila(
                 "SELECT QL.equipo_id AS local, QL.equipo_nombre AS local_nombre,
                         QV.equipo_id AS visitante, QV.equipo_nombre AS visitante_nombre,
-                        P.partido_fecha
+                        P.partido_fecha, F.fase_categoriaid
                    FROM dsl_partido     P
+                   JOIN dsl_fase        F  ON F.fase_id = P.partido_faseid
                    JOIN dsl_inscripcion IL ON IL.inscripcion_id = P.partido_localid
                    JOIN dsl_inscripcion IV ON IV.inscripcion_id = P.partido_visitanteid
                    JOIN dsl_equipo      QL ON QL.equipo_id = IL.inscripcion_equipoid
@@ -360,6 +409,9 @@ class finanzaController extends competenciaController
                 return $this->respuesta('simple', 'Equipo ajeno al partido',
                     'Indique a cuál de los dos equipos que juegan este partido se le cobra.', 'error');
             }
+
+            /* El partido ya dice de qué categoría es, por su fase. */
+            $categoriaId = (int)$d['fase_categoriaid'];
 
             $deudor = ($equipoId === (int)$d['local'] ? $d['local_nombre'] : $d['visitante_nombre'])
                     . ' · ' . $d['local_nombre'] . ' vs ' . $d['visitante_nombre']
@@ -378,12 +430,14 @@ class finanzaController extends competenciaController
         $id = $this->escribir(
             "INSERT INTO dsl_obligacion
                     (obligacion_conceptoid, obligacion_origentipo, obligacion_origenid,
-                     obligacion_equipoid, obligacion_personaid, obligacion_deudor,
+                     obligacion_categoriaid, obligacion_equipoid, obligacion_personaid,
+                     obligacion_deudor,
                      obligacion_detalle, obligacion_fecha, obligacion_vence,
                      obligacion_valor, obligacion_descuento, obligacion_recargo,
                      obligacion_usuarioid)
-             VALUES (:c, :ot, :oi, :eq, :pe, :de, :det, CURDATE(), :ven, :v, :d, :r, :u)",
+             VALUES (:c, :ot, :oi, :cat, :eq, :pe, :de, :det, CURDATE(), :ven, :v, :d, :r, :u)",
             [':c' => $concepto, ':ot' => $origenTipo, ':oi' => $origenId,
+             ':cat' => $categoriaId,
              ':eq' => $equipoId, ':pe' => $personaId, ':de' => $deudor,
              ':det' => $detalle, ':ven' => $vence !== '' ? $vence : null,
              ':v' => $valor, ':d' => $descuento, ':r' => $recargo,

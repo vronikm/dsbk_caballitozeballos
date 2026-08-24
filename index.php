@@ -24,12 +24,50 @@ require_once __DIR__ . "/ds_core/autoload.php";
 require_once __DIR__ . "/ds_core/modulos.php";
 require_once __DIR__ . "/ds_core/inc/session_start.php";
 
+/*----------  Lo que el Hub sirve  ----------*/
+/* LISTA BLANCA, NO CONCATENACION. Sin ella, ?p=../algo convertiria este
+   parametro en un lector de archivos del servidor.
+
+   Todo pasa por aqui porque el .htaccess de la raiz bloquea ds_core/
+   entero salvo assets/ y admin/: el nucleo es codigo de servidor y no se
+   pide por URL. Este index.php es la unica cara publica del Hub. */
+$paginas = [
+    'hub'           => 'hub-view.php',
+    /* Seguridad de la propia cuenta. Vive aqui y no en Core porque solo
+       el rol 1 tiene concedido aquel modulo, y proteger la cuenta de uno
+       tiene que poder hacerlo cualquiera que entre al sistema. */
+    'seguridad'     => 'seguridad-view.php',
+    'seguridadAjax' => 'seguridadAjax.php',
+];
+
+$pagina = (string)($_GET['p'] ?? 'hub');
+if (!isset($paginas[$pagina])) { $pagina = 'hub'; }
+
+$esAjax = $pagina === 'seguridadAjax';
+
 /*----------  Solo usuarios autenticados  ----------*/
 /* El inicio de sesion vive todavia en el modulo Basketball; al ser la
-   sesion comun, basta con enviar alli a quien no la tenga. */
+   sesion comun, basta con enviar alli a quien no la tenga.
+
+   A una peticion AJAX se le responde en JSON: una redireccion a HTML la
+   recibiria el fetch() como texto sin sentido y el usuario veria un error
+   de conexion en lugar de «su sesion expiro». */
 if (!usuario_autenticado()) {
+    if ($esAjax) {
+        http_response_code(401);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'tipo'   => 'redireccionar',
+            'icono'  => 'warning',
+            'titulo' => 'Sesión finalizada',
+            'texto'  => 'Su sesión expiró. Vuelva a ingresar.',
+            'url'    => DS_BASKETBALL_URL . 'login/',
+        ], JSON_UNESCAPED_UNICODE);
+        exit();
+    }
+
     header("Location: " . DS_BASKETBALL_URL . "login/");
     exit();
 }
 
-require_once __DIR__ . "/ds_core/hub/hub-view.php";
+require_once __DIR__ . "/ds_core/hub/" . $paginas[$pagina];

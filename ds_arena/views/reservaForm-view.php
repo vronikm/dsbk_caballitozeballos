@@ -70,8 +70,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                 <input type="hidden" name="reserva_id" value="<?php echo $id; ?>">
 
                 <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-6">
                             <label for="reserva_clienteid">Cliente <span class="text-danger">*</span></label>
                             <select class="form-control" id="reserva_clienteid" name="reserva_clienteid" required>
                                 <option value="">Seleccione…</option>
@@ -84,7 +84,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </select>
                         </div>
 
-                        <div class="form-group col-md-6">
+                        <div class="mb-3 col-md-6">
                             <label for="reserva_instalacionid">Instalación <span class="text-danger">*</span></label>
                             <select class="form-control" id="reserva_instalacionid" name="reserva_instalacionid" required>
                                 <option value="">Seleccione…</option>
@@ -100,20 +100,20 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-4">
                             <label for="reserva_fecha">Fecha <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="reserva_fecha" name="reserva_fecha" required
                                    value="<?php echo htmlspecialchars((string)($reserva['reserva_fecha'] ?? date('Y-m-d')), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="reserva_horainicio">Desde <span class="text-danger">*</span></label>
                             <input type="time" class="form-control" id="reserva_horainicio" name="reserva_horainicio" required
                                    value="<?php echo substr((string)($reserva['reserva_horainicio'] ?? ''), 0, 5); ?>">
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="reserva_horafin">Hasta <span class="text-danger">*</span></label>
                             <input type="time" class="form-control" id="reserva_horafin" name="reserva_horafin" required
                                    value="<?php echo substr((string)($reserva['reserva_horafin'] ?? ''), 0, 5); ?>">
@@ -129,7 +129,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </span>
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="reserva_observacion">Observación</label>
                         <textarea class="form-control" id="reserva_observacion" name="reserva_observacion"
                                   rows="2" maxlength="250"><?php echo htmlspecialchars((string)($reserva['reserva_observacion'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></textarea>

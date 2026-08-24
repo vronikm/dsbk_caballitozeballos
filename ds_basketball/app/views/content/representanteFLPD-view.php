@@ -35,46 +35,14 @@
 	
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo APP_NAME; ?> | Formulario PDP</title>
-	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-	
-	<!-- daterange picker -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.css">
-	<!-- iCheck for checkboxes and radio inputs -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-	<!-- Bootstrap Color Picker -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
-	<!-- Tempusdominus Bootstrap 4 -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-	<!-- Select2 -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2/css/select2.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-	<!-- Bootstrap4 Duallistbox -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
-	<!-- BS Stepper -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bs-stepper/css/bs-stepper.min.css">
-	<!-- dropzonejs -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/dropzone/min/dropzone.min.css">
-	
-	<!-- Theme style -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js" ></script>
-
-  </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Formulario PDP';
+	$extras      = array (0 => 'dropzone',1 => 'swal',);
+	require_once "app/views/inc/cabecera.php";
+?>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
 		<!-- Navbar -->
 		<?php require_once "app/views/inc/navbar.php"; ?>
 		<!-- /.navbar -->
@@ -84,17 +52,17 @@
 		<!-- /.Main Sidebar Container -->  
 
 		<!-- vista -->
-		<div class="content-wrapper">
+		<div class="app-main">
 
 			<!-- Content Header (Page header) -->
-			<div class="content-header">
+			<div class="app-content-header">
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
 							<h1>PROTECCIÓN DE DATOS PERSONALES</h1>
 						</div><!-- /.col -->
 						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
+							<ol class="breadcrumb float-sm-end">
 								<li class="breadcrumb-item"><a href="#">Inicio</a></li>
 								<li class="breadcrumb-item active">Ficha Alumno</li>
 							</ol>
@@ -104,7 +72,7 @@
 			</div>
 			<!-- /.content-header -->
 			
-			<section class="content">
+			<section class="app-content">
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-1">
@@ -209,8 +177,17 @@
 								<!-- this row will not appear when printing -->
 								<div class="row no-print">
 									<div class="col-12">
-										<a href="<?php echo APP_URL.'formularioLPPDF/'.$repreid.'/'; ?> " class="btn btn-dark float-right btn-sm" style="margin-right: 10px;" target="_blank"> <i class="fas fa-print"></i> Ver formulario </a>
-										<?php include "./app/views/inc/btn_back.php";?>
+										<?php /* Flex en vez de float, igual que el resto de
+												 pies. El botón de volver sigue viniendo del
+												 include compartido; sólo cambia el contenedor. */ ?>
+										<div class="d-flex flex-wrap align-items-center" style="gap:.5rem;">
+											<?php include "./app/views/inc/btn_back.php";?>
+
+											<a href="<?php echo APP_URL.'formularioLPPDF/'.$repreid.'/'; ?>"
+											   class="btn btn-dark btn-sm ms-auto" target="_blank">
+												<i class="fas fa-print"></i> Ver formulario
+											</a>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -239,35 +216,27 @@
 	<!-- jQuery -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 	
 	<!-- Select2 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/select2/js/select2.full.min.js"></script>
 	<!-- Bootstrap4 Duallistbox -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
 	<!-- InputMask -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/moment/moment.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- bootstrap color picker -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
 	<!-- Tempusdominus Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 	<!-- Bootstrap Switch -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 	<!-- BS-Stepper -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bs-stepper/js/bs-stepper.min.js"></script>
 	
 	<!-- AdminLTE App -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 		
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js" ></script>
 
 	<!--script src="app/views/dist/js/main.js" ></script-->
 	
 	<!-- fileinput -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/fileinput/fileinput.js"></script>
     
 	<script>
         // Esta función se llama cuando el botón es clickeado

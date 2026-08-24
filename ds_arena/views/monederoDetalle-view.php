@@ -45,7 +45,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                 <hr>
 
-                <div class="text-left">
+                <div class="text-start">
                     <dt class="small text-muted">Cliente</dt>
                     <dd><?php echo htmlspecialchars($cliente['cliente_nombre'], ENT_QUOTES, 'UTF-8'); ?></dd>
                     <dt class="small text-muted">Identificación</dt>
@@ -80,9 +80,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <tr>
                                 <th>Fecha</th>
                                 <th>Concepto</th>
-                                <th class="text-right">Entrada</th>
-                                <th class="text-right">Salida</th>
-                                <th class="text-right">Saldo</th>
+                                <th class="text-end">Entrada</th>
+                                <th class="text-end">Salida</th>
+                                <th class="text-end">Saldo</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -110,13 +110,13 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         <small class="d-block text-muted">Ref.: <?php echo htmlspecialchars($mv['movimiento_referencia'], ENT_QUOTES, 'UTF-8'); ?></small>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-right">
+                                <td class="text-end">
                                     <?php echo $esIngreso ? '<span class="text-success">$' . number_format((float)$mv['movimiento_valor'], 2) . '</span>' : '<span class="text-muted">—</span>'; ?>
                                 </td>
-                                <td class="text-right">
+                                <td class="text-end">
                                     <?php echo !$esIngreso ? '<span class="text-danger">$' . number_format((float)$mv['movimiento_valor'], 2) . '</span>' : '<span class="text-muted">—</span>'; ?>
                                 </td>
-                                <td class="text-right"><strong>$<?php echo number_format((float)$mv['movimiento_saldonuevo'], 2); ?></strong></td>
+                                <td class="text-end"><strong>$<?php echo number_format((float)$mv['movimiento_saldonuevo'], 2); ?></strong></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -138,7 +138,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                 <div class="modal-header">
                     <h5 class="modal-title">Registrar egreso</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
                 <div class="modal-body">
@@ -147,7 +147,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         Disponible: <strong class="text-success">$<?php echo number_format($saldo, 2); ?></strong>
                     </p>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="valor">Importe del egreso <span class="text-danger">*</span></label>
                         <input type="number" step="0.01" min="0.01" max="<?php echo number_format($saldo, 2, '.', ''); ?>"
                                class="form-control" id="valor" name="valor" required
@@ -155,7 +155,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <small class="text-muted">No puede superar el saldo disponible.</small>
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="detalle">Motivo</label>
                         <input type="text" class="form-control" id="detalle" name="detalle" maxlength="200"
                                placeholder="Egreso a pedido del cliente">
@@ -163,7 +163,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-danger">Registrar egreso</button>
                 </div>
             </form>

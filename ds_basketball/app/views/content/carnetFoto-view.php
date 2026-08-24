@@ -112,6 +112,8 @@
                 pointer-events: none;
             }
         </style>
+	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
     </head>
     <body>
         <div class="carnet" id="carnet">

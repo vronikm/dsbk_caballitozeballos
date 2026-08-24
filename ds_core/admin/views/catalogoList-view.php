@@ -43,7 +43,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center<?php echo $activo ? ' active' : ''; ?>"
                            <?php echo $activo ? 'style="background:var(--ds-primary);border-color:var(--ds-primary);"' : ''; ?>>
                             <span><?php echo htmlspecialchars($c['tabla_nombre'], ENT_QUOTES, 'UTF-8'); ?></span>
-                            <span class="badge badge-<?php echo $activo ? 'light' : 'secondary'; ?>">
+                            <span class="badge text-bg-<?php echo $activo ? 'light' : 'secondary'; ?>">
                                 <?php echo (int)$c['activos']; ?>
                             </span>
                         </a>
@@ -60,9 +60,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <?php echo htmlspecialchars($nombreSel ?: 'Valores', ENT_QUOTES, 'UTF-8'); ?>
                 </h3>
                 <?php if ($puedeCrear && $tablaSel > 0): ?>
-                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalValor"
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalValor"
                             onclick="prepararValor(1,'','','A')">
-                        <i class="fas fa-plus mr-1"></i> Nuevo valor
+                        <i class="fas fa-plus me-1"></i> Nuevo valor
                     </button>
                 <?php endif; ?>
             </div>
@@ -75,7 +75,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <th style="width:90px;">Código</th>
                                 <th>Descripción</th>
                                 <th>Estado</th>
-                                <th class="text-right">Acciones</th>
+                                <th class="text-end">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -88,14 +88,14 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <td><code><?php echo htmlspecialchars($v['catalogo_valor'], ENT_QUOTES, 'UTF-8'); ?></code></td>
                                 <td><?php echo htmlspecialchars($v['catalogo_descripcion'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td>
-                                    <span class="badge badge-<?php echo $v['catalogo_estado'] === 'A' ? 'success' : 'secondary'; ?>">
+                                    <span class="badge text-bg-<?php echo $v['catalogo_estado'] === 'A' ? 'success' : 'secondary'; ?>">
                                         <?php echo $v['catalogo_estado'] === 'A' ? 'Activo' : 'Inactivo'; ?>
                                     </span>
                                 </td>
                                 <td class="ds-tabla-acciones">
                                     <?php if ($puedeEditar): ?>
                                         <button type="button" class="btn btn-sm btn-outline-secondary" title="Editar"
-                                                data-toggle="modal" data-target="#modalValor"
+                                                data-bs-toggle="modal" data-bs-target="#modalValor"
                                                 onclick="prepararValor(0,
                                                     <?php echo htmlspecialchars(json_encode($v['catalogo_valor']), ENT_QUOTES, 'UTF-8'); ?>,
                                                     <?php echo htmlspecialchars(json_encode($v['catalogo_descripcion']), ENT_QUOTES, 'UTF-8'); ?>,
@@ -142,24 +142,24 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalValorTitulo">Nuevo valor</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
                 <div class="modal-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="catalogo_valor">Código <span class="text-danger">*</span></label>
                         <input type="text" class="form-control text-uppercase" id="catalogo_valor" name="catalogo_valor"
                                maxlength="3" minlength="3" pattern="[A-Za-z0-9]{3}" required>
                         <small class="text-muted">Exactamente 3 caracteres. No se puede cambiar después.</small>
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="catalogo_descripcion">Descripción <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="catalogo_descripcion" name="catalogo_descripcion"
                                maxlength="50" required>
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="catalogo_estado">Estado</label>
                         <select class="form-control" id="catalogo_estado" name="catalogo_estado">
                             <option value="A">Activo</option>
@@ -169,7 +169,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </form>

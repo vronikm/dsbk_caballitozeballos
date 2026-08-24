@@ -52,3 +52,46 @@
 !/ds_basketball/app/views/imagenes/pagos/.htaccess
 !/ds_basketball/app/views/imagenes/ingresos/.htaccess
 !/ds_basketball/app/views/fotos/usuario/.htaccess
+
+# ---------------------------------------------------------------------
+# Pruebas automatizadas
+# ---------------------------------------------------------------------
+# El codigo de las pruebas SI se versiona: es la red de seguridad del
+# proyecto. Lo que nunca debe entrar es lo que las pruebas CAPTURAN.
+#
+# Se comprobo uno por uno: las capturas de pantalla y los volcados de
+# paginas y de respuestas llevaban cedulas y nombres de alumnos, menores
+# de edad. Por eso las suites que toman captura la escriben en el temporal
+# del sistema; estas reglas son la segunda barrera, por si alguna futura
+# se olvida.
+/pruebas/**/*.png
+/pruebas/**/*.jpg
+/pruebas/**/*.json
+/pruebas/**/*.html
+/pruebas/**/*.log
+/pruebas/**/*.sql
+
+# ---------------------------------------------------------------------
+# Cuarentena y volcados de base
+# ---------------------------------------------------------------------
+# borrar/ es lo que espera revision antes de eliminarse: no se versiona.
+/borrar/
+
+# Un volcado completo de la base ES la base. Se colo uno en
+# ds_base_temporal/digitech_barcelona.sql —888 cedulas, 270 correos, 3295
+# fechas de nacimiento de menores— y llego al repositorio remoto.
+# Las migraciones de ds_core/database/ SI se versionan: son el esquema, no
+# los datos, y por eso la regla apunta a los volcados, no a todo *.sql.
+/ds_base_temporal/
+digitech_barcelona.sql
+*_dump.sql
+
+# ---------------------------------------------------------------------
+# Diagnósticos históricos del arnés
+# ---------------------------------------------------------------------
+# pruebas/archivo/ son sondas de un rato concreto: explican por qué algo
+# quedó como quedó, pero no forman parte de la red de seguridad. Veinticinco
+# de ellas abren la conexión con las credenciales escritas a mano, y «root»
+# con contraseña vacía SON las credenciales reales. Se quedan en el disco,
+# fuera del repositorio.
+/pruebas/archivo/

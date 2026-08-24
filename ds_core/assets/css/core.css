@@ -6,10 +6,13 @@
    ========================================================================== */
 
 .ds-core {
-    --core-borde:   #e6e9ef;
-    --core-suave:   #f6f8fb;
-    --core-texto:   #1f2937;
-    --core-tenue:   #6b7280;
+    /* Apuntan a las variables de Bootstrap 5.3, que se redefinen solas
+       dentro de [data-bs-theme=dark]. Asi las veinte declaraciones que
+       usan estos tokens siguen el tema sin tocar ninguna. */
+    --core-borde:   var(--bs-border-color);
+    --core-suave:   var(--bs-tertiary-bg);
+    --core-texto:   var(--bs-body-color);
+    --core-tenue:   var(--bs-secondary-color);
 
     font-family: var(--ds-font);
     color: var(--core-texto);
@@ -69,7 +72,7 @@
 
 .ds-core .card-header {
     border-bottom: 1px solid var(--core-borde);
-    background: #fff;
+    background: var(--bs-body-bg);
     border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
     padding: 14px 18px;
 }
@@ -83,7 +86,7 @@
     align-items: center;
     gap: 16px;
     padding: 18px;
-    background: #fff;
+    background: var(--bs-body-bg);
     border: 1px solid var(--core-borde);
     border-radius: var(--ds-radius-md);
     height: 100%;
@@ -198,23 +201,51 @@
     margin-right: 4px;
 }
 
-.ds-core .badge-modulo--basketball { border-color: #ffd0a3; color: #b45309; background: #fff7ed; }
-.ds-core .badge-modulo--core       { border-color: #c7d2fe; color: #3730a3; background: #eef2ff; }
-.ds-core .badge-modulo--arena      { border-color: #a5f3fc; color: #0e7490; background: #ecfeff; }
-.ds-core .badge-modulo--league     { border-color: #ddd6fe; color: #5b21b6; background: #f5f3ff; }
-.ds-core .badge-modulo--insights   { border-color: #bbf7d0; color: #15803d; background: #f0fdf4; }
+/* Cada modulo declara su pareja de colores; la regla de abajo los usa.
+   En claro, fondo palido y texto oscuro. En oscuro se invierte el papel:
+   fondo del mismo tono pero translucido sobre el fondo oscuro, y texto
+   claro del mismo color. Asi la insignia sigue diciendo «naranja es
+   Basketball» en los dos temas. */
+.ds-core .badge-modulo--basketball { --bm-borde: #ffd0a3; --bm-texto: #b45309; --bm-fondo: #fff7ed; }
+.ds-core .badge-modulo--core       { --bm-borde: #c7d2fe; --bm-texto: #3730a3; --bm-fondo: #eef2ff; }
+.ds-core .badge-modulo--arena      { --bm-borde: #a5f3fc; --bm-texto: #0e7490; --bm-fondo: #ecfeff; }
+.ds-core .badge-modulo--league     { --bm-borde: #ddd6fe; --bm-texto: #5b21b6; --bm-fondo: #f5f3ff; }
+.ds-core .badge-modulo--insights   { --bm-borde: #bbf7d0; --bm-texto: #15803d; --bm-fondo: #f0fdf4; }
+
+[data-bs-theme="dark"] .ds-core .badge-modulo--basketball { --bm-borde: rgba(255, 208, 163, .30); --bm-texto: #fdba74; --bm-fondo: rgba(180, 83, 9, .20); }
+[data-bs-theme="dark"] .ds-core .badge-modulo--core       { --bm-borde: rgba(199, 210, 254, .30); --bm-texto: #a5b4fc; --bm-fondo: rgba(55, 48, 163, .25); }
+[data-bs-theme="dark"] .ds-core .badge-modulo--arena      { --bm-borde: rgba(165, 243, 252, .30); --bm-texto: #67e8f9; --bm-fondo: rgba(14, 116, 144, .25); }
+[data-bs-theme="dark"] .ds-core .badge-modulo--league     { --bm-borde: rgba(221, 214, 254, .30); --bm-texto: #c4b5fd; --bm-fondo: rgba(91, 33, 182, .28); }
+[data-bs-theme="dark"] .ds-core .badge-modulo--insights   { --bm-borde: rgba(187, 247, 208, .30); --bm-texto: #86efac; --bm-fondo: rgba(21, 128, 61, .25); }
+
+.ds-core .badge-modulo--basketball,
+.ds-core .badge-modulo--core,
+.ds-core .badge-modulo--arena,
+.ds-core .badge-modulo--league,
+.ds-core .badge-modulo--insights {
+    border-color: var(--bm-borde);
+    color: var(--bm-texto);
+    background: var(--bm-fondo);
+}
 
 /* ---------- Botones ---------- */
 
 .ds-core .btn-primary {
-    background: var(--ds-primary);
-    border-color: var(--ds-primary);
-}
-
-.ds-core .btn-primary:hover,
-.ds-core .btn-primary:focus {
-    background: var(--ds-primary-hover);
-    border-color: var(--ds-primary-hover);
+    /* Texto oscuro: el naranja de la marca es demasiado claro para el
+       blanco (2.63 de contraste). Con texto oscuro sube a 5.87, y a
+       6.83 sobre el naranja del hover. */
+    --bs-btn-color:                 #212529;
+    --bs-btn-bg:                    var(--ds-primary);
+    --bs-btn-border-color:          var(--ds-primary);
+    --bs-btn-hover-color:           #212529;
+    --bs-btn-hover-bg:              var(--ds-primary-hover);
+    --bs-btn-hover-border-color:    var(--ds-primary-hover);
+    --bs-btn-active-color:          #212529;
+    --bs-btn-active-bg:             var(--ds-primary-hover);
+    --bs-btn-active-border-color:   var(--ds-primary-hover);
+    --bs-btn-disabled-color:        #212529;
+    --bs-btn-disabled-bg:           var(--ds-primary);
+    --bs-btn-disabled-border-color: var(--ds-primary);
 }
 
 .ds-core .btn { border-radius: var(--ds-radius-sm); font-weight: 600; }
@@ -309,9 +340,10 @@ td.ds-tabla-acciones .ds-hueco {
     gap: 12px;
     padding: 14px 16px;
     border-radius: var(--ds-radius-sm);
-    background: #fff7ed;
-    border: 1px solid #fed7aa;
-    color: #9a3412;
+    /* Misma pareja clara/oscura que las insignias. */
+    background: var(--aviso-fondo, #fff7ed);
+    border: 1px solid var(--aviso-borde, #fed7aa);
+    color: var(--aviso-texto, #9a3412);
     font-size: .88rem;
 }
 
@@ -365,4 +397,11 @@ td.ds-tabla-acciones .ds-hueco {
     color: #fff;
     background-color: #17a2b8;
     border-color: #138496;
+}
+
+/* El aviso de superadministrador, en tema oscuro. */
+[data-bs-theme="dark"] .ds-core .aviso-superadmin {
+    --aviso-fondo: rgba(154, 52, 18, .22);
+    --aviso-borde: rgba(254, 215, 170, .30);
+    --aviso-texto: #fdba74;
 }

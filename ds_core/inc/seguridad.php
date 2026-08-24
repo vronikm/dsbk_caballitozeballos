@@ -279,12 +279,31 @@ if (!function_exists('usuario_autenticado')) {
         $intentado = true;
 
         try {
+            /* utf8mb4, no utf8.
+               En MySQL, «utf8» es el alias de utf8mb3: tres bytes por
+               caracter. Todo lo que necesite cuatro —emoji, y buena parte
+               de la puntuacion tipografica que llega pegada desde Word—
+               se pierde o corrompe en el viaje, y no en la tabla, que ya
+               esta en utf8mb4 desde la migracion 041, sino en la propia
+               conexion. Es el ultimo sitio donde quedaba el juego viejo. */
             $con = new PDO(
-                "mysql:host=" . DB_SERVER . ";dbname=" . DB_NAME . ";charset=utf8",
+                "mysql:host=" . DB_SERVER . ";dbname=" . DB_NAME . ";charset=utf8mb4",
                 DB_USER,
-                DB_PASS
+                DB_PASS,
+                defined('DS_DB_INIT_COMANDO')
+                    ? [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                       PDO::MYSQL_ATTR_INIT_COMMAND => DS_DB_INIT_COMANDO]
+                    : [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
             );
-            $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            /* NO se desactiva ATTR_EMULATE_PREPARES aqui, aunque seria lo
+               deseable: con preparadas nativas MySQL rechaza repetir un
+               marcador con el mismo nombre y devuelve los enteros como
+               enteros en vez de como cadena. Ambas cosas cambian el
+               comportamiento de consultas repartidas por los cuatro
+               modulos, y hacerlo de paso en un arreglo de codificacion
+               seria colar un cambio de conducta dentro de otro. Queda
+               anotado como tarea propia. */
         } catch (\Throwable $e) {
             $con = null;
         }
@@ -637,15 +656,42 @@ if (!function_exists('usuario_autenticado')) {
      * Cuando Arena o League tengan medios propios, cada uno expondra su
      * proxy y este helper recibira el modulo como parametro.
      *
-     * Si el archivo viene vacio o el tipo no existe devuelve la imagen
-     * generica, evitando una peticion que igualmente fallaria.
+     * Si el archivo viene vacio, el tipo no existe o el archivo YA NO ESTA
+     * EN DISCO, devuelve la imagen generica, evitando una peticion que
+     * igualmente fallaria.
+     *
+     * EL ARCHIVO AUSENTE NO ES UN CASO RARO
+     *
+     * La base guarda el nombre de la foto, no la foto. Si el archivo se
+     * borro, se restauro un respaldo de la base sin el de las imagenes o se
+     * migro de servidor a medias, el nombre sigue ahi y el archivo no. Sin
+     * esta comprobacion el navegador pide la imagen, media.php arranca la
+     * sesion entera para acabar respondiendo 404, y el usuario ve el icono
+     * de imagen rota. Mirar el disco aqui es mas barato que ese viaje.
+     *
+     * NO CAMBIA NADA DEL LADO DE media.php: alli el 404 sigue siendo el
+     * mismo para un archivo ausente, un tipo desconocido o un intento de
+     * salirse de la carpeta. Que las tres cosas se respondan igual es
+     * deliberado y no debe tocarse.
      */
     function media_url(string $tipo, ?string $archivo): string
     {
-        $archivo = basename(trim((string)$archivo));
+        $generica = DS_BASKETBALL_URL . 'app/views/dist/img/foto.jpg';
+        $archivo  = basename(trim((string)$archivo));
+        $carpeta  = medios_catalogo()[$tipo] ?? null;
 
-        if ($archivo === '' || !isset(medios_catalogo()[$tipo])) {
-            return DS_BASKETBALL_URL . 'app/views/dist/img/foto.jpg';
+        if ($archivo === '' || $carpeta === null) {
+            return $generica;
+        }
+
+        /* Las carpetas del catalogo cuelgan de app/views/ de Basketball,
+           que es donde vive el proxy. */
+        $ruta = DS_HUB_PATH . 'ds_basketball' . DIRECTORY_SEPARATOR
+              . 'app' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
+              . str_replace('/', DIRECTORY_SEPARATOR, $carpeta) . $archivo;
+
+        if (!is_file($ruta)) {
+            return $generica;
         }
 
         return DS_BASKETBALL_URL . 'app/media.php?t=' . rawurlencode($tipo)
@@ -901,5 +947,102 @@ if (!function_exists('usuario_autenticado')) {
            por password_get_info() como "unknown", y aunque hoy consuma un
            tiempo parecido, no hay ninguna garantía de que siga siendo así. */
         return '$2y$10$7zxSdOMoTt4ztK41elEZg.B0DbZ9I0oBclQ8zaTnFwxdheDegW6p6';
+    }
+
+    /*==================================================================
+      Testigo anti-CSRF para formularios
+
+      QUÉ PROBLEMA RESUELVE, Y POR QUÉ NO BASTA CON origen_es_valido()
+
+      origen_es_valido() mira las cabeceras Origin y Referer, y protege
+      bien las peticiones AJAX del ecosistema. Pero un formulario HTML
+      enviado desde otro sitio puede llegar SIN Referer —basta con
+      referrerpolicy="no-referrer"— y esa función deja pasar la petición
+      sin cabeceras a propósito, porque hay navegadores y proxis que las
+      quitan y bloquearlas rompería el uso legítimo.
+
+      El testigo no depende de cabeceras: es un valor secreto que sólo
+      conoce quien recibió la página. Un sitio ajeno puede hacer que el
+      navegador de la víctima envíe el formulario, pero no puede leer el
+      valor para incluirlo.
+
+      POR QUÉ EL LOGIN TAMBIÉN LO NECESITA
+
+      Suena raro proteger un formulario al que se entra sin sesión, pero
+      el ataque existe y se llama CSRF de inicio de sesión: el atacante
+      fuerza a la víctima a entrar con LA CUENTA DEL ATACANTE. A partir de
+      ahí, todo lo que la víctima haga —registrar un pago, subir un
+      documento, guardar una tarjeta— queda dentro de una cuenta ajena, a
+      la vista de quien la controla.
+
+      UN TESTIGO POR PROPÓSITO
+
+      El de un formulario no sirve para otro. Si uno se filtra —por un
+      Referer, por una captura de pantalla, por un registro—, no se
+      convierte en una llave maestra.
+      ==================================================================*/
+
+    /**
+     * Testigo del proposito indicado, creandolo si aun no existe.
+     *
+     * Se conserva entre recargas a proposito. Regenerarlo en cada vista
+     * rompe la navegacion con dos pestanas abiertas: la primera se queda
+     * con un valor caducado y su envio se rechaza sin que el usuario haya
+     * hecho nada raro.
+     */
+    function csrf_token(string $proposito = 'general'): string
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            /* Sin sesion no hay donde guardarlo. Se devuelve vacio y
+               csrf_valido() lo rechazara: es preferible a inventar un
+               valor que no se pueda comprobar despues. */
+            return '';
+        }
+
+        if (empty($_SESSION['ds_csrf'][$proposito])) {
+            $_SESSION['ds_csrf'][$proposito] = bin2hex(random_bytes(32));
+        }
+
+        return $_SESSION['ds_csrf'][$proposito];
+    }
+
+    /** Campo oculto listo para pegar dentro de un <form>. */
+    function csrf_campo(string $proposito = 'general'): string
+    {
+        return '<input type="hidden" name="ds_csrf" value="'
+             . htmlspecialchars(csrf_token($proposito), ENT_QUOTES, 'UTF-8') . '">';
+    }
+
+    /**
+     * Comprueba el testigo recibido.
+     *
+     * hash_equals y no ===: la comparacion normal de cadenas se detiene en
+     * el primer byte distinto, y ese tiempo, medido muchas veces, permite
+     * ir adivinando el valor byte a byte. hash_equals tarda lo mismo
+     * acierte o no.
+     */
+    function csrf_valido(string $proposito = 'general', ?string $enviado = null): bool
+    {
+        $esperado = $_SESSION['ds_csrf'][$proposito] ?? '';
+        $recibido = $enviado ?? (string)($_POST['ds_csrf'] ?? '');
+
+        if ($esperado === '' || $recibido === '') {
+            return false;
+        }
+
+        return hash_equals($esperado, $recibido);
+    }
+
+    /**
+     * Retira el testigo de un proposito.
+     *
+     * Se llama tras completar la operacion que protegia, para que el mismo
+     * valor no sirva dos veces. NO se llama en cada fallo: eso invalidaria
+     * la pagina que el usuario tiene delante y convertiria un error de
+     * tecleo en «recargue y empiece de nuevo».
+     */
+    function csrf_renovar(string $proposito = 'general'): void
+    {
+        unset($_SESSION['ds_csrf'][$proposito]);
     }
 }

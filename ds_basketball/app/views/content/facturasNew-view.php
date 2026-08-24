@@ -49,23 +49,23 @@
 
 		if (!filter_var($datos['repre_correo'], FILTER_VALIDATE_EMAIL)) {
 			$mail = '<p class="text-danger">'.$datos['repre_correo'].'</p>';
-			$correo = '<strong class="text-danger"><i class="fas fa-envelope mr-1"></i> Correo no válido</strong>';
+			$correo = '<strong class="text-danger"><i class="fas fa-envelope me-1"></i> Correo no válido</strong>';
 			$error='S';
 			$disabled='disabled';
 		}else {
 			$mail = '<p class="text-muted">'.$datos['repre_correo'].'</p>';
-			$correo = '<strong><i class="fas fa-envelope mr-1"></i> Correo</strong>';
+			$correo = '<strong><i class="fas fa-envelope me-1"></i> Correo</strong>';
 		}
 
 		/* validar identificacion SRI */
 		if (!$insAlumno->validarIdentificacionSri($datos['repre_identificacion'], $datos['repre_tipoidentificacion'])) {
 			$identificacion = '<p class="text-danger">'.$datos['repre_identificacion'].'</p>';
-			$cedula = '<strong class="text-danger"><i class="fas fa-address-card mr-1"></i> Identificacion no valida SRI</strong>';
+			$cedula = '<strong class="text-danger"><i class="fas fa-address-card me-1"></i> Identificacion no valida SRI</strong>';
 			$error='S';
 			$disabled='disabled';
 		}else {
 			$identificacion = '<p class="text-muted">'.$datos['repre_identificacion'].'</p>';
-			$cedula = '<strong><i class="fas fa-address-card mr-1"></i> Identificacion</strong>';
+			$cedula = '<strong><i class="fas fa-address-card me-1"></i> Identificacion</strong>';
 		}
 
 	}else{
@@ -78,52 +78,14 @@
 	}
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo APP_NAME; ?> | Facturas</title>
-	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-
-	<!-- daterange picker -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.css">
-	<!-- iCheck for checkboxes and radio inputs -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-	<!-- Bootstrap Color Picker -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
-	<!-- Tempusdominus Bootstrap 4 -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-	<!-- Select2 -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2/css/select2.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-	<!-- Bootstrap4 Duallistbox -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
-	<!-- BS Stepper -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bs-stepper/css/bs-stepper.min.css">
-
-	<!-- Theme style -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-
-
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js" ></script>
-
-	<!-- fileinput -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fileinput/fileinput.css">
-
-	<!-- Ekko Lightbox -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/ekko-lightbox/ekko-lightbox.css">
-
-  </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Facturas';
+	$extras      = array (0 => 'lightbox',1 => 'swal',);
+	require_once "app/views/inc/cabecera.php";
+?>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
 
 		<!-- Preloader -->
 		<!--?php require_once "app/views/inc/preloader.php"; ?-->
@@ -138,17 +100,17 @@
 		<!-- /.Main Sidebar Container -->
 
 		<!-- vista -->
-		<div class="content-wrapper">
+		<div class="app-main">
 
 			<!-- Content Header (Page header) -->
-			<div class="content-header">
+			<div class="app-content-header">
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
 							<h3 class="m-0">Envio de facturas</h3>
 						</div><!-- /.col -->
 						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
+							<ol class="breadcrumb float-sm-end">
 								<li class="breadcrumb-item"><a href="#">Inicio</a></li>
 								<li class="breadcrumb-item active">Ficha Alumno</li>
 							</ol>
@@ -159,7 +121,7 @@
 			<!-- /.content-header -->
 
 			<!-- Main content -->
-			<section class="content">
+			<section class="app-content">
 				<!-- /.container-fluid información alumno -->
 				<div class="container-fluid">
 
@@ -172,7 +134,7 @@
 
 								<!-- Bloque Representante -->
 								<div class="card-body">
-									<strong><i class="fas fa-user mr-1"></i> Nombres</strong>
+									<strong><i class="fas fa-user me-1"></i> Nombres</strong>
 									<p class="text-muted" id="representante_nombre"><?php echo $datos['representante']?></p>
 
 									<hr>
@@ -181,7 +143,7 @@
 									</div>
 
 									<hr>
-									<strong><i class="fas fa-map-marker-alt mr-1"></i> Dirección</strong>
+									<strong><i class="fas fa-map-marker-alt me-1"></i> Dirección</strong>
 									<p class="text-muted" id="representante_direccion"><?php echo $datos['repre_direccion']; ?></p>
 
 									<hr>
@@ -190,22 +152,22 @@
 									</div>
 
 									<hr>
-									<strong><i class="fas fa-phone mr-1"></i> Teléfono</strong>
+									<strong><i class="fas fa-phone me-1"></i> Teléfono</strong>
 									<p class="text-muted" id="representante_celular"><?php echo $datos['repre_celular']; ?></p>
 
 									<hr>
-									<strong><i class="fas fa-print mr-1"></i> Pagos receptados</strong>
+									<strong><i class="fas fa-print me-1"></i> Pagos receptados</strong>
 									<p class="text-muted" id="representante_pagos"><?php echo $datos['pagos']; ?></p>
 
 									<hr>
-									<strong><i class="fas fa-print mr-1"></i> Facturas generadas</strong>
+									<strong><i class="fas fa-print me-1"></i> Facturas generadas</strong>
 									<p class="text-muted" id="representante_facturas"><?php echo $insAlumno->contarFacturasGeneradas($alumno,'',''); ?></p>
 								</div>
 
 
 								<div class="card-footer">
-									<div class="text-right">
-										<a href="#" class="btn btn-sm bg-olive" data-target="#modal-representante" data-toggle="modal">
+									<div class="text-end">
+										<a href="#" class="btn btn-sm bg-olive" data-bs-target="#modal-representante" data-bs-toggle="modal">
 											<i class="fas fa-pen"></i> Actualizar
 										</a>
 									</div>
@@ -221,12 +183,11 @@
 									<div class="row align-items-end">
 										<!-- Fecha inicio -->
 										<div class="col-md-4">
-											<div class="form-group mb-0">
+											<div class="mb-3 mb-0">
 												<label for="fecha_inicio">Fecha inicio</label>
 												<div class="input-group input-group-sm">
-													<div class="input-group-prepend">
-														<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-													</div>
+																							<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+									
 													<input type="date" class="form-control form-control-sm" id="fecha_inicio" name="fecha_inicio" value="<?php echo $fecha_inicio; ?>">
 												</div>
 											</div>
@@ -234,12 +195,11 @@
 
 										<!-- Fecha fin -->
 										<div class="col-md-4">
-											<div class="form-group mb-0">
+											<div class="mb-3 mb-0">
 												<label for="fecha_fin">Fecha fin</label>
 												<div class="input-group input-group-sm">
-													<div class="input-group-prepend">
-														<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-													</div>
+																							<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+									
 													<input type="date" class="form-control form-control-sm" id="fecha_fin" name="fecha_fin" value="<?php echo $fecha_fin; ?>">
 												</div>
 											</div>
@@ -247,10 +207,10 @@
 
 										<!-- Botón -->
 										<div class="col-md-4">
-											<div class="form-group mb-0 d-flex justify-content-center">
+											<div class="mb-3 mb-0 d-flex justify-content-center">
 												<a href="#" id="btn-generar-factura"
 													class="btn btn-sm bg-lightblue btn-ctrl-sm <?php echo $disabled; ?>"
-													data-toggle="modal" data-target="#modal-factura">
+													data-bs-toggle="modal" data-bs-target="#modal-factura">
 													<i class="fas fa-print"></i> Generar Factura
 												</a>
 											</div>
@@ -346,32 +306,30 @@
 
 					<div class="modal-header bg-olive py-2 px-3">
 						<h6 class="modal-title mb-0"><?php echo $datos['representante']; ?></h6>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-						</button>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 					</div>
 
 					<div class="modal-body">
 
-						<div class="form-group form-group-sm">
+						<div class="mb-3 mb-3-sm">
 							<label for="identificacion">Identificación</label>
 							<input type="text" class="form-control form-control-sm" id="identificacion" name="identificacion" required utocomplete="off" value="<?php echo $datos['repre_identificacion']; ?>">
 						</div>
-						<div class="form-group form-group-sm">
+						<div class="mb-3 mb-3-sm">
 							<label for="direccion">Dirección</label>
 							<input type="text" class="form-control form-control-sm" id="direccion" name="direccion" required utocomplete="off" value="<?php echo $datos['repre_direccion']; ?>">
 						</div>
-						<div class="form-group form-group-sm">
+						<div class="mb-3 mb-3-sm">
 							<label for="correo">Correo</label>
 							<input type="email" class="form-control form-control-sm" id="correo" name="correo" required utocomplete="off" value="<?php echo $datos['repre_correo']; ?>">
 						</div>
-						<div class="form-group form-group-sm">
+						<div class="mb-3 mb-3-sm">
 							<label for="celular">Teléfono</label>
 							<input type="text" class="form-control form-control-sm" id="celular" name="celular" required utocomplete="off" value="<?php echo $datos['repre_celular']; ?>">
 						</div>
 					</div>
 					<div class="modal-footer justify-content-between py-2 px-3">
-						<button type="button" class="btn bg-gray btn-sm" data-dismiss="modal">Cerrar</button>
+						<button type="button" class="btn bg-gray btn-sm" data-bs-dismiss="modal">Cerrar</button>
 						<button type="submit" class="btn bg-olive btn-sm">Guardar</button>
 					</div>
 				</form>
@@ -387,14 +345,14 @@
 
 			<!-- HEADER -->
 			<div class="modal-header bg-lightblue py-2 px-3">
-				<h5 class="modal-title"><i class="fas fa-file-invoice-dollar mr-2"></i> Factura Electrónica</h5>
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h5 class="modal-title"><i class="fas fa-file-invoice-dollar me-2"></i> Factura Electrónica</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 			</div>
 
 			<!-- BODY -->
 			<div class="modal-body">
 				<div class="alert alert-warning py-2">
-					<i class="fas fa-exclamation-triangle mr-1"></i>
+					<i class="fas fa-exclamation-triangle me-1"></i>
 					Vista previa. La validez tributaria requiere firma electronica y autorizacion del SRI.
 				</div>
 
@@ -444,11 +402,11 @@
 					<thead class="thead-light">
 					<tr>
 						<th>Código</th>
-						<th class="text-right">Cantidad</th>
+						<th class="text-end">Cantidad</th>
 						<th>Detalle</th>
-						<th class="text-right">Precio Unitario</th>
-						<th class="text-right">Descuento</th>
-						<th class="text-right">Precio Total</th>
+						<th class="text-end">Precio Unitario</th>
+						<th class="text-end">Descuento</th>
+						<th class="text-end">Precio Total</th>
 					</tr>
 					</thead>
 					<tbody id="detalle-factura">
@@ -456,8 +414,8 @@
 					</tbody>
 					<tfoot>
 					<tr>
-						<th colspan="5" class="text-right">Total</th>
-						<th class="text-right" id="total-factura">0.00</th>
+						<th colspan="5" class="text-end">Total</th>
+						<th class="text-end" id="total-factura">0.00</th>
 					</tr>
 					</tfoot>
 				</table>
@@ -468,7 +426,7 @@
 					<div class="col-md-6">
 						<h6 class="font-weight-bold">Información Adicional</h6>
 						<p><strong>Usuario:</strong> <?php echo $h($_SESSION['usuario'] ?? 'Sistema'); ?></p>
-						<div class="form-group mb-2">
+						<div class="mb-3 mb-2">
 							<label class="font-weight-bold mb-1" for="factura_forma_pago">Forma de Pago:</label>
 							<select class="form-control form-control-sm" id="factura_forma_pago" name="forma_pago">
 								<?php foreach(($sriConfig['formas_pago'] ?? []) as $codigo => $nombre){ ?>
@@ -480,28 +438,28 @@
 					<div class="col-md-6">
 						<table class="table table-sm">
 						<tr>
-							<td class="text-right"><b>SUBTOTAL No objeto IVA</b>:</td>
-							<td class="text-right">0.00</td>
+							<td class="text-end"><b>SUBTOTAL No objeto IVA</b>:</td>
+							<td class="text-end">0.00</td>
 						</tr>
 						<tr>
-							<td class="text-right"><b>SUBTOTAL Exento IVA</b>:</td>
-							<td class="text-right">0.00</td>
+							<td class="text-end"><b>SUBTOTAL Exento IVA</b>:</td>
+							<td class="text-end">0.00</td>
 						</tr>
 						<tr>
-							<td class="text-right"><b>SUBTOTAL 0%</b>:</td>
-							<td class="text-right" id="subtotal0">0.00</td>
+							<td class="text-end"><b>SUBTOTAL 0%</b>:</td>
+							<td class="text-end" id="subtotal0">0.00</td>
 						</tr>
 						<tr>
-							<td class="text-right"><b>SUBTOTAL <?php echo number_format($sriIvaDefault, 0); ?>%</b>:</td>
-							<td class="text-right" id="subtotalIva">0.00</td>
+							<td class="text-end"><b>SUBTOTAL <?php echo number_format($sriIvaDefault, 0); ?>%</b>:</td>
+							<td class="text-end" id="subtotalIva">0.00</td>
 						</tr>
 						<tr>
-							<td class="text-right"><b>IVA <?php echo number_format($sriIvaDefault, 0); ?>%</b>:</td>
-							<td class="text-right" id="ivaValor">0.00</td>
+							<td class="text-end"><b>IVA <?php echo number_format($sriIvaDefault, 0); ?>%</b>:</td>
+							<td class="text-end" id="ivaValor">0.00</td>
 						</tr>
 						<tr class="bg-light">
-							<td class="text-right"><b>VALOR TOTAL</b>:</td>
-							<td class="text-right font-weight-bold" id="total">0.00</td>
+							<td class="text-end"><b>VALOR TOTAL</b>:</td>
+							<td class="text-end font-weight-bold" id="total">0.00</td>
 						</tr>
 						</table>
 					</div>
@@ -510,11 +468,11 @@
 
 			<!-- FOOTER -->
 			<div class="modal-footer justify-content-between py-2 px-3">
-				<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">
-				<i class="fas fa-times mr-1"></i> Cerrar
+				<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+				<i class="fas fa-times me-1"></i> Cerrar
 				</button>
 				<button type="button" id="btn-guardar-factura" class="btn bg-lightblue btn-sm">
-				<i class="fas fa-paper-plane mr-1"></i> Emitir Factura
+				<i class="fas fa-paper-plane me-1"></i> Emitir Factura
 				</button>
 			</div>
 			</div>
@@ -533,29 +491,21 @@
 	<!-- jQuery -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 	<!-- Select2 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/select2/js/select2.full.min.js"></script>
 	<!-- Bootstrap4 Duallistbox -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
 	<!-- InputMask -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/moment/moment.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- bootstrap color picker -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
 	<!-- Tempusdominus Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 	<!-- Bootstrap Switch -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 	<!-- BS-Stepper -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bs-stepper/js/bs-stepper.min.js"></script>
 	<!-- AdminLTE App -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js" ></script>
 	<!-- fileinput -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/fileinput/fileinput.js"></script>
 
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/ekko-lightbox/ekko-lightbox.min.js"></script>
 
@@ -657,11 +607,11 @@
 				let row = `
 					<tr>
 						<td>${codigo}</td>
-						<td class="text-right">1.00</td>
+						<td class="text-end">1.00</td>
 						<td>${detalle}</td>
-						<td class="text-right">${base.toFixed(2)}</td>
-						<td class="text-right">0.00</td>
-						<td class="text-right">${base.toFixed(2)}</td>
+						<td class="text-end">${base.toFixed(2)}</td>
+						<td class="text-end">0.00</td>
+						<td class="text-end">${base.toFixed(2)}</td>
 					</tr>
 				`;
 				tbody.insertAdjacentHTML("beforeend", row);

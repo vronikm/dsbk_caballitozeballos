@@ -636,3 +636,94 @@
     .ds-app__quick { transition: none; }
     .ds-app--activo:hover { transform: none; }
 }
+
+/* ==========================================================================
+   Correcciones de maquetacion que valen para todo el ecosistema
+   --------------------------------------------------------------------------
+   Reglas pequenas, medidas, que arreglan un desborde concreto. No son
+   identidad visual: estan aqui porque esta hoja es la unica que llega a
+   todas las pantallas de los cuatro modulos.
+   ========================================================================== */
+
+/* El campo de archivo no encoge dentro de un contenedor flexible.
+   -------------------------------------------------------------------------
+   Medido a 390 px de ancho: el widget de foto de las fichas de alumno
+   arrastraba 360 px y sacaba la pagina 7 px por la derecha. La causa es que
+   <input type="file"> tiene un ancho propio que no cede, y en un
+   .input-group —que es flex— eso empuja a todo el bloque.
+
+   min-width:0 permite que el elemento flexible se encoja por debajo de su
+   contenido, que es justo lo que su valor por defecto (auto) impide. */
+.input-group > .fileinput,
+.fileinput { min-width: 0; }
+
+.fileinput input[type="file"] { max-width: 100%; }
+
+/* Y las miniaturas de las fichas no pasan del ancho disponible. */
+.fileinput .thumbnail,
+.fileinput .thumbnail > img { max-width: 100%; height: auto; }
+
+/* Los bloques apilados necesitan aire entre ellos.
+   -------------------------------------------------------------------------
+   En Bootstrap 5 la tarjeta NO trae margen inferior. La regla que parece
+   darselo, .card-group>.card, solo aplica dentro de un grupo de tarjetas, y
+   ninguna pantalla de aqui usa esa estructura. El resultado eran bloques
+   pegados, sin una linea de aire: se leian como uno solo.
+
+   Se limita a las tarjetas que cuelgan DIRECTAMENTE del contenedor de la
+   pagina, que son las que se apilan una debajo de otra. Las que van dentro
+   de una columna quedan fuera a proposito: ahi el espaciado ya lo pone la
+   rejilla, y anadir margen las descuadraria.
+
+   Las vistas pueden escribir mb-4 a mano —es lo que hace la propia
+   plantilla en su ejemplo— y entonces manda la clase. Esto es la red para
+   las que no lo hagan. */
+.app-content .container-fluid > .card { margin-bottom: 1.5rem; }
+
+/* Las utilidades de color de TEXTO, legibles en los dos temas.
+   -------------------------------------------------------------------------
+   Medido sobre los tres fondos habituales del sistema:
+
+                    blanco   gris claro   oscuro
+       text-danger    4.53      3.82        3.41
+       text-success   4.53      3.82        3.40
+       text-primary   4.50      3.80        3.43
+       text-warning   1.63      1.37        9.46
+       text-info      1.96      1.65        7.88
+
+   Es decir: aprueban SOLO sobre blanco puro y por los pelos, y en cuanto el
+   texto cae sobre un gris o sobre el tema oscuro dejan de leerse. Amarillo y
+   cian no llegan ni sobre blanco. Son 119 usos en el sistema.
+
+   Bootstrap 5.3 trae para esto la variante «text-emphasis» de cada color,
+   pensada para texto y no para fondos, y que cambia sola con el tema. Con
+   ella las mismas cinco utilidades quedan entre 5.27 y 12.94 en claro y en
+   oscuro.
+
+   No cambia el significado: el rojo sigue siendo rojo, solo con la
+   saturacion que hace falta para leerlo. */
+.text-danger  { color: var(--bs-danger-text-emphasis)  !important; }
+.text-success { color: var(--bs-success-text-emphasis) !important; }
+.text-warning { color: var(--bs-warning-text-emphasis) !important; }
+.text-info    { color: var(--bs-info-text-emphasis)    !important; }
+.text-primary { color: var(--bs-primary-text-emphasis) !important; }
+
+/* El selector de foto: que rotulo se ve en cada estado.
+   -------------------------------------------------------------------------
+   El marcado de las trece vistas es el de un plugin de la epoca de Bootstrap
+   3 que no se carga en ninguna. Sin sus estilos, los dos rotulos salian a la
+   vez —«Seleccionar Foto Cambiar»— y la previsualizacion no aparecia nunca.
+
+   Son las tres reglas que hacen falta, en lugar de los 42 KB de aquel CSS
+   escrito para otra version del framework. La logica vive en
+   ds_core/assets/js/foto.js. */
+.fileinput .fileinput-exists     { display: none; }
+.fileinput .fileinput-new        { display: inline-block; }
+
+.fileinput.fileinput-exists .fileinput-new    { display: none; }
+.fileinput.fileinput-exists .fileinput-exists { display: inline-block; }
+
+/* La miniatura y la previsualizacion son bloques, no texto en linea. */
+.fileinput .thumbnail            { display: block; overflow: hidden; }
+.fileinput.fileinput-exists .fileinput-preview.thumbnail { display: block; }
+.fileinput .fileinput-preview:empty { display: none; }

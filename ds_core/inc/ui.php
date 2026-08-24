@@ -14,6 +14,14 @@
 |     por defecto) y el mismo ancho mínimo.
 |   · Cada acción tiene un icono asignado, siempre el mismo en todo el
 |     ecosistema. Ver ds_icono().
+|
+| LOS ICONOS LLEVAN «me-1», LA UTILIDAD DE BOOTSTRAP 5
+|
+| Durante la migración estuvieron un tiempo con «mr-1 me-1», las dos a la
+| vez, porque este archivo lo usan los CUATRO módulos y Basketball seguía
+| en Bootstrap 4 mientras los otros tres ya estaban en el 5. Cada versión
+| entendía la suya e ignoraba la otra. Ya no hace falta: los cuatro corren
+| Bootstrap 5.
 */
 
 if (!function_exists('ds_icono')) {
@@ -82,7 +90,7 @@ if (!function_exists('ds_icono')) {
             $attr .= ' disabled';
         }
 
-        $contenido = '<i class="' . ds_icono($accion) . ' mr-1"></i> '
+        $contenido = '<i class="' . ds_icono($accion) . ' me-1"></i> '
                    . htmlspecialchars($texto, ENT_QUOTES, 'UTF-8');
 
         if (!empty($opciones['href'])) {
@@ -164,7 +172,7 @@ if (!function_exists('ds_icono')) {
     function ds_boton_buscar(string $texto = 'Buscar'): string
     {
         return '<button type="submit" class="form-control btn btn-primary">'
-             . '<i class="' . ds_icono('ver') . ' mr-1"></i> '
+             . '<i class="' . ds_icono('ver') . ' me-1"></i> '
              . htmlspecialchars($texto, ENT_QUOTES, 'UTF-8') . '</button>';
     }
 

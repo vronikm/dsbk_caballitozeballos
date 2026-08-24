@@ -58,26 +58,26 @@
 						<td>'.$rows['repre_primernombre'].' '.$rows['repre_segundonombre'].'</td>
 						<td>'.$rows['repre_apellidopaterno'].' '.$rows['repre_apellidomaterno'].'</td>
 						<td>							
-							'.$this->siPuede('crear','representanteList','<a href="'.APP_URL.'alumnoNew/'.$rows['repre_id'].'/" class="btn float-right btn-secondary btn-xs" style="margin-right: 5px;"><i class="fas fa-plus mr-1"></i>Nuevo Alumno</a>').'	
-							'.$this->siPuede('crear','representanteList','<a href="'.APP_URL.'representanteVinc/'.$rows['repre_id'].'/" class="btn float-right btn-warning btn-xs" style="margin-right: 5px;"><i class="fas fa-link mr-1"></i>Vincular alumno</a>').'
+							'.$this->siPuede('crear','representanteList','<a href="'.APP_URL.'alumnoNew/'.$rows['repre_id'].'/" class="btn float-end btn-secondary btn-xs" style="margin-right: 5px;"><i class="fas fa-plus me-1"></i>Nuevo Alumno</a>').'	
+							'.$this->siPuede('crear','representanteList','<a href="'.APP_URL.'representanteVinc/'.$rows['repre_id'].'/" class="btn float-end btn-warning btn-xs" style="margin-right: 5px;"><i class="fas fa-link me-1"></i>Vincular alumno</a>').'
 						</td>
 						<td>
-							<a href="'.APP_URL.'representanteFLPD/'.$rows['repre_id'].'/" target="_blank" class="nav-icon far fa-file float-right" title="Formulario LPD" style="margin-right: 5px;"></a>
+							<a href="'.APP_URL.'representanteFLPD/'.$rows['repre_id'].'/" target="_blank" class="nav-icon far fa-file float-end" title="Formulario LPD" style="margin-right: 5px;"></a>
 							'.$this->siPuede('editar','representanteList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/representanteAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_repre" value="estadofirmado">
 								<input type="hidden" name="repre_id" value="'.$rows['repre_id'].'">						
-								<button type="submit" class="btn float-right '.$boton.' btn-xs" style="margin-right: 5px;"> '.$texto.' </button>
+								<button type="submit" class="btn float-end '.$boton.' btn-xs" style="margin-right: 5px;"> '.$texto.' </button>
 							</form>').'	
 						</td>
 						<td>
 							'.$this->siPuede('eliminar','representanteList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/representanteAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_repre" value="eliminar">
 								<input type="hidden" name="repre_id" value="'.$rows['repre_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'
 													
-							'.$this->siPuede('editar','representanteList','<a href="'.APP_URL.'representanteUpdate/'.$rows['repre_id'].'/" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;" title="Actualizar" aria-label="Actualizar"><i class="fas fa-pen"></i></a>').'							
-							<a href="'.APP_URL.'representanteProfile/'.$rows['repre_id'].'/" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;" title="Ver" aria-label="Ver"><i class="fas fa-eye"></i></a>							
+							'.$this->siPuede('editar','representanteList','<a href="'.APP_URL.'representanteUpdate/'.$rows['repre_id'].'/" class="btn float-end btn-actualizar btn-xs" style="margin-right: 5px;" title="Actualizar" aria-label="Actualizar"><i class="fas fa-pen"></i></a>').'							
+							<a href="'.APP_URL.'representanteProfile/'.$rows['repre_id'].'/" class="btn float-end btn-ver btn-xs" style="margin-right: 5px;" title="Ver" aria-label="Ver"><i class="fas fa-eye"></i></a>							
 						</td>
 					</tr>';	
 			}
@@ -829,7 +829,7 @@
 								<input type="hidden" name="modulo_repre" value="vincularepresentado">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">		
 								<input type="hidden" name="alumno_repreid" value="'.$repreid.'">
-								<button type="submit" href="'.APP_URL.'representanteList/" class="btn float-right btn-success btn-xs" style="margin-right: 5px;"><i class="fas fa-link mr-1"></i>Vincular</button>							
+								<button type="submit" href="'.APP_URL.'representanteList/" class="btn float-end btn-success btn-xs" style="margin-right: 5px;"><i class="fas fa-link me-1"></i>Vincular</button>							
 
 								</form>').'
 						</td>

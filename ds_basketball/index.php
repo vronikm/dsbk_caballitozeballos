@@ -20,6 +20,16 @@
     $viewsController= new viewsController();
     $vista=$viewsController->obtenerVistasControlador($url[0]);
 
+    # La verificacion del segundo factor va con el login y no con el resto:
+    # quien llega ahi acerto la contrasena pero AUN NO esta autenticado, asi
+    # que no puede pasar por los controles que exigen sesion. Su propia
+    # puerta es la marca que dejo el paso anterior, y la vista la comprueba
+    # antes de imprimir nada.
+    if($url[0]=="verificar2fa"){
+        require_once "app/views/content/verificar2fa-view.php";
+        exit();
+    }
+
     if($vista=="login" || $vista=="404"){
         # Una ruta inexistente debe responder 404, no 200 con la página de
         # error: los buscadores y las herramientas se guían por el estado.

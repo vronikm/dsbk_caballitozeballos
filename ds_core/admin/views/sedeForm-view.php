@@ -44,15 +44,15 @@ require_once __DIR__ . "/inc/layout-top.php";
                 <input type="hidden" name="quitar_firma" id="quitar_firma" value="0">
 
                 <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group col-md-7">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-7">
                             <label for="sede_nombre">Nombre de la sede <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="sede_nombre" name="sede_nombre"
                                    maxlength="100" required
                                    value="<?php echo htmlspecialchars((string)($sede['sede_nombre'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
 
-                        <div class="form-group col-md-5">
+                        <div class="mb-3 col-md-5">
                             <label for="sede_escuelaid">Organización <span class="text-danger">*</span></label>
                             <select class="form-control" id="sede_escuelaid" name="sede_escuelaid" required>
                                 <option value="">Seleccione…</option>
@@ -67,7 +67,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
 
                     <!-- El campo que decide qué módulos operan sobre la sede -->
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="sede_tipoingreso">Tipo de sede <span class="text-danger">*</span></label>
                         <select class="form-control" id="sede_tipoingreso" name="sede_tipoingreso" required>
                             <?php foreach ($tipos as $t): ?>
@@ -83,35 +83,35 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </small>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-8">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-8">
                             <label for="sede_direccion">Dirección</label>
                             <input type="text" class="form-control" id="sede_direccion" name="sede_direccion" maxlength="200"
                                    value="<?php echo htmlspecialchars((string)($sede['sede_direccion'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="sede_telefono">Teléfono</label>
                             <input type="text" class="form-control" id="sede_telefono" name="sede_telefono" maxlength="50"
                                    value="<?php echo htmlspecialchars((string)($sede['sede_telefono'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-6">
                             <label for="sede_email">Correo</label>
                             <input type="email" class="form-control" id="sede_email" name="sede_email" maxlength="50"
                                    value="<?php echo htmlspecialchars((string)($sede['sede_email'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
 
-                        <div class="form-group col-md-3">
+                        <div class="mb-3 col-md-3">
                             <label for="sede_inscripcion">Inscripción</label>
                             <input type="number" step="0.01" min="0" class="form-control"
                                    id="sede_inscripcion" name="sede_inscripcion"
                                    value="<?php echo htmlspecialchars((string)($sede['sede_inscripcion'] ?? '0.00'), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
 
-                        <div class="form-group col-md-3">
+                        <div class="mb-3 col-md-3">
                             <label for="sede_pension">Pensión</label>
                             <input type="number" step="0.01" min="0" class="form-control"
                                    id="sede_pension" name="sede_pension"
@@ -127,7 +127,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <hr>
 
                     <!-- Logo propio de la sede; si no tiene, hereda el de la organización -->
-                    <div class="form-row align-items-center">
+                    <div class="row g-2 align-items-center">
                         <div class="col-md-3 text-center mb-3">
                             <?php if ($urlLogo !== ''): ?>
                                 <img src="<?php echo $urlLogo; ?>" alt="Logo" id="vistaPreviaLogo"
@@ -143,9 +143,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
 
                         <div class="col-md-9">
-                            <div class="form-group mb-1">
+                            <div class="mb-3 mb-1">
                                 <label for="sede_foto">Logo de la sede</label>
-                                <input type="file" class="form-control-file" id="sede_foto" name="sede_foto"
+                                <input type="file" class="form-control" id="sede_foto" name="sede_foto"
                                        accept="image/jpeg,image/png,image/webp">
                                 <small class="text-muted">
                                     Opcional. Si no se carga ninguno, la sede usa el logo de la organización.
@@ -155,11 +155,11 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php if ($tieneLogoPropio): ?>
                                 <button type="button" class="btn btn-sm btn-outline-danger mt-2"
                                         data-quitar="logo" data-previa="vistaPreviaLogo">
-                                    <i class="fas fa-times mr-1"></i> Quitar logo propio
+                                    <i class="fas fa-times me-1"></i> Quitar logo propio
                                 </button>
                             <?php else: ?>
                                 <p class="text-muted small mb-0 mt-2">
-                                    <i class="fas fa-info-circle mr-1"></i>
+                                    <i class="fas fa-info-circle me-1"></i>
                                     Esta sede está usando el logo de la organización.
                                 </p>
                             <?php endif; ?>
@@ -169,7 +169,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <hr>
 
                     <!-- Firma propia de la sede; si no tiene, hereda la de la organización -->
-                    <div class="form-row align-items-center">
+                    <div class="row g-2 align-items-center">
                         <div class="col-md-3 text-center mb-3">
                             <?php if ($urlFirma !== ''): ?>
                                 <img src="<?php echo $urlFirma; ?>" alt="Firma autorizada" id="vistaPreviaFirma"
@@ -185,9 +185,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
 
                         <div class="col-md-9">
-                            <div class="form-group mb-1">
+                            <div class="mb-3 mb-1">
                                 <label for="sede_firma">Firma autorizada de la sede</label>
-                                <input type="file" class="form-control-file" id="sede_firma" name="sede_firma"
+                                <input type="file" class="form-control" id="sede_firma" name="sede_firma"
                                        accept="image/jpeg,image/png,image/webp">
                                 <small class="text-muted">
                                     Opcional. Útil cuando cada sede firma sus propios recibos.
@@ -197,11 +197,11 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php if ($tieneFirmaPropia): ?>
                                 <button type="button" class="btn btn-sm btn-outline-danger mt-2"
                                         data-quitar="firma" data-previa="vistaPreviaFirma">
-                                    <i class="fas fa-times mr-1"></i> Quitar firma propia
+                                    <i class="fas fa-times me-1"></i> Quitar firma propia
                                 </button>
                             <?php else: ?>
                                 <p class="text-muted small mb-0 mt-2">
-                                    <i class="fas fa-info-circle mr-1"></i>
+                                    <i class="fas fa-info-circle me-1"></i>
                                     Esta sede está usando la firma de la organización.
                                 </p>
                             <?php endif; ?>

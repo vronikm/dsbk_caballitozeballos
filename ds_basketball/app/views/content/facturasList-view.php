@@ -23,30 +23,14 @@
 	$rolid = rol_actual();
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo APP_NAME; ?> | Facturas</title>
-	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-	<!-- DataTables -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-	<!-- Theme style -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css?v=1.0">
-    
-  </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Facturas';
+	$extras      = array (0 => 'datatables',);
+	require_once "app/views/inc/cabecera.php";
+?>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
 
       <!-- Preloader -->
       <!--?php require_once "app/views/inc/preloader.php"; ?-->
@@ -61,17 +45,17 @@
       <!-- /.Main Sidebar Container -->  
 
       <!-- vista -->
-      <div class="content-wrapper">
+      <div class="app-main">
 
 		<!-- Content Header (Page header) -->
-		<div class="content-header">
+		<div class="app-content-header">
 			<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
 				<h5 class="m-0">Registro de facturas</h5>
 				</div><!-- /.col -->
 				<div class="col-sm-6">
-				<ol class="breadcrumb float-sm-right">
+				<ol class="breadcrumb float-sm-end">
 					<li class="breadcrumb-item"><a href="#">Nuevo</a></li>
 					<li class="breadcrumb-item active">Dashboard v1</li>
 				</ol>
@@ -82,7 +66,7 @@
 		<!-- /.content-header -->
 
 		<!-- Section listado de alumnos -->
-		<section class="content">
+		<section class="app-content">
 			<form action="<?php echo APP_URL."facturasList/" ?>" method="POST" autocomplete="off" enctype="multipart/form-data" >
 			
 			<div class="container-fluid">
@@ -90,9 +74,7 @@
 					<div class="card-header">
 					<h3 class="card-title">Alumnos</h3>
 					<div class="card-tools">
-						<button type="button" class="btn btn-tool" data-card-widget="collapse">
-						<i class="fas fa-minus"></i>
-						</button>
+						<button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Plegar o desplegar" aria-label="Plegar o desplegar"><i data-lte-icon="expand" class="fas fa-plus"></i><i data-lte-icon="collapse" class="fas fa-minus"></i></button>
 					</div>
 					</div>  
 
@@ -100,36 +82,36 @@
 					<div class="card-body">
 						<div class="row align-items-end">
 							<div class="col-sm-2">
-								<div class="form-group input-group-sm">
+								<div class="mb-3 input-group-sm">
 									<label for="alumno_identificacion">Identificación</label>                        
 									<input type="text" class="form-control" id="alumno_identificacion" name="alumno_identificacion" placeholder="Identificación" value="<?php echo $h($alumno_identificacion); ?>">
 								</div>        
 							</div>
 							<div class="col-sm-2">
-								<div class="form-group input-group-sm">
+								<div class="mb-3 input-group-sm">
 									<label for="alumno_apellido1">Apellido paterno</label>
 									<input type="text" class="form-control" id="alumno_apellido1" name="alumno_apellido1" placeholder="Primer apellido" value="<?php echo $h($alumno_apellidopaterno); ?>">
 								</div>         
 							</div>
 							<div class="col-md-2">
-								<div class="form-group input-group-sm">
+								<div class="mb-3 input-group-sm">
 									<label for="alumno_nombre1">Primer nombre</label>
 									<input type="text" class="form-control" id="alumno_nombre1" name="alumno_nombre1" placeholder="Primer nombre" value="<?php echo $h($alumno_primernombre); ?>">
 								</div>
 							</div>  
 
 							<div class="col-md-2">
-								<div class="form-group">
-									<div class="form-group input-group-sm">
+								<div class="mb-3">
+									<div class="mb-3 input-group-sm">
 										<label for="alumno_ano">Año</label>
 										<input type="text" class="form-control" id="alumno_ano" name="alumno_ano" placeholder="año" value="<?php echo $h($alumno_anio); ?>">
 									</div>	
 								</div>
 							</div>
 							<div class="col-md-2">
-								<div class="form-group input-group-sm">
+								<div class="mb-3 input-group-sm">
 									<label for="alumno_sedeid">Sede</label>
-									<select class="form-control select2" id="alumno_sedeid" name="alumno_sedeid">		
+									<select class="form-control" id="alumno_sedeid" name="alumno_sedeid">		
 										<?php
 											if($rolid == 1 || $rolid == 2){
 												if($alumno_sedeid == 0){	
@@ -145,7 +127,7 @@
 							</div>
 
 							<div class="col-md-2">
-								<div class="form-group input-group-sm">									
+								<div class="mb-3 input-group-sm">									
 									<?php echo ds_boton_buscar(); ?>
 								</div>
 							</div>
@@ -163,9 +145,7 @@
 					<div class="card-header">
 						<h3 class="card-title">Resultado de la búsqueda</h3>
 						<div class="card-tools">
-							<button type="button" class="btn btn-tool" data-card-widget="collapse">
-								<i class="fas fa-minus"></i>
-							</button>
+							<button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Plegar o desplegar" aria-label="Plegar o desplegar"><i data-lte-icon="expand" class="fas fa-plus"></i><i data-lte-icon="collapse" class="fas fa-minus"></i></button>
 						</div>
 					</div>
 
@@ -211,27 +191,29 @@
 	<!-- jQuery -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 	<!-- DataTables  & Plugins -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables/jquery.dataTables.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jszip/jszip.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/pdfmake/pdfmake.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/pdfmake/vfs_fonts.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.bootstrap5.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.responsive.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/responsive.bootstrap5.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.buttons.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.bootstrap5.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.html5.min.js"></script>
+	<?php /* pdfmake y jszip pesan 2,2 MB y sirven a dos botones: se traen
+			 al pulsarlos, no en cada carga. Va DESPUES de buttons.html5, que es
+			 quien define esos botones. */ ?>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/exportar.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.print.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.colVis.min.js"></script>
 	<!-- AdminLTE App -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 	
 	<!-- Page specific script -->
 	<script>
-		$(function () {
-			$("#example1").DataTable({
+		document.addEventListener('DOMContentLoaded', function () {
+			new DataTable("#example1", {
 			"responsive": true, "lengthChange": true, "autoWidth": false,
 			"pageLength": 10,
 			"lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
@@ -259,7 +241,7 @@
 					"sortDescending": ": activar para ordenar la columna descendente"
 				}
 			},
-			}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');			    
+			});			    
 		});
 	</script>
 

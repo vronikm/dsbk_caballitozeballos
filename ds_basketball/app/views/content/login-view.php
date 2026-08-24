@@ -78,7 +78,7 @@ $funciones = [
              acciones, tiene su propio diseño, y es la página más pública del
              sistema. Cada KB cuenta aquí. */ ?>
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-    <link rel="stylesheet" href="<?php echo $vendor; ?>plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/fontawesome6/css/all.min.css">
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/digisports.css">
 
     <?php /* SweetAlert2 va ANTES que login.css: su tema es claro y choca con
@@ -88,6 +88,8 @@ $funciones = [
     <script src="<?php echo $vendor; ?>js/sweetalert2.all.min.js"></script>
 
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/login.css">
+	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
 </head>
 <body class="dsl-body">
 
@@ -138,6 +140,15 @@ $funciones = [
             <div class="dsl-card__regla"></div>
 
             <form method="POST" action="" id="formLogin">
+
+                <?php
+                /* Testigo anti-CSRF.
+                   Sí, en el login. El ataque no es entrar en la cuenta de
+                   la víctima: es forzarla a entrar en la DEL ATACANTE, de
+                   modo que todo lo que registre después quede en una
+                   cuenta ajena. Ver csrf_token() en ds_core/inc/seguridad.php. */
+                echo csrf_campo('login');
+                ?>
 
                 <div class="dsl-campo">
                     <label class="dsl-campo__etiqueta" for="login_usuario">Usuario</label>

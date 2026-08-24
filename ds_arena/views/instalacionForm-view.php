@@ -36,8 +36,8 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                 <div class="card-body">
 
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-4">
                             <label for="instalacion_clase">Tipo <span class="text-danger">*</span></label>
                             <select class="form-control" id="instalacion_clase" name="instalacion_clase" required>
                                 <option value="C" <?php echo ($inst['instalacion_clase'] ?? 'C') === 'C' ? 'selected' : ''; ?>>Cancha</option>
@@ -45,7 +45,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </select>
                         </div>
 
-                        <div class="form-group col-md-8">
+                        <div class="mb-3 col-md-8">
                             <label for="instalacion_sedeid">Sede <span class="text-danger">*</span></label>
                             <select class="form-control" id="instalacion_sedeid" name="instalacion_sedeid" required>
                                 <option value="">Seleccione…</option>
@@ -60,20 +60,21 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-4">
                             <label for="instalacion_codigo">Código</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" id="instalacion_codigo" name="instalacion_codigo"
                                        maxlength="20" placeholder="Se genera solo"
                                        value="<?php echo htmlspecialchars((string)($inst['instalacion_codigo'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                                 <?php if ($esAlta): ?>
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" type="button" id="btnCodigoAuto"
-                                            title="Volver a la propuesta del sistema">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </button>
-                                </div>
+                                <?php /* En Bootstrap 5 el botón va suelto dentro
+                                         del input-group; el <div> envolvente de
+                                         la versión 4 ya no existe. */ ?>
+                                <button class="btn btn-outline-secondary" type="button" id="btnCodigoAuto"
+                                        title="Volver a la propuesta del sistema">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
                                 <?php endif; ?>
                             </div>
                             <small class="text-muted" id="ayudaCodigo">
@@ -83,7 +84,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </small>
                         </div>
 
-                        <div class="form-group col-md-8">
+                        <div class="mb-3 col-md-8">
                             <label for="instalacion_nombre">Nombre <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="instalacion_nombre" name="instalacion_nombre"
                                    maxlength="80" required
@@ -92,8 +93,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
 
                     <!-- Sólo aplica a canchas -->
-                    <div class="form-row" id="camposCancha">
-                        <div class="form-group col-md-6">
+                    <div class="row g-2" id="camposCancha">
+                        <div class="mb-3 col-md-6">
                             <label for="instalacion_cubierta">Cubierta</label>
                             <select class="form-control" id="instalacion_cubierta" name="instalacion_cubierta">
                                 <option value="S" <?php echo ($inst['instalacion_cubierta'] ?? 'S') === 'S' ? 'selected' : ''; ?>>Sí, techada</option>
@@ -101,7 +102,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </select>
                         </div>
 
-                        <div class="form-group col-md-6">
+                        <div class="mb-3 col-md-6">
                             <label for="instalacion_pisoid">Tipo de piso</label>
                             <select class="form-control" id="instalacion_pisoid" name="instalacion_pisoid">
                                 <option value="0">Sin especificar</option>
@@ -115,8 +116,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-4">
                             <label for="instalacion_valorhora">Valor por hora (USD) <span class="text-danger">*</span></label>
                             <input type="number" step="0.01" min="0" class="form-control"
                                    id="instalacion_valorhora" name="instalacion_valorhora" required
@@ -124,7 +125,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <small class="text-muted">Tarifa base. Puede afinarse por franja horaria.</small>
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="instalacion_capacidad">Capacidad</label>
                             <input type="number" min="0" class="form-control"
                                    id="instalacion_capacidad" name="instalacion_capacidad"
@@ -132,7 +133,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <small class="text-muted">Personas o plazas.</small>
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="instalacion_estado">Estado</label>
                             <select class="form-control" id="instalacion_estado" name="instalacion_estado">
                                 <option value="A" <?php echo ($inst['instalacion_estado'] ?? 'A') === 'A' ? 'selected' : ''; ?>>Activa</option>
@@ -141,7 +142,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="instalacion_detalle">Descripción</label>
                         <textarea class="form-control" id="instalacion_detalle" name="instalacion_detalle"
                                   rows="2" maxlength="250"><?php echo htmlspecialchars((string)($inst['instalacion_detalle'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></textarea>

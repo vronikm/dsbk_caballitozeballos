@@ -1,0 +1,17 @@
+# =====================================================================
+# Pruebas automatizadas: NUNCA por HTTP
+# =====================================================================
+# Aqui hay scripts que se conectan a la base con credenciales, crean y
+# borran usuarios, y vacian tablas de prueba. Estan pensados para
+# ejecutarse desde la consola.
+#
+# Se sirven desde la raiz web, y el .htaccess de la raiz entrega
+# directamente cualquier archivo que exista, asi que sin este bloqueo
+# bastaria conocer un nombre para ejecutarlos desde el navegador.
+#
+# Mismo criterio que app/controllers/ y las carpetas de datos personales.
+Options -Indexes
+Require all denied
+<IfModule mod_access_compat.c>
+    Deny from all
+</IfModule>

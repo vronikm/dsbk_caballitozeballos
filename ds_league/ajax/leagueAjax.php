@@ -132,6 +132,10 @@ switch ($_POST['modulo_league']) {
         echo (new \league\controllers\finanzaController())->anularObligacion();
         break;
 
+    case 'emitirComprobante':
+        echo (new \league\controllers\comprobanteController())->emitir();
+        break;
+
     default:
         league_rechazar(400, [
             'tipo'   => 'simple',

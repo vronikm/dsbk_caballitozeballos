@@ -34,7 +34,7 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="col-lg-7 mb-3">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tags mr-2"></i>Conceptos</h3>
+                <h3 class="card-title"><i class="fas fa-tags me-2"></i>Conceptos</h3>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -44,7 +44,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <th>Código</th>
                                 <th>Concepto</th>
                                 <th>Se aplica a</th>
-                                <th class="text-right">Valor sugerido</th>
+                                <th class="text-end">Valor sugerido</th>
                                 <th class="ds-tabla-acciones"></th>
                             </tr>
                         </thead>
@@ -60,7 +60,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <td class="text-muted" style="font-size:.85rem;">
                                     <?php echo $h($ambitos[$c['concepto_ambito']] ?? $c['concepto_ambito']); ?>
                                 </td>
-                                <td class="text-right">
+                                <td class="text-end">
                                     <?php if ((float)$c['concepto_valor'] > 0): ?>
                                         <?php echo number_format((float)$c['concepto_valor'], 2); ?>
                                     <?php else: ?>
@@ -104,12 +104,12 @@ require_once __DIR__ . "/inc/layout-top.php";
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title" id="tituloForm">
-                        <i class="fas fa-plus mr-2"></i>Nuevo concepto
+                        <i class="fas fa-plus me-2"></i>Nuevo concepto
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group col-5">
+                    <div class="row g-2">
+                        <div class="mb-3 col-5">
                             <label for="concepto_codigo">Código</label>
                             <input type="text" name="concepto_codigo" id="concepto_codigo"
                                    class="form-control text-uppercase" maxlength="20" required
@@ -118,26 +118,27 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 Mayúsculas, números y guión bajo.
                             </small>
                         </div>
-                        <div class="form-group col-7">
+                        <div class="mb-3 col-7">
                             <label for="concepto_nombre">Nombre</label>
                             <input type="text" name="concepto_nombre" id="concepto_nombre"
                                    class="form-control" maxlength="80" required>
                         </div>
                     </div>
-                    <div class="form-row mb-0">
-                        <div class="form-group col-7 mb-0">
-                            <label for="concepto_ambito">Se aplica a</label>
-                            <select name="concepto_ambito" id="concepto_ambito" class="form-control">
-                                <?php foreach ($ambitos as $cod => $txt): ?>
-                                    <option value="<?php echo $cod; ?>"><?php echo $h($txt); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group col-5 mb-0">
-                            <label for="concepto_valor">Valor sugerido</label>
-                            <input type="number" name="concepto_valor" id="concepto_valor"
-                                   class="form-control text-right" step="0.01" min="0" value="0.00">
-                        </div>
+                    <?php /* A ancho completo: las etiquetas de ámbito son
+                             frases, y en media columna el desplegable las
+                             corta justo donde está la información. */ ?>
+                    <div class="mb-3">
+                        <label for="concepto_ambito">Se aplica a</label>
+                        <select name="concepto_ambito" id="concepto_ambito" class="form-control">
+                            <?php foreach ($ambitos as $cod => $txt): ?>
+                                <option value="<?php echo $cod; ?>"><?php echo $h($txt); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3 col-6 px-0 mb-0">
+                        <label for="concepto_valor">Valor sugerido</label>
+                        <input type="number" name="concepto_valor" id="concepto_valor"
+                               class="form-control text-end" step="0.01" min="0" value="0.00">
                     </div>
                 </div>
                 <?php echo ds_acciones_form('', ['limpiar' => true]); ?>

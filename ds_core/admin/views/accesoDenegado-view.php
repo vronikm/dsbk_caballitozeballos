@@ -8,8 +8,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Acceso denegado | <?php echo APP_NAME; ?></title>
-    <link rel="stylesheet" href="<?php echo DS_VENDOR_URL; ?>plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/fontawesome6/css/all.min.css">
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/digisports.css">
+	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
 </head>
 <body class="ds-body">
     <div class="ds-container d-flex align-items-center justify-content-center" style="min-height:100vh;">

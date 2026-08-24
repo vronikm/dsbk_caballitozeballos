@@ -26,7 +26,7 @@ if (!$cabecera) {
     $vistaActual = 'plantillaPanel';
     require_once __DIR__ . "/inc/layout-top.php";
     echo '<div class="callout callout-warning"><h6 class="mb-1">'
-       . '<i class="fas fa-exclamation-circle mr-2"></i>Inscripción no encontrada</h6>'
+       . '<i class="fas fa-exclamation-circle me-2"></i>Inscripción no encontrada</h6>'
        . '<p class="mb-0 text-muted">Elija un equipo desde el panel de su categoría.</p></div>';
     require_once __DIR__ . "/inc/layout-bottom.php";
     return;
@@ -60,7 +60,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 <?php if (empty($cabecera['categoria_fechacorte'])
           && ($cabecera['categoria_edadmin'] !== null || $cabecera['categoria_edadmax'] !== null)): ?>
 <div class="callout callout-warning">
-    <h6 class="mb-1"><i class="fas fa-exclamation-circle mr-2"></i>Falta la fecha de corte</h6>
+    <h6 class="mb-1"><i class="fas fa-exclamation-circle me-2"></i>Falta la fecha de corte</h6>
     <p class="mb-0 text-muted">
         Esta categoría tiene rango de edad pero no indica a qué fecha se mide, así que
         las edades de abajo están calculadas a hoy y cambiarán solas con el tiempo.
@@ -75,8 +75,8 @@ require_once __DIR__ . "/inc/layout-top.php";
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title mb-0">
-                    <i class="fas fa-id-card mr-2"></i>Plantilla
-                    <span class="badge badge-<?php echo $habilitados >= $minimo ? 'success' : 'warning'; ?> ml-2">
+                    <i class="fas fa-id-card me-2"></i>Plantilla
+                    <span class="badge text-bg-<?php echo $habilitados >= $minimo ? 'success' : 'warning'; ?> ms-2">
                         <?php echo $habilitados; ?> habilitados
                         <?php if ($minimo > 0): ?>de <?php echo $minimo; ?> mínimos<?php endif; ?>
                     </span>
@@ -138,14 +138,14 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 </td>
                                 <td>
                                     <?php if ($f['plantilla_habilitado'] === 'S' && !$baja): ?>
-                                        <span class="badge badge-success">Habilitado</span>
+                                        <span class="badge text-bg-success">Habilitado</span>
                                     <?php elseif ($faltas): ?>
-                                        <span class="badge badge-danger" title="<?php echo $h(implode('; ', $faltas)); ?>">
+                                        <span class="badge text-bg-danger" title="<?php echo $h(implode('; ', $faltas)); ?>">
                                             No cumple
                                         </span>
                                         <br><small class="text-danger"><?php echo $h(implode('; ', $faltas)); ?></small>
                                     <?php else: ?>
-                                        <span class="badge badge-secondary">Pendiente</span>
+                                        <span class="badge text-bg-secondary">Pendiente</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -164,11 +164,11 @@ require_once __DIR__ . "/inc/layout-top.php";
                                                     title="<?php echo $autorizada
                                                         ? 'Autorizada el ' . $h((string)$f['persona_consentfecha'])
                                                         : 'Sin autorización: en el portal se muestran las iniciales'; ?>">
-                                                <i class="fas fa-<?php echo $autorizada ? 'eye' : 'eye-slash'; ?> mr-1"></i>
+                                                <i class="fas fa-<?php echo $autorizada ? 'eye' : 'eye-slash'; ?> me-1"></i>
                                                 <?php echo $autorizada ? 'Autorizada' : 'Reservada'; ?>
                                             </button>
                                         <?php else: ?>
-                                            <span class="badge badge-<?php echo $autorizada ? 'success' : 'secondary'; ?>">
+                                            <span class="badge text-bg-<?php echo $autorizada ? 'success' : 'secondary'; ?>">
                                                 <?php echo $autorizada ? 'Autorizada' : 'Reservada'; ?></span>
                                         <?php endif; ?>
                                     <?php endif; ?>
@@ -219,11 +219,11 @@ require_once __DIR__ . "/inc/layout-top.php";
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title" id="tituloForm">
-                        <i class="fas fa-user-plus mr-2"></i>Añadir a la plantilla
+                        <i class="fas fa-user-plus me-2"></i>Añadir a la plantilla
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="persona_identificacion">Identificación</label>
                         <input type="text" name="persona_identificacion" id="persona_identificacion"
                                class="form-control" maxlength="20" required>
@@ -231,23 +231,23 @@ require_once __DIR__ . "/inc/layout-top.php";
                             Si ya está registrada, se reutiliza su ficha en lugar de duplicarla.
                         </small>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="persona_apellidos">Apellidos</label>
                         <input type="text" name="persona_apellidos" id="persona_apellidos"
                                class="form-control" maxlength="150" required>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="persona_nombres">Nombres</label>
                         <input type="text" name="persona_nombres" id="persona_nombres"
                                class="form-control" maxlength="150" required>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-7">
+                    <div class="row g-2">
+                        <div class="mb-3 col-7">
                             <label for="persona_fechanac">Nacimiento</label>
                             <input type="date" name="persona_fechanac" id="persona_fechanac"
                                    class="form-control" max="<?php echo date('Y-m-d'); ?>">
                         </div>
-                        <div class="form-group col-5">
+                        <div class="mb-3 col-5">
                             <label for="persona_genero">Género</label>
                             <select name="persona_genero" id="persona_genero" class="form-control">
                                 <option value="M">Masculino</option>
@@ -256,8 +256,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </select>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-7">
+                    <div class="row g-2">
+                        <div class="mb-3 col-7">
                             <label for="plantilla_rol">Rol</label>
                             <select name="plantilla_rol" id="plantilla_rol" class="form-control">
                                 <?php foreach ($roles as $k => $v): ?>
@@ -265,16 +265,16 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="form-group col-5">
+                        <div class="mb-3 col-5">
                             <label for="plantilla_dorsal">Dorsal</label>
                             <input type="number" name="plantilla_dorsal" id="plantilla_dorsal"
                                    class="form-control" min="0" max="99">
                         </div>
                     </div>
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="persona_foto">Fotografía</label>
                         <input type="file" name="persona_foto" id="persona_foto"
-                               class="form-control-file" accept="image/jpeg,image/png,image/webp">
+                               class="form-control" accept="image/jpeg,image/png,image/webp">
                         <small class="form-text text-muted">
                             Para el carné. JPG, PNG o WEBP, hasta 2 MB.
                         </small>

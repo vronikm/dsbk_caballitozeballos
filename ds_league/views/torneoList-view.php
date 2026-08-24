@@ -31,7 +31,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
 <?php if (!$temporadas): ?>
 <div class="callout callout-warning">
-    <h6 class="mb-1"><i class="fas fa-exclamation-circle mr-2"></i>No hay temporadas</h6>
+    <h6 class="mb-1"><i class="fas fa-exclamation-circle me-2"></i>No hay temporadas</h6>
     <p class="mb-0 text-muted">
         Un torneo pertenece a una temporada.
         <a href="<?php echo APP_URL; ?>temporadaList/">Cree una primero</a>.
@@ -43,7 +43,7 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="col-lg-7 mb-3">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title mb-0"><i class="fas fa-trophy mr-2"></i>Torneos</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-trophy me-2"></i>Torneos</h3>
                 <?php if ($temporadaId > 0): ?>
                     <a href="<?php echo APP_URL; ?>torneoList/" class="ds-link">Ver todos →</a>
                 <?php endif; ?>
@@ -56,7 +56,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <th>Torneo</th>
                                 <th>Temporada</th>
                                 <th>Deporte</th>
-                                <th class="text-right">Categorías</th>
+                                <th class="text-end">Categorías</th>
                                 <th>Portal</th>
                                 <th class="ds-tabla-acciones"></th>
                             </tr>
@@ -71,7 +71,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <td><strong><?php echo $h($o['torneo_nombre']); ?></strong></td>
                                 <td class="text-muted"><?php echo $h($o['temporada_nombre']); ?></td>
                                 <td class="text-muted"><?php echo $h($o['torneo_deporte']); ?></td>
-                                <td class="text-right"><?php echo (int)$o['categorias']; ?></td>
+                                <td class="text-end"><?php echo (int)$o['categorias']; ?></td>
                                 <td>
                                     <?php $pub = ($o['torneo_publico'] ?? 'N') === 'S'; ?>
                                     <?php if (puede_eliminar('torneoList')): ?>
@@ -79,11 +79,11 @@ require_once __DIR__ . "/inc/layout-top.php";
                                                 class="btn btn-xs btn-<?php echo $pub ? 'success' : 'outline-secondary'; ?> js-publicar"
                                                 data-nombre="<?php echo $h($o['torneo_nombre']); ?>"
                                                 data-pub="<?php echo $pub ? 'S' : 'N'; ?>">
-                                            <i class="fas fa-<?php echo $pub ? 'globe' : 'eye-slash'; ?> mr-1"></i>
+                                            <i class="fas fa-<?php echo $pub ? 'globe' : 'eye-slash'; ?> me-1"></i>
                                             <?php echo $pub ? 'Publicado' : 'Privado'; ?>
                                         </button>
                                     <?php else: ?>
-                                        <span class="badge badge-<?php echo $pub ? 'success' : 'secondary'; ?>">
+                                        <span class="badge text-bg-<?php echo $pub ? 'success' : 'secondary'; ?>">
                                             <?php echo $pub ? 'Publicado' : 'Privado'; ?></span>
                                     <?php endif; ?>
                                     <?php if ($pub && !empty($o['torneo_slug'])): ?>
@@ -127,16 +127,16 @@ require_once __DIR__ . "/inc/layout-top.php";
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title" id="tituloForm">
-                        <i class="fas fa-plus mr-2"></i>Nuevo torneo
+                        <i class="fas fa-plus me-2"></i>Nuevo torneo
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="torneo_nombre">Nombre</label>
                         <input type="text" name="torneo_nombre" id="torneo_nombre"
                                class="form-control" maxlength="120" required>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="torneo_temporadaid">Temporada</label>
                         <select name="torneo_temporadaid" id="torneo_temporadaid" class="form-control" required>
                             <?php foreach ($temporadas as $t): ?>
@@ -147,7 +147,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="torneo_deporte">Deporte</label>
                         <select name="torneo_deporte" id="torneo_deporte" class="form-control">
                             <option value="baloncesto">Baloncesto</option>

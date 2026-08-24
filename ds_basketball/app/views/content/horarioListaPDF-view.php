@@ -31,7 +31,14 @@
 	$sede=$insListaHorario->informacionSede($horario_sedeid);
 	if($sede->rowCount()==1){
 		$sede=$sede->fetch(); 
-    }
+    } else {
+			/* Sin registro, $sede seguiria siendo el statement y la
+			   vista lo usaria como array: error fatal en pantalla, con la
+			   ruta del servidor dentro. Se vuelve a donde ya vuelve esta
+			   misma vista cuando el identificador no sirve. */
+			header("Location: " . APP_URL . 'asistenciaHorarioLista/');
+			exit();
+		}
 
     $data="alumno.jpg";
     $image = $generator->render_image($symbology, $data, $optionsQR);

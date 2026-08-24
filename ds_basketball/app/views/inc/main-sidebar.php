@@ -15,25 +15,60 @@
 
     if($usuario_login != ""){
       $GenerarMenu = $insGenerar->ObtenerMenu($usuario_login, DS_MODULO);
-      $menuHTML    = $insGenerar->ConstruirMenu($GenerarMenu, $url[0] ?? '');
+
+      /*
+      | Los numeritos del menu.
+      |
+      | Se calculan SOLO si el usuario tiene esa entrada: quien no puede ver
+      | las inscripciones pendientes no paga la consulta. Y el menu se dibuja
+      | en cada pagina, asi que cada consulta que se meta aqui la paga el
+      | sistema entero: la de inscripciones cuesta 2,4 ms medidos, y es una
+      | cola de tareas que no crece sin limite.
+      |
+      | La mora se quedo fuera a proposito: la cifra que enseña el panel sale
+      | de una consulta por sede con varias subconsultas, y repetirla en cada
+      | carga no sale a cuenta por un numerito.
+      */
+      $contadoresMenu = [];
+      $tienePendientes = false;
+      foreach ($GenerarMenu as $m) {
+          if (trim((string) ($m['menu_vista'] ?? ''), "/ \t\n\r\0\x0B") === 'inscripcionPendientes') {
+              $tienePendientes = true;
+              break;
+          }
+      }
+      if ($tienePendientes) {
+          try {
+              $insInscripcionMenu = new \app\controllers\inscripcionController();
+              $contadoresMenu['inscripcionPendientes'] = $insInscripcionMenu->contarPendientesInscripcion();
+          } catch (\Throwable $e) {
+              /* Un contador que falla no puede dejar sin menu a nadie. */
+              $contadoresMenu = [];
+          }
+      }
+
+      $menuHTML    = $insGenerar->ConstruirMenu($GenerarMenu, $url[0] ?? '', $contadoresMenu);
     }else{
       session_destroy();
 		  header("Location: ".APP_URL."login/");
     }
 ?>
 
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="app-sidebar bg-body-secondary shadow ds-core__sidebar" data-bs-theme="dark">
+    <div class="sidebar-brand">
     <!-- Brand Logo -->
     <a href="#" class="brand-link">
-      <img src="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png" alt="<?php echo APP_NAME; ?>" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light"><?php echo $nombre; ?></span>
+      <img src="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png" alt="<?php echo APP_NAME; ?>" class="brand-image opacity-75 shadow">
+      <span class="brand-text fw-light"><?php echo $nombre; ?></span>
     </a>
 
+    </div>
+
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar-wrapper">
       <!-- Sidebar Menu -->
       <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">               
+        <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">               
               
           <?php echo $menuHTML; ?>
           
@@ -47,8 +82,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  var sidebar = document.querySelector('.main-sidebar .sidebar');
-  var menu = document.querySelector('.main-sidebar .nav-sidebar');
+  var sidebar = document.querySelector('.app-sidebar .sidebar-wrapper');
+  var menu = document.querySelector('.app-sidebar .sidebar-menu');
   var storageKey = 'digisports.basketball.sidebar.scrollTop';
 
   if (!sidebar || !menu || !window.sessionStorage) {

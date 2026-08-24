@@ -4,24 +4,11 @@
     $sedes = $insInscripcion->listarSedesActivas();
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo APP_NAME; ?> | Enlace de Inscripción</title>
-
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-    <script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js"></script>
-
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Enlace de Inscripción';
+	$extras      = array (0 => 'swal',);
+	$cabeceraExtra = <<<'CSS'
     <style>
         .enlace-resultado {
             display: none;
@@ -40,13 +27,16 @@
         .btn-whatsapp {
             background: #25D366;
             border-color: #25D366;
-            color: #fff;
+            /* Texto oscuro: blanco sobre este verde da 1.98 y no llega al
+               minimo. El verde se conserva porque es lo que identifica a
+               WhatsApp; con texto oscuro sube a 7.78. */
+            color: #212529;
             font-weight: 600;
         }
         .btn-whatsapp:hover {
             background: #1ebe5c;
             border-color: #1ebe5c;
-            color: #fff;
+            color: #212529;
         }
         .btn-copiar {
             background: #6c757d;
@@ -61,9 +51,11 @@
             margin-top: 15px;
         }
     </style>
-</head>
-<body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+CSS;
+	require_once "app/views/inc/cabecera.php";
+?>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
         <!-- Navbar -->
         <?php require_once "app/views/inc/navbar.php"; ?>
 
@@ -71,16 +63,16 @@
         <?php require_once "app/views/inc/main-sidebar.php"; ?>
 
         <!-- Vista -->
-        <div class="content-wrapper">
+        <div class="app-main">
             <!-- Content Header -->
-            <div class="content-header">
+            <div class="app-content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
                             <h4 class="m-0">Generar Enlace de Inscripción</h4>
                         </div>
                         <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
+                            <ol class="breadcrumb float-sm-end">
                                 <li class="breadcrumb-item"><a href="<?php echo APP_URL . 'dashboard/'; ?>">Dashboard</a></li>
                                 <li class="breadcrumb-item active">Enlace de Inscripción</li>
                             </ol>
@@ -90,7 +82,7 @@
             </div>
 
             <!-- Main content -->
-            <section class="content">
+            <section class="app-content">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
@@ -113,7 +105,7 @@
                                         <div class="row">
                                             <!-- Sede -->
                                             <div class="col-md-6">
-                                                <div class="form-group">
+                                                <div class="mb-3">
                                                     <label for="sede_id">
                                                         <i class="fas fa-map-marker-alt text-primary"></i> Sede <span class="text-danger">*</span>
                                                     </label>
@@ -130,7 +122,7 @@
 
                                             <!-- Vigencia -->
                                             <div class="col-md-6">
-                                                <div class="form-group">
+                                                <div class="mb-3">
                                                     <label for="horas_vigencia">
                                                         <i class="fas fa-clock text-primary"></i> Vigencia del enlace
                                                     </label>
@@ -145,7 +137,7 @@
                                             </div>
                                         </div>
 
-                                        <button type="button" id="btnGenerar" class="btn btn-primary btn-block">
+                                        <button type="button" id="btnGenerar" class="btn btn-primary w-100">
                                             <i class="fas fa-magic"></i> Generar Enlace
                                         </button>
                                     </form>
@@ -164,12 +156,12 @@
 
                                         <div class="row mt-3">
                                             <div class="col-md-6 mb-2">
-                                                <button type="button" id="btnCopiar" class="btn btn-copiar btn-block">
+                                                <button type="button" id="btnCopiar" class="btn btn-copiar w-100">
                                                     <i class="fas fa-copy"></i> Copiar enlace
                                                 </button>
                                             </div>
                                             <div class="col-md-6 mb-2">
-                                                <a href="#" id="btnWhatsApp" target="_blank" class="btn btn-whatsapp btn-block">
+                                                <a href="#" id="btnWhatsApp" target="_blank" class="btn btn-whatsapp w-100">
                                                     <i class="fab fa-whatsapp"></i> Compartir por WhatsApp
                                                 </a>
                                             </div>
@@ -191,9 +183,10 @@
     <!-- jQuery -->
     <script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
-    <script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
-    <script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.js"></script>
+    <script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 
     <script>
     $(document).ready(function () {

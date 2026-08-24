@@ -704,25 +704,25 @@
 							<form class="FormularioAjax" action="'.APP_URL.'app/ajax/alumnoAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_alumno" value="eliminar">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>';
 				}
 
 				if($puedeEditar){
 					$acciones.='
-							<a href="'.APP_URL.'alumnoUpdate/'.$rows['alumno_id'].'/" target="_blank" class="btn float-right btn-actualizar btn-xs" style="margin-right: 5px;" title="Actualizar" aria-label="Actualizar"><i class="fas fa-pen"></i></a>';
+							<a href="'.APP_URL.'alumnoUpdate/'.$rows['alumno_id'].'/" target="_blank" class="btn float-end btn-actualizar btn-xs" style="margin-right: 5px;" title="Actualizar" aria-label="Actualizar"><i class="fas fa-pen"></i></a>';
 				}
 
 				/* Ver es lectura: quien llega a la pantalla ya tiene permiso. */
 				$acciones.='
-							<a href="'.APP_URL.'alumnoProfile/'.$rows['alumno_id'].'/" target="_blank" class="btn float-right btn-ver btn-xs" style="margin-right: 5px;" title="Ver" aria-label="Ver"><i class="fas fa-eye"></i></a>';
+							<a href="'.APP_URL.'alumnoProfile/'.$rows['alumno_id'].'/" target="_blank" class="btn float-end btn-ver btn-xs" style="margin-right: 5px;" title="Ver" aria-label="Ver"><i class="fas fa-eye"></i></a>';
 
 				if($puedeEditar){
 					$acciones.='
 							<form class="FormularioAjax" action="'.APP_URL.'app/ajax/alumnoAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_alumno" value="actualizarestado">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">
-								<button type="submit" class="btn float-right '.$boton.' btn-xs" style="margin-right: 5px;"> '.$texto.' </button>
+								<button type="submit" class="btn float-end '.$boton.' btn-xs" style="margin-right: 5px;"> '.$texto.' </button>
 							</form>';
 				}
 

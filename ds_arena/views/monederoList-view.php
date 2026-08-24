@@ -44,8 +44,8 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title mb-0">Monederos</h3>
         <?php if ($puedeAcreditar && $clientes): ?>
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalIngreso">
-                <i class="fas fa-plus mr-1"></i> Acreditar saldo
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalIngreso">
+                <i class="fas fa-plus me-1"></i> Acreditar saldo
             </button>
         <?php endif; ?>
     </div>
@@ -57,10 +57,10 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <tr>
                         <th>Cliente</th>
                         <th>Identificación</th>
-                        <th class="text-right">Saldo</th>
+                        <th class="text-end">Saldo</th>
                         <th>Movimientos</th>
                         <th>Último</th>
-                        <th class="text-right">Acciones</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,7 +74,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <tr>
                         <td><strong><?php echo htmlspecialchars($m['cliente_nombre'], ENT_QUOTES, 'UTF-8'); ?></strong></td>
                         <td><code><?php echo htmlspecialchars($m['cliente_identificacion'], ENT_QUOTES, 'UTF-8'); ?></code></td>
-                        <td class="text-right">
+                        <td class="text-end">
                             <?php if ($saldo > 0): ?>
                                 <strong class="text-success">$<?php echo number_format($saldo, 2); ?></strong>
                             <?php else: ?>
@@ -83,10 +83,10 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </td>
                         <td><?php echo (int)$m['movimientos']; ?></td>
                         <td><small class="text-muted"><?php echo $m['ultimo'] ?: '—'; ?></small></td>
-                        <td class="text-right">
+                        <td class="text-end">
                             <a href="<?php echo APP_URL; ?>monederoDetalle/?cliente=<?php echo (int)$m['cliente_id']; ?>"
                                class="btn btn-sm btn-outline-secondary">
-                                <i class="fas fa-list mr-1"></i> Movimientos
+                                <i class="fas fa-list me-1"></i> Movimientos
                             </a>
                         </td>
                     </tr>
@@ -111,11 +111,11 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                 <div class="modal-header">
                     <h5 class="modal-title">Acreditar saldo</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
                 <div class="modal-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="cliente_id">Cliente <span class="text-danger">*</span></label>
                         <select class="form-control" id="cliente_id" name="cliente_id" required>
                             <option value="">Seleccione…</option>
@@ -127,34 +127,34 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </select>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-7">
+                    <div class="row g-2">
+                        <div class="mb-3 col-7">
                             <label for="origen">Origen</label>
                             <select class="form-control" id="origen" name="origen">
                                 <option value="TRA">Transferencia del cliente</option>
                                 <option value="AJU">Ajuste manual</option>
                             </select>
                         </div>
-                        <div class="form-group col-5">
+                        <div class="mb-3 col-5">
                             <label for="valor">Importe <span class="text-danger">*</span></label>
                             <input type="number" step="0.01" min="0.01" class="form-control" id="valor" name="valor" required>
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="referencia">Referencia</label>
                         <input type="text" class="form-control" id="referencia" name="referencia" maxlength="60">
                         <small class="text-muted">Obligatoria para transferencias.</small>
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="detalle">Detalle</label>
                         <input type="text" class="form-control" id="detalle" name="detalle" maxlength="200">
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Acreditar</button>
                 </div>
             </form>

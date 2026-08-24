@@ -4,7 +4,7 @@
 	use app\controllers\asistenciaController;
 	$insHora = new asistenciaController();	
 
-	$horaid = ($url[1] != "") ? $url[1] : 0;	
+	$horaid = (($url[1] ?? "") != "") ? $url[1] : 0;	
 
 	if($horaid != 0){
 		$datos=$insHora->BuscarHora($horaid);		
@@ -24,41 +24,13 @@
 		$estado = 'A';
 	}	
 ?>
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo APP_NAME; ?> | Ingreso Hora</title>
-	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">	
-	<!-- daterange picker -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.css">
-	<!-- iCheck for checkboxes and radio inputs -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-	<!-- Bootstrap Color Picker -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
-	<!-- Tempusdominus Bootstrap 4 -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-	<!-- Select2 -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2/css/select2.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-	<!-- Bootstrap4 Duallistbox -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
-	<!-- BS Stepper -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bs-stepper/css/bs-stepper.min.css">	
-	<!-- Theme style >
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.min.css"-->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">	
-  </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Ingreso Hora';
+	require_once "app/views/inc/cabecera.php";
+?>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
 
 		<!-- Preloader -->
 		<!--?php require_once "app/views/inc/preloader.php"; ?-->
@@ -73,16 +45,16 @@
 		<!-- /.Main Sidebar Container -->  
 
 		<!-- vista -->
-		<div class="content-wrapper">
+		<div class="app-main">
 			<!-- Content Header (Page header) -->
-			<div class="content-header">
+			<div class="app-content-header">
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
 							<h4 class="m-0">Horas</h4>
 						</div><!-- /.col -->
 						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
+							<ol class="breadcrumb float-sm-end">
 								<li class="breadcrumb-item"><a href="#">Inicio</a></li>
 								<li class="breadcrumb-item active">Ficha Alumno</li>
 							</ol>
@@ -92,17 +64,15 @@
 			</div>
 			<!-- /.content-header -->
 			<!-- Main content -->
-			<section class="content">				
+			<section class="app-content">				
 				<!-- /.container-fluid información alumno -->
 				<div class="container-fluid">
 					<div class="card card-default">						
-						<div class="card-header" style="font-size: 13px; height: 40px;">
+						<div class="card-header" style="font-size: 13px; min-height: 40px;">
 							<h3 class="card-title">Ingreso de nueva hora</h3>
 							<div class="card-tools">
-								<button type="button" class="btn btn-tool" data-card-widget="collapse">
-									<i class="fas fa-minus"></i>
-								</button>
-								<button type="button" class="btn btn-tool" data-card-widget="remove">
+								<button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Plegar o desplegar" aria-label="Plegar o desplegar"><i data-lte-icon="expand" class="fas fa-plus"></i><i data-lte-icon="collapse" class="fas fa-minus"></i></button>
+								<button type="button" class="btn btn-tool" data-lte-toggle="card-remove" title="Quitar" aria-label="Quitar">
 									<i class="fas fa-times"></i>
 								</button>
 							</div>
@@ -116,38 +86,36 @@
 									<input type="hidden" name="hora_id" value="<?php echo $horaid; ?>">
 									<div class="row" style='font-size: 14px;'>
 										<div class="col-md-2">
-											<div class="form-group" style='font-size: 13px; height: 15px;'>
+											<div class="mb-3" style='font-size: 13px; min-height: 15px;'>
 												<label for="hora_inicio">Hora inicio</label>
 
 												<div class="input-group">
-													<div class="input-group-prepend">
-														<span class="input-group-text"><i class="far fa-clock"></i></span>
-													</div>
+																							<span class="input-group-text"><i class="far fa-clock"></i></span>
+									
 													<input type="text" class="form-control" style='font-size: 15px; height: 30px;' id="hora_inicio" name="hora_inicio" data-inputmask='"mask": "99:99:99"' data-mask value="<?php echo $hora_inicio; ?>">
 												</div>
 												<!-- /.input group -->
 											</div>	
 										</div>
 										<div class="col-md-2">
-											<div class="form-group" style='font-size: 13px; height: 20px;'>
+											<div class="mb-3" style='font-size: 13px; min-height: 20px;'>
 												<label for="hora_fin">Hora fin</label>
 												<div class="input-group">
-													<div class="input-group-prepend">
-														<span class="input-group-text"><i class="far fa-clock"></i></spa>
-													</div>
+																							<span class="input-group-text"><i class="far fa-clock"></i></spa>
+									
 													<input type="text" class="form-control" style='font-size: 15px; height: 30px;' id="hora_fin" name="hora_fin" data-inputmask='"mask": "99:99:99"' data-mask value="<?php echo $hora_fin; ?>">
 												</div>
 												<!-- /.input group -->
 											</div>	
 										</div>
 										<div class="col-md-6">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="detalle">Detalle</label>
 												<input type="text" class="form-control" style='font-size: 15px; height: 30px;' id="detalle" name="detalle" value="<?php echo $detalle; ?>">
 											</div>
 										</div>
 										<div class="col-md-2">
-											<div class="form-group" style='font-size: 13px;'>
+											<div class="mb-3" style='font-size: 13px;'>
 												<label for="estado">Estado</label>
 												<select class="form-control" style='font-size: 13px; height: 31px;' id="estado" name="estado">		
 													<?php 
@@ -209,28 +177,21 @@
 	<!-- jQuery -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 	
 	<!-- Select2 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/select2/js/select2.full.min.js"></script>
 	<!-- Bootstrap4 Duallistbox -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
 	<!-- InputMask -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/moment/moment.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- bootstrap color picker -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
 	<!-- Tempusdominus Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 	<!-- Bootstrap Switch -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 	<!-- BS-Stepper -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bs-stepper/js/bs-stepper.min.js"></script>
 
 	<!-- AdminLTE App -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 		
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js" ></script>
 
@@ -276,7 +237,7 @@
 				errorElement: 'span',
 				errorPlacement: function (error, element) {
 				error.addClass('invalid-feedback');
-				element.closest('.form-group').append(error);
+				element.closest('.mb-3').append(error);
 				},
 				highlight: function (element, errorClass, validClass) {
 				$(element).addClass('is-invalid');

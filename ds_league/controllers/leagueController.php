@@ -308,12 +308,15 @@ class leagueController
 
         $sql .= " ORDER BY m.menu_orden";
 
+        /* Marcado de AdminLTE 4. La diferencia con v3 es la clase
+           nav-icon en el icono: sin ella el texto se pega al borde y los
+           iconos no quedan alineados entre si. */
         $html = '';
         foreach ($this->filas($sql, $params) as $f) {
             $activo = ($f['menu_vista'] === $vistaActual) ? ' active' : '';
             $html .= '<li class="nav-item">'
                    . '<a href="' . APP_URL . $f['menu_vista'] . '/" class="nav-link' . $activo . '">'
-                   . '<i class="' . htmlspecialchars($f['menu_icono'], ENT_QUOTES, 'UTF-8') . '"></i>'
+                   . '<i class="nav-icon ' . htmlspecialchars($f['menu_icono'], ENT_QUOTES, 'UTF-8') . '"></i>'
                    . '<p>' . htmlspecialchars($f['menu_nombre'], ENT_QUOTES, 'UTF-8') . '</p>'
                    . '</a></li>';
         }

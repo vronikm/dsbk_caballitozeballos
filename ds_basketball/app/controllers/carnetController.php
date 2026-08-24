@@ -115,12 +115,12 @@
 
 				foreach($datos as $rows) {
 					if((int)$rows['carnet_impreso'] === 1) {
-						$estadoImpresion = '<span class="badge badge-success"><i class="fas fa-check"></i> Impreso</span>';
+						$estadoImpresion = '<span class="badge text-bg-success"><i class="fas fa-check"></i> Impreso</span>';
 						if(!empty($rows['fecha_impresion'])) {
 							$estadoImpresion .= '<br><small class="text-muted">' . $rows['fecha_impresion'] . '</small>';
 						}
 					} else {
-						$estadoImpresion = '<span class="badge badge-warning"><i class="fas fa-clock"></i> Pendiente</span>';
+						$estadoImpresion = '<span class="badge text-bg-warning"><i class="fas fa-clock"></i> Pendiente</span>';
 					}
 
 					$tabla .= '
@@ -132,7 +132,7 @@
 							<td data-order="' . (int)$rows['carnet_impreso'] . '">' . $estadoImpresion . '</td>
 							<td>
 								<a href="' . APP_URL . 'carnetFotoPDF/' . $rows['alumno_id'] . '/"
-								class="btn float-right btn-success btn-xs"
+								class="btn float-end btn-success btn-xs"
 								style="margin-right: 5px;">
 								Ver carnet
 								</a>

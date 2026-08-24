@@ -49,9 +49,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                                     <th>Reserva</th>
                                     <th>Cliente</th>
                                     <th>Fecha</th>
-                                    <th class="text-right">Total</th>
-                                    <th class="text-right">Abonado</th>
-                                    <th class="text-right">Saldo</th>
+                                    <th class="text-end">Total</th>
+                                    <th class="text-end">Abonado</th>
+                                    <th class="text-end">Saldo</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -60,9 +60,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                                     <td><code><?php echo htmlspecialchars($s['reserva_codigo'], ENT_QUOTES, 'UTF-8'); ?></code></td>
                                     <td><?php echo htmlspecialchars($s['cliente_nombre'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td><?php echo $s['reserva_fecha']; ?></td>
-                                    <td class="text-right">$<?php echo number_format((float)$s['reserva_total'], 2); ?></td>
-                                    <td class="text-right text-success">$<?php echo number_format((float)$s['reserva_abonado'], 2); ?></td>
-                                    <td class="text-right text-danger"><strong>$<?php echo number_format((float)$s['reserva_saldo'], 2); ?></strong></td>
+                                    <td class="text-end">$<?php echo number_format((float)$s['reserva_total'], 2); ?></td>
+                                    <td class="text-end text-success">$<?php echo number_format((float)$s['reserva_abonado'], 2); ?></td>
+                                    <td class="text-end text-danger"><strong>$<?php echo number_format((float)$s['reserva_saldo'], 2); ?></strong></td>
                                 </tr>
                             <?php endforeach; ?>
                             </tbody>

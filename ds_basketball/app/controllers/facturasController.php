@@ -151,7 +151,7 @@
 						<td>'.$rows['alumno_apellidopaterno'].' '.$rows['alumno_apellidomaterno'].'</td>
 						<td>'.$rows['alumno_fechanacimiento'].'</td>
 						<td>
-							'.$this->siPuede('crear','facturasList','<a href="'.APP_URL.'facturasNew/'.$rows['alumno_id'].'/" class="btn float-right '.$botonpago.' btn-sm" target="_blank"><i class="fas fa-file-invoice-dollar mr-1"></i>Registrar factura</a>').'
+							'.$this->siPuede('crear','facturasList','<a href="'.APP_URL.'facturasNew/'.$rows['alumno_id'].'/" class="btn float-end '.$botonpago.' btn-sm" target="_blank"><i class="fas fa-file-invoice-dollar me-1"></i>Registrar factura</a>').'
 						</td>
 					</tr>';
 			}
@@ -1742,7 +1742,7 @@
 				$xmlUrl = APP_URL.'app/ajax/facturasAjax.php?modulo_facturas=DESCARGAR_XML&factura_id='.$rows['id'];
 				$rideUrl = APP_URL.'app/ajax/facturasAjax.php?modulo_facturas=VER_RIDE&factura_id='.$rows['id'];
 				$estado = (string)$rows['estado_sri'];
-				$estadoClass = ($estado==='AUTORIZADO') ? 'badge-success' : (in_array($estado, ['DEVUELTA','NO_AUTORIZADO','ERROR'], true) ? 'badge-danger' : (in_array($estado, ['ENVIADA','RECIBIDA','FIRMADA'], true) ? 'badge-info' : 'badge-warning'));
+				$estadoClass = ($estado==='AUTORIZADO') ? 'text-bg-success' : (in_array($estado, ['DEVUELTA','NO_AUTORIZADO','ERROR'], true) ? 'text-bg-danger' : (in_array($estado, ['ENVIADA','RECIBIDA','FIRMADA'], true) ? 'text-bg-info' : 'text-bg-warning'));
 				$errorSecuencial = $this->esErrorSecuencialRegistrado($rows['mensaje_error'] ?? '');
 				/* RIDE, XML y Consultar son lectura: los ve cualquiera que
 				   llegue a la pantalla. Emitir, regenerar y enviar son

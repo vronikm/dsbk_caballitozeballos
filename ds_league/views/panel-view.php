@@ -37,7 +37,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 ?>
 
 <div class="callout" style="border-left-color: var(--ds-league);">
-    <h5 class="mb-1"><i class="fas fa-trophy mr-2"></i>League está en fase 0</h5>
+    <h5 class="mb-1"><i class="fas fa-trophy me-2"></i>League está en fase 0</h5>
     <p class="mb-0 text-muted">
         Los cimientos del módulo están montados. Todavía no hay temporadas,
         torneos ni equipos: esas pantallas llegan en la fase 1.
@@ -50,7 +50,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         <div class="col-lg-4 col-md-6 mb-3">
             <div class="card h-100">
                 <div class="card-body d-flex align-items-start">
-                    <span class="mr-3" style="font-size:1.6rem;line-height:1;
+                    <span class="me-3" style="font-size:1.6rem;line-height:1;
                           color: var(--ds-<?php echo $d['ok'] ? 'success' : 'warning'; ?>);">
                         <i class="fas fa-<?php echo $d['ok'] ? 'check-circle' : 'exclamation-circle'; ?>"></i>
                     </span>
@@ -93,7 +93,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <?php foreach ($estadosPartido as $e): ?>
                             <tr>
                                 <td>
-                                    <span class="badge badge-<?php
+                                    <span class="badge text-bg-<?php
                                         echo ['exito' => 'success', 'aviso' => 'warning',
                                               'peligro' => 'danger', 'info' => 'info'][$e['estado_tono']] ?? 'secondary';
                                     ?>"><?php echo htmlspecialchars($e['estado_nombre'], ENT_QUOTES, 'UTF-8'); ?></span>
@@ -134,14 +134,14 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <ul class="list-unstyled mb-0">
                     <?php foreach ($transiciones as $t): ?>
                         <li class="mb-2 d-flex align-items-baseline">
-                            <i class="fas fa-arrow-right mr-2 text-muted" style="font-size:.75rem;"></i>
+                            <i class="fas fa-arrow-right me-2 text-muted" style="font-size:.75rem;"></i>
                             <span>
                                 <strong><?php echo htmlspecialchars($t['accion'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                 <span class="text-muted">
                                     → <?php echo htmlspecialchars($t['estado_nombre'], ENT_QUOTES, 'UTF-8'); ?>
                                 </span>
                                 <?php if ($t['exige_motivo'] === 'S'): ?>
-                                    <span class="badge badge-light border ml-1"
+                                    <span class="badge text-bg-light border ms-1"
                                           title="No se puede ejecutar sin justificación escrita">exige motivo</span>
                                 <?php endif; ?>
                             </span>

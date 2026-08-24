@@ -151,48 +151,11 @@
 
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo APP_NAME; ?> | Ficha alumno</title>
-	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-	
-	<!-- daterange picker -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.css">
-	<!-- iCheck for checkboxes and radio inputs -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-	<!-- Bootstrap Color Picker -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
-	<!-- Tempusdominus Bootstrap 4 -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-	<!-- Select2 -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2/css/select2.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-	<!-- Bootstrap4 Duallistbox -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
-	<!-- BS Stepper -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bs-stepper/css/bs-stepper.min.css">
-	<!-- dropzonejs -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/dropzone/min/dropzone.min.css">
-	
-	<!-- Theme style -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-
-
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js" ></script>
-
-	<!-- fileinput -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fileinput/fileinput.css">
-    
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Ficha alumno';
+	$extras      = array (0 => 'dropzone',1 => 'swal',);
+	$cabeceraExtra = <<<'CSS'
 	<style>
 		input:invalid {
 		  box-shadow: 0 0 2px 1px red;
@@ -207,10 +170,12 @@
 		  box-shadow: none;
 		}
 	</style>
-  </head>
+CSS;
+	require_once "app/views/inc/cabecera.php";
+?>
 
-  <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
 
 		<!-- Preloader -->
 		<!--?php require_once "app/views/inc/preloader.php"; ?-->
@@ -225,17 +190,17 @@
 		<!-- /.Main Sidebar Container -->  
 
 		<!-- vista -->
-		<div class="content-wrapper">
+		<div class="app-main">
 
 			<!-- Content Header (Page header) -->
-			<div class="content-header">
+			<div class="app-content-header">
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
 							<h1 class="m-0">Ficha Alumno</h1>
 						</div><!-- /.col -->
 						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
+							<ol class="breadcrumb float-sm-end">
 								<li class="breadcrumb-item"><a href="#">Inicio</a></li>
 								<li class="breadcrumb-item active">Ficha Alumno</li>
 							</ol>
@@ -246,18 +211,18 @@
 			<!-- /.content-header -->
 
 			<!-- Main content -->
-			<section class="content">				
+			<section class="app-content">				
 				<!-- /.container-fluid información alumno -->
 				<div class="container-fluid">						
 					<div class="card">
 						<div class="card-header p-2">
 							<ul class="nav nav-pills">
-								<li class="nav-item"><a class="nav-link active" href="#informacionp" data-toggle="tab">Información Personal</a></li>
-								<li class="nav-item"><a class="nav-link" href="#cedula" data-toggle="tab">Cédula</a></li>
-								<li class="nav-item"><a class="nav-link" href="#representante" data-toggle="tab">Representante</a></li>
-								<li class="nav-item"><a class="nav-link" href="#contactoem" data-toggle="tab">Contacto emergencia</a></li>											
-								<li class="nav-item"><a class="nav-link" href="#informacionm" data-toggle="tab">Información Médica</a></li>
-								<li class="nav-item"><a class="nav-link" href="#horario" data-toggle="tab">Horario</a></li>
+								<li class="nav-item"><a class="nav-link active" href="#informacionp" data-bs-toggle="tab">Información Personal</a></li>
+								<li class="nav-item"><a class="nav-link" href="#cedula" data-bs-toggle="tab">Cédula</a></li>
+								<li class="nav-item"><a class="nav-link" href="#representante" data-bs-toggle="tab">Representante</a></li>
+								<li class="nav-item"><a class="nav-link" href="#contactoem" data-bs-toggle="tab">Contacto emergencia</a></li>											
+								<li class="nav-item"><a class="nav-link" href="#informacionm" data-bs-toggle="tab">Información Médica</a></li>
+								<li class="nav-item"><a class="nav-link" href="#horario" data-bs-toggle="tab">Horario</a></li>
 							</ul>
 						</div><!-- /.card-header -->
 					
@@ -269,20 +234,20 @@
 									<div class="row">
 										<div class="col-md-2">
 											<label for="alumno_foto">Foto</label>	
-											<div class="text-left"> 
+											<div class="text-start"> 
 												<img class="profile-user-img img-fluid " style="width: 148px; height: 184px;" src="<?php echo $foto; ?>" alt="User profile picture">                        										
 											</div>		
 										</div>
 										<div class="col-md-10"> 
 											<div class="row">
 												<div class="col-md-4">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="alumno_identificacion">Identificación</label>                        
 														<input type="text" class="form-control" id="alumno_identificacion" name="alumno_identificacion" value="<?php echo $datos['alumno_identificacion']; ?>" disabled="">
 													</div>
 												</div>											
 												<div class="col-md-4">                        
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="alumno_apellido1">Apellido paterno</label>
 														<input type="text" class="form-control" id="alumno_apellido1" name="alumno_apellido1" value="<?php echo $datos['alumno_apellidopaterno']; ?>" disabled="">
 													</div>
@@ -292,15 +257,15 @@
 													<input type="text" class="form-control" id="alumno_apellido2" name="alumno_apellido2" value="<?php echo $datos['alumno_apellidomaterno']; ?>" disabled="">
 												</div>
 												<div class="col-sm-4">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="alumno_tipoidentificacion">Tipo identificación</label>
-														<select id="alumno_tipoidentificacion" class="form-control select2" name="alumno_tipoidentificacion" disabled="">																					
+														<select id="alumno_tipoidentificacion" class="form-control" name="alumno_tipoidentificacion" disabled="">																					
 															<?php echo $insAlumno->listarOptionTipoIdentificacion($datos['alumno_tipoidentificacion']); ?>
 														</select>
 													</div>          
 												</div>
 												<div class="col-md-4">                        
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="alumno_nombre1">Primer nombre</label>
 														<input type="text" class="form-control" id="alumno_nombre1" name="alumno_nombre1" value="<?php echo $datos['alumno_primernombre']; ?>" disabled="">
 													</div>
@@ -310,9 +275,9 @@
 													<input type="text" class="form-control" id="alumno_nombre2" name="alumno_nombre2" value="<?php echo $datos['alumno_segundonombre']; ?>" disabled="">
 												</div>    
 												<div class="col-md-4">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="alumno_nacionalidadid">Nacionalidad</label>
-														<select class="form-control select2" style="width: 100%;" id="alumno_nacionalidadid" name="alumno_nacionalidadid" disabled="">
+														<select class="form-control" style="width: 100%;" id="alumno_nacionalidadid" name="alumno_nacionalidadid" disabled="">
 															<?php echo $insAlumno->listarOptionNacionalidad($datos['alumno_nacionalidadid']); ?>
 														</select>
 													</div> 
@@ -321,19 +286,17 @@
 													<label for="alumno_fechanacimiento">Fecha nacimiento</label>
 														<div class="input-group">
 														<input type="text" class="form-control" id="alumno_fechanacimiento" name="alumno_fechanacimiento" value="<?php echo $datos['alumno_fechanacimiento']; ?>" disabled>
-														<div class="input-group-append">
-															<span id="edad_texto" class="input-group-text" style="font-weight:bold; color:#007bff;">--</span>
-														</div>
+																									<span id="edad_texto" class="input-group-text" style="font-weight:bold; color:#007bff;">--</span>
+										
 													</div>
 												</div>
 												<div class="col-md-4">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="alumno_fechaingreso">Fecha ingreso</label>
 														<div class="input-group">
 															<input type="text" class="form-control" id="alumno_fechaingreso" name="alumno_fechaingreso" value="<?php echo $datos['alumno_fechaingreso']; ?>" disabled>
-															<div class="input-group-append">
-																<span id="ingreso_texto" class="input-group-text" style="font-weight:bold; color:#007bff;">--</span>
-															</div>
+																											<span id="ingreso_texto" class="input-group-text" style="font-weight:bold; color:#007bff;">--</span>
+											
 														</div>
 													</div>								
 												</div>
@@ -345,27 +308,27 @@
 									<!-- Segunda sección foto-->
 									<div class="row">
 										<div class="col-md-2">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Numcamiseta">Número de camiseta</label>
 												<input type="text" class="form-control" id="alumno_numcamiseta" name="alumno_numcamiseta" value="<?php echo $datos['alumno_numcamiseta']; ?>" disabled=""> 
 											</div>
 										</div>   
 										<div class="col-md-2">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="alumno_sedeid">Sede</label>
-												<select class="form-control select2" id="alumno_sedeid" name="alumno_sedeid" disabled="">									
+												<select class="form-control" id="alumno_sedeid" name="alumno_sedeid" disabled="">									
 													<?php echo $insAlumno->listarSedeAlumno($datos['alumno_sedeid']); ?>
 												</select>	
 											</div>
 										</div>
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="alumno_direccion">Dirección</label>
 												<input type="text" class="form-control" id="alumno_direccion" name="alumno_direccion" value="<?php echo $datos['alumno_direccion']; ?>" disabled="">
 											</div>	
 										</div>
 										<div class="col-md-2">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="alumno_hermanos">Tiene hermanos?</label>
 												<!-- radio -->
 												<div class="form-check">
@@ -377,7 +340,7 @@
 											</div>
 										</div>	
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="alumno_genero">Sexo</label>
 												<div class="form-check">
 													<input class="col-sm-1 form-check-input" type="radio" id="alumno_generoM" name="alumno_genero" value="M" <?php echo $alumno_generoM; ?> disabled="">
@@ -395,43 +358,43 @@
 								<div class="tab-pane" id="representante">
 									<div class="row">
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="repre_identificacion">Identificación</label>
 												<input type="text" class="form-control" id="repre_identificacion" name="repre_identificacion" value="<?php echo $repre_identificacion;?>" disabled="" >                          
 											</div>
 										</div>
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="repre_nombre">Nombre</label>
 												<input type="text" class="form-control" id="repre_nombre" name="repre_nombre" value="<?php echo $repre_nombre;?>" disabled="" >
 											</div>
 										</div>
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="repre_parentesco">Parentesco</label>
 												<input type="text" class="form-control" id="repre_parentesco" name="repre_parentesco" value="<?php echo $repre_parentesco;?>" disabled="" >
 											</div> 
 										</div>
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="repre_celular">Celular</label>
 												<input type="text" class="form-control" id="repre_celular" name="repre_celular" value="<?php echo $repre_celular; ?>" disabled="">
 											</div> 
 										</div>
 										<div class="col-md-4">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="repre_direccion">Dirección</label>
 												<input type="text" class="form-control" id="repre_direccion" name="repre_direccion" value="<?php echo $repre_direccion; ?>" disabled="">
 											</div>
 										</div>              
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="repre_correo">Correo</label>
 												<input type="text" class="form-control" id="repre_correo" name="repre_correo" value="<?php echo $repre_correo; ?>" disabled="">
 											</div> 
 										</div>
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="repre_factura">Requiere factura</label>
 												<div class="form-check">
 													<input class="col-sm-1 form-check-input" type="radio" id="repre_facturaS" value="S" name="repre_factura" <?php echo $repre_facturaS;?> disabled="">
@@ -448,61 +411,61 @@
 								<div class="tab-pane" id="informacionm">
 									<div class="row">
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="infomedic_tiposangre">Tipo de sangre</label>
 												<input type="text" class="form-control" id="infomedic_tiposangre" name="infomedic_tiposangre" value="<?php echo $tipo_sangre;?>" disabled="" >                          
 											</div>
 										</div> 
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Peso">Peso (Kg)</label>
 												<input type="text" class="form-control" id="infomedic_peso" name="infomedic_peso"  value="<?php echo $peso;?>" disabled="">                          
 											</div>
 										</div>   
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Talla">Talla (cm)</label>
 												<input type="text" class="form-control" id="infomedic_talla" name="infomedic_talla"  value="<?php echo $talla;?>" disabled="" >                          
 											</div>
 										</div>
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Enfermedad">Enfermedad diagnosticada</label>
 												<input type="text" class="form-control" id="infomedic_enfermedad" name="infomedic_enfermedad"  value="<?php echo $enfermedad;?>" disabled="" >                          
 											</div>
 										</div>
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Medicamentos">Medicamentos</label>
 												<input type="text" class="form-control" id="infomedic_medicamentos" name="infomedic_medicamentos"  value="<?php echo $medicamentos;?>" disabled="" >                          
 											</div>
 										</div> 
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Alergia1">Alergia a medicamentos</label>
 												<input type="text" class="form-control" id="infomedic_alergia1" name="infomedic_alergia1"  value="<?php echo $alergia1;?>" disabled="" >                          
 											</div>
 										</div> 
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Alergia2">Alergia a objetos</label>
 												<input type="text" class="form-control" id="infomedic_alergia2" name="infomedic_alergia2"  value="<?php echo $alergia2;?>" disabled="" >                          
 											</div>
 										</div>  
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Cirugias">Cirugías</label>
 												<input type="text" class="form-control" id="infomedic_cirugias" name="infomedic_cirugias"  value="<?php echo $cirugias;?>" disabled="" >                          
 											</div>
 										</div>  
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Observacion">Observación</label>
 												<input type="text" class="form-control" id="infomedic_observacion" name="infomedic_observacion"  value="<?php echo $observacion;?>" disabled="" >                          
 											</div>
 										</div>  
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Covid">Carnet vacunación Covid</label>
 												<div class="form-check">
 													<input class="col-sm-1 form-check-input" type="radio" id="infomedic_covidSi" name="infomedic_covid" value="S" <?php echo $infomedic_covidSi;?> disabled="" > 
@@ -513,7 +476,7 @@
 											</div>
 										</div>
 										<div class="col-md-4">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Vacunas">Carnet vacunación habitual</label>
 												<div class="form-check">
 													<input class="col-sm-1 form-check-input" type="radio" id="infomedic_vacunasSi" name="infomedic_vacunas" value="S" <?php echo $infomedic_vacunasSi;?> disabled="" > 
@@ -530,21 +493,21 @@
 								<div class="tab-pane" id="contactoem">
 									<div class="row">
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="CEmergencia">Celular</label>
 												<input type="text" class="form-control" id="cemer_celular" name="cemer_celular" value="<?php echo $cemer_celular;?>" disabled="" >                          
 											</div>
 										</div>
 										<div class="col-md-3">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="Nomcontactoemer">Nombre contacto</label>
 												<input type="text" class="form-control" id="cemer_nombre" name="cemer_nombre" value="<?php echo $cemer_nombre;?>" disabled="" >                          
 											</div>
 										</div>
 										<div class="col-md-4">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="cemer_parentesco">Parentesco</label>
-												<select class="form-control select2" style="width: 100%;" id="cemer_parentesco" name="cemer_parentesco" disabled="" >
+												<select class="form-control" style="width: 100%;" id="cemer_parentesco" name="cemer_parentesco" disabled="" >
 													<?php echo $insAlumno->listarCatalogoParentesco($cemer_parentesco); ?>
 												</select>
 											</div> 
@@ -556,19 +519,19 @@
 								<div class="tab-pane" id="cedula">
 									<div class="row">
 										<div class="col-md-4">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="alumno_cedulaA">Anverso</label>		
-												<div class="text-left">
-													<img class="profile-user-img img-fluid " style="width: 330px; height: 210px;" src="<?php echo $cedulaA; ?>" alt="Cedula Anverso" disabled=""> 
+												<div class="text-start">
+													<img class="profile-user-img img-fluid " style="width: 100%; max-width: 330px; height: 210px;" src="<?php echo $cedulaA; ?>" alt="Cedula Anverso" disabled=""> 
 												</div>
 											</div>
 										</div>		
-											<!-- /.form-group -->	
+											<!-- /.mb-3 -->	
 										<div class="col-md-4">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="alumno_cedulaR">Reverso</label>		
-												<div class="text-left">
-													<img class="profile-user-img img-fluid " style="width: 330px; height: 210px;" src="<?php echo $cedulaR; ?>" alt="Cedula Reverso" disabled=""> 
+												<div class="text-start">
+													<img class="profile-user-img img-fluid " style="width: 100%; max-width: 330px; height: 210px;" src="<?php echo $cedulaR; ?>" alt="Cedula Reverso" disabled=""> 
 												</div>
 											</div>
 										</div>	
@@ -645,171 +608,40 @@
 	<!-- jQuery -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 	
 	<!-- Select2 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/select2/js/select2.full.min.js"></script>
 	<!-- Bootstrap4 Duallistbox -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
 	<!-- InputMask -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/moment/moment.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- bootstrap color picker -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
 	<!-- Tempusdominus Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 	<!-- Bootstrap Switch -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 	<!-- BS-Stepper -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bs-stepper/js/bs-stepper.min.js"></script>
 	<!-- dropzonejs -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/dropzone/min/dropzone.min.js"></script>
 
 	<!-- AdminLTE App -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 		
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js" ></script>
 
 	<!--script src="app/views/dist/js/main.js" ></script-->
 	
 	<!-- fileinput -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/fileinput/fileinput.js"></script>
     
 	<script>
 		$(function () {
-			//Initialize Select2 Elements
-			$('.select2').select2()
-
-			//Initialize Select2 Elements
-			$('.select2bs4').select2({
-			theme: 'bootstrap4'
-			})
-
-			//Datemask dd/mm/yyyy
-			$('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
-			//Datemask2 mm/dd/yyyy
-			$('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
-			//Money Euro
+			/* Lo único del bloque de ejemplo de AdminLTE que esta página
+			   usaba de verdad. El resto —tempusdominus, daterangepicker,
+			   duallistbox, colorpicker, bootstrap-switch y bs-stepper—
+			   apuntaba a selectores inexistentes: se descargaban seis
+			   librerías para ejecutar código contra nada. */
 			$('[data-mask]').inputmask()
-
-			//Date picker
-			$('#reservationdate').datetimepicker({
-				format: 'L'
-			});
-
-			//Date and time picker
-			$('#reservationdatetime').datetimepicker({ icons: { time: 'far fa-clock' } });
-
-			//Date range picker
-			$('#reservation').daterangepicker()
-			//Date range picker with time picker
-			$('#reservationtime').daterangepicker({
-			timePicker: true,
-			timePickerIncrement: 30,
-			locale: {
-				format: 'MM/DD/YYYY hh:mm A'
-			}
-			})
-			//Date range as a button
-			$('#daterange-btn').daterangepicker(
-			{
-				ranges   : {
-				'Today'       : [moment(), moment()],
-				'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-				'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-				'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-				'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-				'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-				},
-				startDate: moment().subtract(29, 'days'),
-				endDate  : moment()
-			},
-			function (start, end) {
-				$('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-			}
-			)
-
-			//Timepicker
-			$('#timepicker').datetimepicker({
-			format: 'LT'
-			})
-
-			//Bootstrap Duallistbox
-			$('.duallistbox').bootstrapDualListbox()
-
-			//Colorpicker
-			$('.my-colorpicker1').colorpicker()
-			//color picker with addon
-			$('.my-colorpicker2').colorpicker()
-
-			$('.my-colorpicker2').on('colorpickerChange', function(event) {
-			$('.my-colorpicker2 .fa-square').css('color', event.color.toString());
-			})
-
-			$("input[data-bootstrap-switch]").each(function(){
-			$(this).bootstrapSwitch('state', $(this).prop('checked'));
-			})
-
 		})
-		// BS-Stepper Init
-		document.addEventListener('DOMContentLoaded', function () {
-			window.stepper = new Stepper(document.querySelector('.bs-stepper'))
-		});
 		
-				// DropzoneJS Demo Code Start
-		Dropzone.autoDiscover = false
-
-		// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-		var previewNode = document.querySelector("#template")
-		previewNode.id = ""
-		var previewTemplate = previewNode.parentNode.innerHTML
-		previewNode.parentNode.removeChild(previewNode)
-
-		var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
-			url: "/target-url", // Set the url
-			thumbnailWidth: 80,
-			thumbnailHeight: 80,
-			parallelUploads: 20,
-			previewTemplate: previewTemplate,
-			autoQueue: false, // Make sure the files aren't queued until manually added
-			previewsContainer: "#previews", // Define the container to display the previews
-			clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
-		})
-
-		myDropzone.on("addedfile", function(file) {
-			// Hookup the start button
-			file.previewElement.querySelector(".start").onclick = function() { myDropzone.enqueueFile(file) }
-		})
-
-		// Update the total progress bar
-		myDropzone.on("totaluploadprogress", function(progress) {
-			document.querySelector("#total-progress .progress-bar").style.width = progress + "%"
-		})
-
-		myDropzone.on("sending", function(file) {
-			// Show the total progress bar when upload starts
-			document.querySelector("#total-progress").style.opacity = "1"
-			// And disable the start button
-			file.previewElement.querySelector(".start").setAttribute("disabled", "disabled")
-		})
-
-		// Hide the total progress bar when nothing's uploading anymore
-		myDropzone.on("queuecomplete", function(progress) {
-			document.querySelector("#total-progress").style.opacity = "0"
-		})
-
-		// Setup the buttons for all transfers
-		// The "add files" button doesn't need to be setup because the config
-		// `clickable` has already been specified.
-		document.querySelector("#actions .start").onclick = function() {
-			myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED))
-		}
-		document.querySelector("#actions .cancel").onclick = function() {
-			myDropzone.removeAllFiles(true)
-		}
-		// DropzoneJS Demo Code End
 	</script>
 	<script>
 			window.addEventListener("DOMContentLoaded", function() {

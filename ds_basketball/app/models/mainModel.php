@@ -19,7 +19,13 @@ class mainModel
     protected function conectar()
     {
         try {
-            $conexion = new PDO("mysql:host={$this->server};dbname={$this->db};charset=utf8", $this->user, $this->pass);
+            /* utf8mb4, no utf8: en MySQL «utf8» es el alias de utf8mb3, de
+               tres bytes por caracter. Las tablas ya estan en utf8mb4
+               (migracion 041); si la conexion sigue en el juego viejo, lo
+               que necesite cuatro bytes se pierde aqui, no alli. */
+            $conexion = new PDO("mysql:host={$this->server};dbname={$this->db};charset=utf8mb4",
+                                 $this->user, $this->pass, defined("DS_DB_INIT_COMANDO")
+                                     ? [PDO::MYSQL_ATTR_INIT_COMMAND => DS_DB_INIT_COMANDO] : []);
             $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $conexion;
         } catch (PDOException $e) {

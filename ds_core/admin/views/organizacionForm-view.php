@@ -44,8 +44,8 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                 <div class="card-body">
 
-                    <div class="form-row">
-                        <div class="form-group col-md-8">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-8">
                             <label for="escuela_nombre">Nombre legal <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="escuela_nombre" name="escuela_nombre"
                                    maxlength="100" required <?php echo $puedeEdit ? '' : 'readonly'; ?>
@@ -55,7 +55,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </small>
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="escuela_ruc">RUC</label>
                             <input type="text" class="form-control" id="escuela_ruc" name="escuela_ruc"
                                    maxlength="20" <?php echo $puedeEdit ? '' : 'readonly'; ?>
@@ -72,27 +72,27 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="escuela_direccion">Dirección</label>
                         <input type="text" class="form-control" id="escuela_direccion" name="escuela_direccion"
                                maxlength="200" <?php echo $puedeEdit ? '' : 'readonly'; ?>
                                value="<?php echo htmlspecialchars((string)$org['escuela_direccion'], ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-5">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-5">
                             <label for="escuela_email">Correo</label>
                             <input type="email" class="form-control" id="escuela_email" name="escuela_email"
                                    maxlength="50" <?php echo $puedeEdit ? '' : 'readonly'; ?>
                                    value="<?php echo htmlspecialchars((string)$org['escuela_email'], ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="escuela_telefono">Teléfono</label>
                             <input type="text" class="form-control" id="escuela_telefono" name="escuela_telefono"
                                    maxlength="50" <?php echo $puedeEdit ? '' : 'readonly'; ?>
                                    value="<?php echo htmlspecialchars((string)$org['escuela_telefono'], ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
-                        <div class="form-group col-md-3">
+                        <div class="mb-3 col-md-3">
                             <label for="escuela_movil">Móvil</label>
                             <input type="text" class="form-control" id="escuela_movil" name="escuela_movil"
                                    maxlength="50" <?php echo $puedeEdit ? '' : 'readonly'; ?>
@@ -102,7 +102,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                     <hr>
 
-                    <div class="form-row align-items-center">
+                    <div class="row g-2 align-items-center">
                         <div class="col-md-3 text-center mb-3">
                             <?php if ($logoUrl !== ''): ?>
                                 <img src="<?php echo $logoUrl; ?>" alt="Logo" id="vistaPreviaLogo"
@@ -118,9 +118,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
 
                         <div class="col-md-9">
-                            <div class="form-group mb-1">
+                            <div class="mb-3 mb-1">
                                 <label for="escuela_logo">Logo de la organización</label>
-                                <input type="file" class="form-control-file" id="escuela_logo" name="escuela_logo"
+                                <input type="file" class="form-control" id="escuela_logo" name="escuela_logo"
                                        accept="image/jpeg,image/png,image/webp" <?php echo $puedeEdit ? '' : 'disabled'; ?>>
                                 <small class="text-muted">
                                     JPG, PNG o WEBP · máximo 2 MB. Las sedes sin logo propio usan éste.
@@ -130,7 +130,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php if ($logoUrl !== '' && $puedeEdit): ?>
                                 <button type="button" class="btn btn-sm btn-outline-danger mt-2"
                                         data-quitar="logo" data-previa="vistaPreviaLogo">
-                                    <i class="fas fa-times mr-1"></i> Quitar logo actual
+                                    <i class="fas fa-times me-1"></i> Quitar logo actual
                                 </button>
                             <?php endif; ?>
                         </div>
@@ -139,7 +139,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <hr>
 
                     <!-- Firma autorizada: se estampa al pie de los recibos -->
-                    <div class="form-row align-items-center">
+                    <div class="row g-2 align-items-center">
                         <div class="col-md-3 text-center mb-3">
                             <?php if ($firmaUrl !== ''): ?>
                                 <img src="<?php echo $firmaUrl; ?>" alt="Firma autorizada" id="vistaPreviaFirma"
@@ -155,9 +155,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
 
                         <div class="col-md-9">
-                            <div class="form-group mb-1">
+                            <div class="mb-3 mb-1">
                                 <label for="escuela_firma">Firma autorizada</label>
-                                <input type="file" class="form-control-file" id="escuela_firma" name="escuela_firma"
+                                <input type="file" class="form-control" id="escuela_firma" name="escuela_firma"
                                        accept="image/jpeg,image/png,image/webp" <?php echo $puedeEdit ? '' : 'disabled'; ?>>
                                 <small class="text-muted">
                                     Va al pie de los recibos, sobre la leyenda «Firma autorizada».
@@ -168,7 +168,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php if ($firmaUrl !== '' && $puedeEdit): ?>
                                 <button type="button" class="btn btn-sm btn-outline-danger mt-2"
                                         data-quitar="firma" data-previa="vistaPreviaFirma">
-                                    <i class="fas fa-times mr-1"></i> Quitar firma actual
+                                    <i class="fas fa-times me-1"></i> Quitar firma actual
                                 </button>
                             <?php endif; ?>
                         </div>
@@ -178,7 +178,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 <?php echo ds_acciones_form(APP_URL . 'panel/', [
                     'soloLectura' => !$puedeEdit,
                     'nota'        => $puedeEdit ? ''
-                        : '<i class="' . ds_icono('bloqueado') . ' mr-1"></i> '
+                        : '<i class="' . ds_icono('bloqueado') . ' me-1"></i> '
                         . 'Su rol puede consultar estos datos pero no modificarlos.',
                 ]); ?>
             </form>

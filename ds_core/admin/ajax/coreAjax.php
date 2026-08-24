@@ -95,6 +95,12 @@ switch ($_POST['modulo_core']) {
     case 'guardarPuntoEmision': echo $insCore->guardarPuntoEmision(); break;
     case 'eliminarValorCatalogo': echo $insCore->eliminarValorCatalogo(); break;
 
+    /* Lo unico del segundo factor que es administrativo: quitarselo a
+       OTRA persona cuando pierde el telefono. El autoservicio vive en el
+       Hub, porque solo el rol 1 tiene concedido este modulo y los demas
+       usuarios tambien tienen que poder proteger su cuenta. */
+    case 'restablecerSegundoFactor': echo $insCore->restablecerSegundoFactor(); break;
+
     default:
         core_rechazar(400, [
             'tipo'   => 'simple',

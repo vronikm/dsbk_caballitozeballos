@@ -22,9 +22,9 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title mb-0">Roles</h3>
         <?php if ($puedeCrear): ?>
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalRol"
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalRol"
                     onclick="prepararRol(0,'','','A')">
-                <i class="fas fa-plus mr-1"></i> Nuevo rol
+                <i class="fas fa-plus me-1"></i> Nuevo rol
             </button>
         <?php endif; ?>
     </div>
@@ -40,7 +40,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <th>Permisos</th>
                         <th>Módulos</th>
                         <th>Estado</th>
-                        <th class="text-right">Acciones</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,7 +49,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <td><?php echo (int)$r['rol_id']; ?></td>
                         <td>
                             <strong><?php echo htmlspecialchars($r['rol_nombre'], ENT_QUOTES, 'UTF-8'); ?></strong>
-                            <?php if ($esSuper): ?><span class="badge badge-warning ml-1">Protegido</span><?php endif; ?>
+                            <?php if ($esSuper): ?><span class="badge text-bg-warning ms-1">Protegido</span><?php endif; ?>
                             <?php if ($r['rol_detalle']): ?>
                                 <small class="d-block text-muted"><?php echo htmlspecialchars($r['rol_detalle'], ENT_QUOTES, 'UTF-8'); ?></small>
                             <?php endif; ?>
@@ -66,7 +66,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php endforeach; ?>
                         </td>
                         <td>
-                            <span class="badge badge-<?php echo $r['rol_estado'] === 'A' ? 'success' : 'secondary'; ?>">
+                            <span class="badge text-bg-<?php echo $r['rol_estado'] === 'A' ? 'success' : 'secondary'; ?>">
                                 <?php echo $r['rol_estado'] === 'A' ? 'Activo' : 'Inactivo'; ?>
                             </span>
                         </td>
@@ -76,7 +76,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                             <?php if ($puedeEditar && !$esSuper): ?>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" title="Editar"
-                                        data-toggle="modal" data-target="#modalRol"
+                                        data-bs-toggle="modal" data-bs-target="#modalRol"
                                         onclick="prepararRol(<?php echo (int)$r['rol_id']; ?>,
                                                  <?php echo htmlspecialchars(json_encode($r['rol_nombre']), ENT_QUOTES, 'UTF-8'); ?>,
                                                  <?php echo htmlspecialchars(json_encode($r['rol_detalle']), ENT_QUOTES, 'UTF-8'); ?>,
@@ -115,20 +115,20 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalRolTitulo">Nuevo rol</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
                 <div class="modal-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="rol_nombre">Nombre <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="rol_nombre" id="rol_nombre" maxlength="20" required>
                         <small class="text-muted">Máximo 20 caracteres.</small>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="rol_detalle">Descripción</label>
                         <textarea class="form-control" name="rol_detalle" id="rol_detalle" rows="2" maxlength="300"></textarea>
                     </div>
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="rol_estado">Estado</label>
                         <select class="form-control" name="rol_estado" id="rol_estado">
                             <option value="A">Activo</option>
@@ -138,7 +138,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </form>

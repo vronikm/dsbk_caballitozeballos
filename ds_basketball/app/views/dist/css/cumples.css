@@ -1,6 +1,18 @@
 :root {
     --azul:    #054017;
     --amarillo: #ffe001;
+
+    /* El acento se usa sobre el FONDO DE LA PAGINA, que si cambia con el
+       tema. En claro es el verde de la marca; en oscuro, el mismo verde
+       aclarado para que siga leyendose. Las superficies de marca —la
+       barra de filtro y la cabecera de cada tarjeta— NO usan esta
+       variable: son oscuras en los dos temas y su texto blanco es
+       correcto siempre. */
+    --cumple-acento: var(--azul);
+}
+
+[data-bs-theme="dark"] {
+    --cumple-acento: #6ee7a0;
 }
 
 /* ---- Barra unificada: filtro + fecha ---- */
@@ -69,7 +81,7 @@
 
 /* ---- Fecha label ---- */
 .cumple-fecha-label {
-    color: var(--azul);
+    color: var(--cumple-acento);
     font-weight: 700;
     font-size: 1rem;
     margin-bottom: 0;
@@ -79,9 +91,9 @@
 .cumple-empty {
     text-align: center;
     padding: 60px 20px;
-    color: #888;
+    color: var(--bs-secondary-color);
 }
-.cumple-empty i { font-size: 3.5rem; color: #ddd; display: block; margin-bottom: 12px; }
+.cumple-empty i { font-size: 3.5rem; color: var(--bs-border-color); display: block; margin-bottom: 12px; }
 
 /* ---- Tarjeta de alumno ---- */
 .alumno-card {
@@ -89,7 +101,7 @@
     overflow: hidden;
     box-shadow: 0 3px 14px rgba(0,42,100,.13);
     transition: transform .2s, box-shadow .2s;
-    background: #fff;
+    background: var(--bs-body-bg);
     border: none;
 }
 .alumno-card:hover {
@@ -124,7 +136,7 @@
     overflow: hidden;
     border: 3px solid var(--amarillo);
     box-shadow: 0 2px 8px rgba(0,0,0,.18);
-    background: #f0f4ff;
+    background: var(--bs-tertiary-bg);
 }
 .alumno-card .foto-wrapper img {
     width: 100%;
@@ -138,13 +150,13 @@
 .alumno-card .alumno-nombre {
     font-weight: 700;
     font-size: 0.92rem;
-    color: var(--azul);
+    color: var(--cumple-acento);
     line-height: 0.75;
     margin-bottom: 4px;
 }
 .alumno-card .alumno-id {
     font-size: 0.78rem;
-    color: #888;
+    color: var(--bs-secondary-color);
     margin-bottom: 6px;
 }
 .alumno-card .edad-badge {

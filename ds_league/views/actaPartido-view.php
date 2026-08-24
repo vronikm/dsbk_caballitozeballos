@@ -28,7 +28,7 @@ if (!$partido) {
     $vistaActual = 'actaPartido';
     require_once __DIR__ . "/inc/layout-top.php";
     echo '<div class="callout callout-warning"><h6 class="mb-1">'
-       . '<i class="fas fa-exclamation-circle mr-2"></i>Partido no encontrado</h6>'
+       . '<i class="fas fa-exclamation-circle me-2"></i>Partido no encontrado</h6>'
        . '<p class="mb-0 text-muted">Ábralo desde el calendario de su categoría.</p></div>';
     require_once __DIR__ . "/inc/layout-bottom.php";
     return;
@@ -82,7 +82,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         : '– – –'; ?>
             </strong>
             <span style="font-size:1.1rem;"><?php echo $h($partido['visitante']); ?></span>
-            <span class="badge badge-<?php
+            <span class="badge text-bg-<?php
                 echo ['exito'=>'success','aviso'=>'warning','peligro'=>'danger',
                       'info'=>'info','neutro'=>'secondary'][$partido['estado_tono']] ?? 'secondary'; ?>">
                 <?php echo $h($partido['estado_nombre']); ?>
@@ -108,7 +108,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 && ($sumaLocal !== (int)$partido['partido_puntoslocal']
                  || $sumaVisit !== (int)$partido['partido_puntosvisitante'])): ?>
                 <br><span class="text-danger">
-                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                    <i class="fas fa-exclamation-triangle me-1"></i>
                     No coincide con el marcador registrado. Revise el acta.
                 </span>
             <?php endif; ?>
@@ -134,7 +134,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 <div class="card mb-3">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-users mr-2"></i><?php echo $h($e['nombre']); ?>
+            <i class="fas fa-users me-2"></i><?php echo $h($e['nombre']); ?>
             <span class="text-muted" style="font-weight:400;font-size:.85rem;">
                 · <?php echo $h($e['lado']); ?>
             </span>

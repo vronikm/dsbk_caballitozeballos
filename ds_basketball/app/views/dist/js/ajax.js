@@ -5,7 +5,9 @@ const formularios_ajax = document.querySelectorAll(".FormularioAjax");
    parsear JSON. Si el servidor devolvio algo que no es JSON (p. ej. un warning
    de PHP antes de la respuesta), muestra un mensaje claro y registra la
    respuesta cruda en la consola para diagnostico. */
-function manejarRespuestaAjax(texto) {
+/* El formulario que origino la peticion viaja hasta la alerta porque la
+   respuesta de tipo "limpiar" tiene que vaciar ESE y no otro. */
+function manejarRespuestaAjax(texto, formulario) {
     let data;
     try {
         data = JSON.parse(texto);
@@ -27,7 +29,7 @@ function manejarRespuestaAjax(texto) {
         });
         return;
     }
-    return alertas_ajax(data);
+    return alertas_ajax(data, formulario);
 }
 
 /* Escapa texto para insertarlo de forma segura como HTML. */
@@ -53,6 +55,10 @@ formularios_ajax.forEach(formularios => {
 
         e.preventDefault();
 
+        /* Se guarda aqui la referencia al formulario: mas abajo la respuesta
+           llega dentro de funciones de flecha, donde «this» ya no lo es. */
+        const formEnviado = this;
+
         // Verificar si el formulario tiene el atributo para recargar directo
         if (this.hasAttribute("data-recargar-directo")) {
             let data = new FormData(this);
@@ -71,7 +77,7 @@ formularios_ajax.forEach(formularios => {
 
             fetch(action, config)
                 .then(respuesta => respuesta.text())
-                .then(manejarRespuestaAjax)
+                .then(t => manejarRespuestaAjax(t, formEnviado))
                 .catch(errorConexionAjax);
 
             return; // Salir antes de mostrar la alerta
@@ -105,7 +111,7 @@ formularios_ajax.forEach(formularios => {
 
                 fetch(action, config)
                     .then(respuesta => respuesta.text())
-                    .then(manejarRespuestaAjax)
+                    .then(t => manejarRespuestaAjax(t, formEnviado))
                     .catch(errorConexionAjax);
             }
         });
@@ -115,7 +121,9 @@ formularios_ajax.forEach(formularios => {
 });
 
 
-function alertas_ajax(alerta) {
+/* «formulario» es opcional: hay vistas que llaman a esta funcion por su
+   cuenta, sin venir de un envio. */
+function alertas_ajax(alerta, formulario) {
     if (alerta.tipo == "simple") {
 
         Swal.fire({
@@ -147,7 +155,11 @@ function alertas_ajax(alerta) {
             confirmButtonText: 'Aceptar'
         }).then((result) => {
             if (result.isConfirmed) {
-                document.querySelector(".FormularioAjax").reset();
+                /* Antes se limpiaba el primer formulario del documento, que
+                   desde que el navbar se incluye arriba es el de cambiar la
+                   contrasena. El resultado: tras registrar un alumno los datos
+                   seguian en pantalla, invitando a guardarlo dos veces. */
+                if (formulario) { formulario.reset(); }
             }
         });
 
@@ -213,57 +225,30 @@ function alertas_ajax(alerta) {
             icon: alerta.icono,
             title: alerta.titulo
         });
-    } 
-        
-    
-        /*
-         var Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000
-        });
-      $('.swalDefaultSuccess').click(function() {
-        Toast.fire({
-          icon: 'success',
-          title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-        })
-      });
-      $('.swalDefaultInfo').click(function() {
-        Toast.fire({
-          icon: 'info',
-          title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-        })
-      });
-      $('.swalDefaultError').click(function() {
-        Toast.fire({
-          icon: 'error',
-          title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-        })
-      });
-      $('.swalDefaultWarning').click(function() {
-        Toast.fire({
-          icon: 'warning',
-          title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-        })
-      });
-      $('.swalDefaultQuestion').click(function() {
-        Toast.fire({
-          icon: 'question',
-          title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-        })
-      });
-
-      */
+    }
 }
 
-/* Boton cerrar sesion */
-let btn_exit=document.getElementById("btn_exit");
+/* Boton cerrar sesion
+|
+| POR CLASE, NO POR ID, Y RECORRIENDO TODOS
+|
+| Hay DOS enlaces de salida —el del menu de usuario y el del menu lateral—
+| y ambos llevaban id="btn_exit". getElementById devuelve siempre el
+| primero, asi que la confirmacion se enganchaba solo al de arriba: el del
+| menu lateral cerraba la sesion SIN preguntar. No fallaba, simplemente no
+| avisaba, que es peor.
+|
+| Ademas se comprueba que exista. Antes, una vista sin ese elemento hacia
+| addEventListener sobre null, y esa excepcion detenia la ejecucion del
+| resto de este archivo: los formularios de esa pantalla dejaban de
+| enviarse por AJAX sin que nada lo explicara.
+*/
+document.querySelectorAll(".js-salir").forEach(function (btn_exit) {
 
-btn_exit.addEventListener("click", function(e){
+  btn_exit.addEventListener("click", function(e){
 
     e.preventDefault();
-    
+
     Swal.fire({
         title: '¿Quiere salir del sistema?',
         text: "La sesión actual se cerrará y saldrá del sistema",
@@ -275,10 +260,13 @@ btn_exit.addEventListener("click", function(e){
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            let url=this.getAttribute("href");
-            window.location.href=url;
+            /* El destino sale del propio enlace pulsado, no de una
+               variable capturada: con dos botones hay dos href. */
+            window.location.href = btn_exit.getAttribute("href");
         }
     });
+
+  });
 
 });
 

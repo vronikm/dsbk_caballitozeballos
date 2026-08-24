@@ -37,7 +37,7 @@
             }
 
             if (titulo) {
-                titulo.innerHTML = '<i class="fas fa-pen mr-2"></i>Editar';
+                titulo.innerHTML = '<i class="fas fa-pen me-2"></i>Editar';
             }
 
             form.scrollIntoView({ behavior: 'smooth', block: 'center' });

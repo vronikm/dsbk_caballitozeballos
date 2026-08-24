@@ -145,6 +145,24 @@ if (!function_exists('facturacion_punto_de')) {
             throw new \RuntimeException('Sin conexión a la base de datos.');
         }
 
+        /* LA RESERVA NO PUEDE IR DENTRO DE UNA TRANSACCIÓN AJENA
+
+           seguridad_conexion() devuelve una conexión COMPARTIDA. Si quien
+           llama ya abrió una transacción, el contador se incrementaría
+           dentro de ella y un rollback posterior devolvería el número al
+           bote — justo lo contrario de lo que promete esta función. Peor:
+           fallaría en silencio, y el síntoma aparecería mucho después como
+           dos comprobantes con el mismo secuencial.
+
+           Se comprueba en vez de confiar en que el llamador respete el
+           orden. Reservar primero, abrir la transacción después. */
+        if ($con->inTransaction()) {
+            throw new \RuntimeException(
+                'El secuencial debe reservarse ANTES de abrir la transacción: '
+                . 'dentro de ella, un rollback liberaría el número y dos '
+                . 'comprobantes podrían acabar con el mismo.');
+        }
+
         $estab = $punto['punto_establecimiento'];
         $pto   = $punto['punto_codigo'];
 

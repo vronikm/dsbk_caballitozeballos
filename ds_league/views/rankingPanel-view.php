@@ -27,7 +27,7 @@ if (!$categoria) {
     $vistaActual = 'rankingPanel';
     require_once __DIR__ . "/inc/layout-top.php";
     echo '<div class="callout callout-warning"><h6 class="mb-1">'
-       . '<i class="fas fa-exclamation-circle mr-2"></i>Categoría no encontrada</h6>'
+       . '<i class="fas fa-exclamation-circle me-2"></i>Categoría no encontrada</h6>'
        . '<p class="mb-0 text-muted">Elija una desde '
        . '<a href="' . APP_URL . 'categoriaList/">el listado</a>.</p></div>';
     require_once __DIR__ . "/inc/layout-bottom.php";
@@ -79,7 +79,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         <div class="card h-100">
             <div class="card-header">
                 <h3 class="card-title">
-                    <i class="fas fa-medal mr-2" style="color:var(--ds-league,#a78bfa);"></i>
+                    <i class="fas fa-medal me-2" style="color:var(--ds-league,#a78bfa);"></i>
                     <?php echo $h($tipo['tipo_nombre']); ?>
                 </h3>
             </div>
@@ -89,10 +89,10 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <tr>
                             <th style="width:1.8rem;"></th>
                             <th>Jugador</th>
-                            <th class="text-right" style="width:3.2rem;"
+                            <th class="text-end" style="width:3.2rem;"
                                 title="Partidos jugados">PJ</th>
-                            <th class="text-right" style="width:3.6rem;">Total</th>
-                            <th class="text-right" style="width:3.8rem;"
+                            <th class="text-end" style="width:3.6rem;">Total</th>
+                            <th class="text-end" style="width:3.8rem;"
                                 title="Por partido">Prom.</th>
                         </tr>
                     </thead>
@@ -119,9 +119,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                                     </span>
                                 </div>
                             </td>
-                            <td class="text-right text-muted"><?php echo (int)$l['partidos']; ?></td>
-                            <td class="text-right"><strong><?php echo (int)round($l['total']); ?></strong></td>
-                            <td class="text-right text-muted">
+                            <td class="text-end text-muted"><?php echo (int)$l['partidos']; ?></td>
+                            <td class="text-end"><strong><?php echo (int)round($l['total']); ?></strong></td>
+                            <td class="text-end text-muted">
                                 <?php echo number_format((float)$l['promedio'], 1, ',', ''); ?>
                             </td>
                         </tr>

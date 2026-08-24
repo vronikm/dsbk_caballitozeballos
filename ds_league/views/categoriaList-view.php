@@ -34,7 +34,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
 <?php if (!$torneos): ?>
 <div class="callout callout-warning">
-    <h6 class="mb-1"><i class="fas fa-exclamation-circle mr-2"></i>No hay torneos</h6>
+    <h6 class="mb-1"><i class="fas fa-exclamation-circle me-2"></i>No hay torneos</h6>
     <p class="mb-0 text-muted">
         Una categoría pertenece a un torneo.
         <a href="<?php echo APP_URL; ?>torneoList/">Cree uno primero</a>.
@@ -46,7 +46,7 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="col-lg-7 mb-3">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title mb-0"><i class="fas fa-layer-group mr-2"></i>Categorías</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-layer-group me-2"></i>Categorías</h3>
                 <?php if ($torneoId > 0): ?>
                     <a href="<?php echo APP_URL; ?>categoriaList/" class="ds-link">Ver todas →</a>
                 <?php endif; ?>
@@ -59,7 +59,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <th>Categoría</th>
                                 <th>Género</th>
                                 <th>Edad</th>
-                                <th class="text-right">Equipos</th>
+                                <th class="text-end">Equipos</th>
                                 <th class="ds-tabla-acciones"></th>
                             </tr>
                         </thead>
@@ -87,7 +87,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         <br><small>al <?php echo $h($c['categoria_fechacorte']); ?></small>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-right"><?php echo (int)$c['equipos']; ?></td>
+                                <td class="text-end"><?php echo (int)$c['equipos']; ?></td>
                                 <td class="ds-tabla-acciones">
                                     <a href="<?php echo APP_URL; ?>categoriaPanel/<?php echo (int)$c['categoria_id']; ?>/"
                                        class="btn btn-sm btn-ver" title="Abrir la competencia">
@@ -130,18 +130,18 @@ require_once __DIR__ . "/inc/layout-top.php";
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title" id="tituloForm">
-                        <i class="fas fa-plus mr-2"></i>Nueva categoría
+                        <i class="fas fa-plus me-2"></i>Nueva categoría
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="categoria_nombre">Nombre</label>
                         <input type="text" name="categoria_nombre" id="categoria_nombre"
                                class="form-control" maxlength="80" placeholder="Sub-14 Masculino" required>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-7">
+                    <div class="row g-2">
+                        <div class="mb-3 col-7">
                             <label for="categoria_torneoid">Torneo</label>
                             <select name="categoria_torneoid" id="categoria_torneoid" class="form-control" required>
                                 <?php foreach ($torneos as $o): ?>
@@ -152,7 +152,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="form-group col-5">
+                        <div class="mb-3 col-5">
                             <label for="categoria_genero">Género</label>
                             <select name="categoria_genero" id="categoria_genero" class="form-control">
                                 <?php foreach ($generos as $k => $v): ?>
@@ -162,18 +162,18 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-4">
+                    <div class="row g-2">
+                        <div class="mb-3 col-4">
                             <label for="categoria_edadmin">Edad mín.</label>
                             <input type="number" name="categoria_edadmin" id="categoria_edadmin"
                                    class="form-control" min="4" max="99">
                         </div>
-                        <div class="form-group col-4">
+                        <div class="mb-3 col-4">
                             <label for="categoria_edadmax">Edad máx.</label>
                             <input type="number" name="categoria_edadmax" id="categoria_edadmax"
                                    class="form-control" min="4" max="99">
                         </div>
-                        <div class="form-group col-4">
+                        <div class="mb-3 col-4">
                             <label for="categoria_fechacorte">Medida al</label>
                             <input type="date" name="categoria_fechacorte" id="categoria_fechacorte"
                                    class="form-control">
@@ -189,18 +189,18 @@ require_once __DIR__ . "/inc/layout-top.php";
                        style="font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;">
                         Puntuación de la tabla
                     </p>
-                    <div class="form-row">
-                        <div class="form-group col-4">
+                    <div class="row g-2">
+                        <div class="mb-3 col-4">
                             <label for="categoria_ptsvictoria">Victoria</label>
                             <input type="number" name="categoria_ptsvictoria" id="categoria_ptsvictoria"
                                    class="form-control" min="0" max="10" value="2" required>
                         </div>
-                        <div class="form-group col-4">
+                        <div class="mb-3 col-4">
                             <label for="categoria_ptsderrota">Derrota</label>
                             <input type="number" name="categoria_ptsderrota" id="categoria_ptsderrota"
                                    class="form-control" min="0" max="10" value="1" required>
                         </div>
-                        <div class="form-group col-4">
+                        <div class="mb-3 col-4">
                             <label for="categoria_ptswalkover">Walkover</label>
                             <input type="number" name="categoria_ptswalkover" id="categoria_ptswalkover"
                                    class="form-control" min="0" max="10" value="0" required>

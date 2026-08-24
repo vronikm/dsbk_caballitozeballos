@@ -57,12 +57,12 @@ require_once __DIR__ . "/inc/layout-top.php";
 
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-building mr-2"></i>Emisor y comprobantes</h3>
+                    <h3 class="card-title"><i class="fas fa-building me-2"></i>Emisor y comprobantes</h3>
                 </div>
 
                 <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-4">
                             <label for="ambiente">Ambiente <span class="text-danger">*</span></label>
                             <select class="form-control" id="ambiente" name="ambiente" required>
                                 <option value="1" <?php echo $sel($cfg['ambiente'], '1'); ?>>Pruebas</option>
@@ -71,14 +71,14 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <small class="text-muted">En Producción los comprobantes son reales.</small>
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="ruc">RUC <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="ruc" name="ruc" maxlength="13" required
                                    value="<?php echo $h($cfg['ruc']); ?>">
                             <small class="text-muted">13 dígitos; debe coincidir con el del certificado.</small>
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="obligado_contabilidad">Obligado a llevar contabilidad</label>
                             <select class="form-control" id="obligado_contabilidad" name="obligado_contabilidad">
                                 <option value="NO" <?php echo $sel($cfg['obligado_contabilidad'], 'NO'); ?>>No</option>
@@ -87,44 +87,44 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="razon_social">Razón social <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="razon_social" name="razon_social" required
                                value="<?php echo $h($cfg['razon_social']); ?>">
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="nombre_comercial">Nombre comercial</label>
                         <input type="text" class="form-control" id="nombre_comercial" name="nombre_comercial"
                                value="<?php echo $h($cfg['nombre_comercial']); ?>">
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="direccion_matriz">Dirección matriz <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="direccion_matriz" name="direccion_matriz" required
                                value="<?php echo $h($cfg['direccion_matriz']); ?>">
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="direccion_establecimiento">Dirección del establecimiento</label>
                         <input type="text" class="form-control" id="direccion_establecimiento"
                                name="direccion_establecimiento"
                                value="<?php echo $h($cfg['direccion_establecimiento']); ?>">
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-4">
                             <label for="codigo_establecimiento">Establecimiento</label>
                             <input type="text" class="form-control" id="codigo_establecimiento"
                                    name="codigo_establecimiento" maxlength="3"
                                    value="<?php echo $h($cfg['codigo_establecimiento']); ?>">
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="punto_emision">Punto de emisión</label>
                             <input type="text" class="form-control" id="punto_emision" name="punto_emision" maxlength="3"
                                    value="<?php echo $h($cfg['punto_emision']); ?>">
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="secuencial_inicio">Siguiente secuencial</label>
                             <input type="number" min="1" max="999999999" step="1" class="form-control"
                                    id="secuencial_inicio" name="secuencial_inicio"
@@ -133,8 +133,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-6">
                             <label for="iva_tarifa_default">IVA por defecto</label>
                             <?php /* Las tarifas admitidas las valida el módulo de facturación:
                                      se envían como entero, no como decimal. */
@@ -148,7 +148,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </select>
                         </div>
 
-                        <div class="form-group col-md-6">
+                        <div class="mb-3 col-md-6">
                             <label for="forma_pago_default">Forma de pago por defecto</label>
                             <select class="form-control" id="forma_pago_default" name="forma_pago_default" required>
                                 <?php foreach ($formasPago as $codigo => $texto): ?>
@@ -161,19 +161,19 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-4">
                             <label for="contribuyente_especial">Contribuyente especial</label>
                             <input type="text" class="form-control" id="contribuyente_especial"
                                    name="contribuyente_especial" maxlength="13"
                                    value="<?php echo $h($cfg['contribuyente_especial']); ?>">
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="agente_retencion">Agente de retención</label>
                             <input type="text" class="form-control" id="agente_retencion" name="agente_retencion"
                                    maxlength="8" value="<?php echo $h($cfg['agente_retencion']); ?>">
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="mb-3 col-md-4">
                             <label for="contribuyente_rimpe">Régimen RIMPE</label>
                             <input type="text" class="form-control" id="contribuyente_rimpe" name="contribuyente_rimpe"
                                    value="<?php echo $h($cfg['contribuyente_rimpe']); ?>">
@@ -192,10 +192,10 @@ require_once __DIR__ . "/inc/layout-top.php";
              sabe descifrar la clave y leer el .p12 -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-certificate mr-2"></i>Certificado de firma</h3>
+                <h3 class="card-title"><i class="fas fa-certificate me-2"></i>Certificado de firma</h3>
             </div>
             <div class="card-body" id="estadoCertificado">
-                <p class="text-muted mb-0"><i class="fas fa-spinner fa-spin mr-1"></i> Consultando…</p>
+                <p class="text-muted mb-0"><i class="fas fa-spinner fa-spin me-1"></i> Consultando…</p>
             </div>
         </div>
 
@@ -204,23 +204,22 @@ require_once __DIR__ . "/inc/layout-top.php";
             <input type="hidden" name="modulo_facturas" value="SUBIR_CERTIFICADO_SRI">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-upload mr-2"></i>Cargar certificado</h3>
+                    <h3 class="card-title"><i class="fas fa-upload me-2"></i>Cargar certificado</h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="certificado">Archivo .p12 / .pfx</label>
-                        <input type="file" class="form-control-file" id="certificado" name="certificado"
+                        <input type="file" class="form-control" id="certificado" name="certificado"
                                accept=".p12,.pfx" required>
                     </div>
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="clave_certificado">Clave del certificado</label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="clave_certificado"
                                    name="clave_certificado" autocomplete="new-password" required>
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-secondary" id="btnVerClave"
-                                        title="Ver clave"><i class="fas fa-eye"></i></button>
-                            </div>
+                                                        <button type="button" class="btn btn-outline-secondary" id="btnVerClave"
+                                    title="Ver clave"><i class="fas fa-eye"></i></button>
+                        
                         </div>
                         <small class="text-muted">
                             Se guarda cifrada fuera del repositorio. El archivo no se descarga nunca.
@@ -235,19 +234,19 @@ require_once __DIR__ . "/inc/layout-top.php";
 
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-vial mr-2"></i>Comprobaciones</h3>
+                <h3 class="card-title"><i class="fas fa-vial me-2"></i>Comprobaciones</h3>
             </div>
             <div class="card-body">
                 <form class="FormularioAjax" method="POST" action="<?php echo $ajaxSri; ?>">
                     <input type="hidden" name="modulo_facturas" value="PROBAR_CERTIFICADO_SRI">
-                    <button type="submit" class="btn btn-outline-secondary btn-block">
-                        <i class="fas fa-key mr-1"></i> Probar certificado y clave
+                    <button type="submit" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-key me-1"></i> Probar certificado y clave
                     </button>
                 </form>
                 <form class="FormularioAjax mt-2" method="POST" action="<?php echo $ajaxSri; ?>">
                     <input type="hidden" name="modulo_facturas" value="PROBAR_CONEXION_SRI">
-                    <button type="submit" class="btn btn-outline-secondary btn-block mb-0">
-                        <i class="fas fa-network-wired mr-1"></i> Probar conexión con el SRI
+                    <button type="submit" class="btn btn-outline-secondary w-100 mb-0">
+                        <i class="fas fa-network-wired me-1"></i> Probar conexión con el SRI
                     </button>
                 </form>
             </div>
@@ -299,7 +298,12 @@ require_once __DIR__ . "/inc/layout-top.php";
         .then(function (r) { return r.json(); })
         .then(function (info) {
             var e = etiquetas[info.estado] || ['warning', info.estado || 'Desconocido'];
-            var html = '<span class="badge badge-' + e[0] + ' mb-3">' + escapar(e[1]) + '</span>';
+            /* text-bg-, no badge-: en Bootstrap 5 el color del distintivo
+               cambió de prefijo. Esta clase se arma en JavaScript, así que
+               ningún buscador sobre el HTML la encontraba y el distintivo
+               salía sin color —blanco sobre blanco, ilegible— sin que nada
+               fallara. Lo destapó medir el contraste, no mirar la pantalla. */
+            var html = '<span class="badge text-bg-' + e[0] + ' mb-3">' + escapar(e[1]) + '</span>';
 
             html += '<dl class="row mb-0" style="font-size:.9rem;">';
             html += fila('Archivo',  escapar(info.archivo));
@@ -318,7 +322,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         })
         .catch(function () {
             caja.innerHTML = '<p class="text-danger mb-0">' +
-                '<i class="fas fa-exclamation-triangle mr-1"></i>' +
+                '<i class="fas fa-exclamation-triangle me-1"></i>' +
                 'No se pudo consultar el certificado.</p>';
         });
 })();

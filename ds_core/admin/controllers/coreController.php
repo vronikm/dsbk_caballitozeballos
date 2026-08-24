@@ -40,6 +40,12 @@ class coreController
         }
     }
 
+    /** La primera fila, o [] si no hay ninguna. */
+    private function fila(string $sql, array $params = []): array
+    {
+        return $this->filas($sql, $params)[0] ?? [];
+    }
+
     private function escalar(string $sql, array $params = [])
     {
         try {
@@ -382,6 +388,7 @@ class coreController
         return $this->filas(
             "SELECT u.usuario_id, u.usuario_usuario, u.usuario_rolid,
                     u.usuario_estado, u.usuario_tienebloqueo, u.usuario_fechacreacion,
+                    u.usuario_2fa_estado,
                     r.rol_nombre,
                     COALESCE(e.empleado_nombre, '') AS empleado,
                     s.sede_nombre
@@ -1491,7 +1498,9 @@ class coreController
             $activo = ($f['menu_vista'] === $vistaActual) ? ' active' : '';
             $html .= '<li class="nav-item">'
                    . '<a href="' . APP_URL . $f['menu_vista'] . '/" class="nav-link' . $activo . '">'
-                   . '<i class="' . htmlspecialchars($f['menu_icono'], ENT_QUOTES, 'UTF-8') . '"></i>'
+                   /* nav-icon es de AdminLTE 4: sin ella el texto se pega
+                      al borde y los iconos no quedan alineados entre si. */
+                   . '<i class="nav-icon ' . htmlspecialchars($f['menu_icono'], ENT_QUOTES, 'UTF-8') . '"></i>'
                    . '<p>' . htmlspecialchars($f['menu_nombre'], ENT_QUOTES, 'UTF-8') . '</p>'
                    . '</a></li>';
         }
@@ -1662,4 +1671,69 @@ class coreController
                 'La base de datos rechazó el cambio.', 'error');
         }
     }
+
+    /*======================================================================
+      Segundo factor de autenticación
+
+      CADA UNO CONFIGURA EL SUYO, Y NADIE CONFIGURA EL DE OTRO
+
+      Un administrador no puede activar el segundo factor de otra persona:
+      necesitaría su teléfono, y si pudiera hacerlo sin él tendría también
+      la forma de generar sus códigos. Lo único que puede hacer sobre una
+      cuenta ajena es RESTABLECER —quitarlo— cuando alguien pierde el
+      teléfono y se queda fuera, y eso queda registrado con nombre y fecha
+      porque es exactamente el movimiento que haría quien quiere entrar en
+      una cuenta que no es suya.
+      ====================================================================*/
+
+    /**
+     * Quita el segundo factor de OTRA persona.
+     *
+     * Es la salida cuando alguien pierde el teléfono y se queda fuera. Sólo
+     * el superadministrador, con motivo obligatorio, y queda anotado quién
+     * lo hizo y sobre quién: sin ese rastro, esta función es una puerta
+     * trasera a cualquier cuenta.
+     */
+    public function restablecerSegundoFactor(): string
+    {
+        if (!es_superadministrador()) {
+            return $this->alerta('simple', 'Acceso denegado',
+                'Sólo el superadministrador puede restablecer la verificación de otra '
+                . 'persona.', 'error');
+        }
+
+        $usuarioid = (int)($_POST['usuario_id'] ?? 0);
+        $motivo    = trim((string)($_POST['motivo'] ?? ''));
+
+        if ($usuarioid <= 0) {
+            return $this->alerta('simple', 'Falta el usuario', 'No se indicó a quién.', 'error');
+        }
+        if ($motivo === '') {
+            return $this->alerta('simple', 'Falta el motivo',
+                'Quitarle a alguien su segundo factor necesita una justificación escrita.',
+                'error');
+        }
+
+        $quien = $this->fila("SELECT usuario_usuario, usuario_2fa_estado
+                                FROM seguridad_usuario WHERE usuario_id = :id",
+                             [':id' => $usuarioid]);
+
+        if (!$quien) {
+            return $this->alerta('simple', 'No encontrado', 'Ese usuario no existe.', 'error');
+        }
+        if ($quien['usuario_2fa_estado'] === 'N') {
+            return $this->alerta('simple', 'No tiene verificación',
+                'Esa cuenta no tiene el segundo factor configurado.', 'error');
+        }
+
+        if (!dosf_desactivar($usuarioid, 'RESTABLECER', $motivo)) {
+            return $this->alerta('simple', 'No se pudo restablecer',
+                'La base de datos rechazó el cambio.', 'error');
+        }
+
+        return $this->alerta('recargar', 'Verificación restablecida',
+            'La cuenta «' . $quien['usuario_usuario'] . '» vuelve a entrar sólo con su '
+            . 'contraseña. Pídale que la configure de nuevo.');
+    }
+
 }

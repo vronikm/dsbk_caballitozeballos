@@ -41,7 +41,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         <div class="card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title mb-0"><?php echo htmlspecialchars($reserva['reserva_codigo'], ENT_QUOTES, 'UTF-8'); ?></h3>
-                <span class="badge badge-<?php echo $colores[$reserva['reserva_estado']] ?? 'secondary'; ?>">
+                <span class="badge text-bg-<?php echo $colores[$reserva['reserva_estado']] ?? 'secondary'; ?>">
                     <?php echo $estados[$reserva['reserva_estado']] ?? $reserva['reserva_estado']; ?>
                 </span>
             </div>
@@ -87,7 +87,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <?php if ($saldo > 0.001): ?>
                         <strong class="text-danger">Saldo $<?php echo number_format($saldo, 2); ?></strong>
                     <?php else: ?>
-                        <span class="badge badge-success">Pagada</span>
+                        <span class="badge text-bg-success">Pagada</span>
                     <?php endif; ?>
                 </div>
             </div>
@@ -99,8 +99,8 @@ require_once __DIR__ . "/inc/layout-top.php";
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title mb-0"><?php echo count($pagos); ?> abono<?php echo count($pagos) === 1 ? '' : 's'; ?></h3>
                 <?php if ($puedeCobrar): ?>
-                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalAbono">
-                        <i class="fas fa-plus mr-1"></i> Registrar abono
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalAbono">
+                        <i class="fas fa-plus me-1"></i> Registrar abono
                     </button>
                 <?php endif; ?>
             </div>
@@ -112,8 +112,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <tr>
                                 <th>Fecha</th>
                                 <th>Forma</th>
-                                <th class="text-right">Valor</th>
-                                <th class="text-right">Vuelto</th>
+                                <th class="text-end">Valor</th>
+                                <th class="text-end">Vuelto</th>
                                 <th>Referencia</th>
                             </tr>
                         </thead>
@@ -131,8 +131,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         <small class="d-block text-muted"><?php echo htmlspecialchars($p['pago_observacion'], ENT_QUOTES, 'UTF-8'); ?></small>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-right"><strong>$<?php echo number_format((float)$p['pago_valor'], 2); ?></strong></td>
-                                <td class="text-right">
+                                <td class="text-end"><strong>$<?php echo number_format((float)$p['pago_valor'], 2); ?></strong></td>
+                                <td class="text-end">
                                     <?php if ((float)$p['pago_vuelto'] > 0): ?>
                                         $<?php echo number_format((float)$p['pago_vuelto'], 2); ?>
                                         <?php if ($p['pago_vueltoamonedero'] === 'S'): ?>
@@ -171,7 +171,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                 <div class="modal-header">
                     <h5 class="modal-title">Registrar abono</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
                 <div class="modal-body">
@@ -179,7 +179,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         Saldo pendiente: <strong class="text-danger">$<?php echo number_format($saldo, 2); ?></strong>
                     </p>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="pago_formaid">Forma de ingreso <span class="text-danger">*</span></label>
                         <select class="form-control" id="pago_formaid" name="pago_formaid" required>
                             <?php foreach ($formas as $f):
@@ -197,7 +197,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </select>
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="pago_valor">Importe del abono <span class="text-danger">*</span></label>
                         <input type="number" step="0.01" min="0.01" max="<?php echo number_format($saldo, 2, '.', ''); ?>"
                                class="form-control" id="pago_valor" name="pago_valor" required
@@ -205,13 +205,13 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <small class="text-muted">No puede superar el saldo pendiente.</small>
                     </div>
 
-                    <div class="form-group" id="grupoRecibido">
+                    <div class="mb-3" id="grupoRecibido">
                         <label for="pago_recibido">Recibido del cliente</label>
                         <input type="number" step="0.01" min="0" class="form-control" id="pago_recibido" name="pago_recibido">
                         <small class="text-muted">Sólo si entrega más de lo que se cobra, para calcular el vuelto.</small>
                     </div>
 
-                    <div class="form-group" id="grupoVuelto" style="display:none;">
+                    <div class="mb-3" id="grupoVuelto" style="display:none;">
                         <div class="aviso-superadmin">
                             <i class="fas fa-coins fa-lg mt-1"></i>
                             <div>
@@ -224,19 +224,19 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-group" id="grupoReferencia">
+                    <div class="mb-3" id="grupoReferencia">
                         <label for="pago_referencia">Referencia</label>
                         <input type="text" class="form-control" id="pago_referencia" name="pago_referencia" maxlength="60">
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="pago_observacion">Observación</label>
                         <input type="text" class="form-control" id="pago_observacion" name="pago_observacion" maxlength="200">
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Registrar</button>
                 </div>
             </form>

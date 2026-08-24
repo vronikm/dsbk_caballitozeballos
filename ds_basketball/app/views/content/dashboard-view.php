@@ -31,6 +31,9 @@
 		return 0;
 	};
 
+	$totalPendientes = 0;
+	$filasSede       = [];
+
 	if($verGerencial){
 		// Sedes dinámicas (una tarjeta por cada registro de general_sede)
 		$sedes = $insDashboard->obtenerSedes()->fetchAll();
@@ -39,49 +42,82 @@
 		$totalRepresentantes   = $valorEscalar($insDashboard->obtenerRepresentantes(),   "totalRepresentantes");
 		$totalAlumnosActivos   = $valorEscalar($insDashboard->totalAlumnosActivos(),     "totalAlumnosActivos");
 		$totalAlumnosInactivos = $valorEscalar($insDashboard->totalAlumnosInactivos(),   "totalAlumnosInactivos");
+
+		/*
+		| PRIMERO SE RECOGE, DESPUES SE PINTA
+		|
+		| Antes las cifras de cada sede se consultaban dentro del mismo bucle
+		| que dibujaba sus tarjetas, y la mora total se acumulaba ahí. Eso
+		| obligaba a poner el CONSOLIDADO al final, porque hasta terminar el
+		| recorrido valía cero. El resultado era que había que bajar por
+		| veintiocho tarjetas para llegar al total, que es justo lo primero
+		| que se busca al entrar.
+		|
+		| Separando las dos cosas el total ya está listo antes de dibujar
+		| nada. Son las mismas consultas y el mismo número: sólo cambia
+		| cuándo se hacen.
+		*/
+		foreach($sedes as $sede){
+			$sedeId = $sede["sede_id"];
+
+			$fila = [
+				"id"         => $sedeId,
+				"nombre"     => $sede["sede_nombre"],
+				"activos"    => $valorEscalar($insDashboard->obtenerAlumnosActivos($sedeId),   "totalActivos"),
+				"inactivos"  => $valorEscalar($insDashboard->obtenerAlumnosInactivos($sedeId), "totalInactivos"),
+				"cancelado"  => $valorEscalar($insDashboard->obtenerPagosCancelados($sedeId),  "totalCancelados"),
+				"pendiente"  => $valorEscalar($insDashboard->obtenerPagosPendientes($sedeId),  "totalPendientes"),
+			];
+
+			$totalPendientes += $fila["pendiente"];
+			$filasSede[]      = $fila;
+		}
 	}
 
-	// Se acumula recorriendo las sedes (ver bucle de tarjetas)
-	$totalPendientes = 0;
+	/*
+	| Las cuatro tarjetas de cada sede, en un solo sitio.
+	|
+	| Estaban escritas cuatro veces seguidas, con el mismo bloque copiado y
+	| un color cambiado. Dos de ellas —pagos receptados y pagos pendientes—
+	| compartían icono, asi que de un vistazo no se distinguían: había que
+	| leer el rótulo para saber cuál era cuál.
+	|
+	| Cada métrica lleva ahora su propio icono, y el color de enlace del pie
+	| va emparejado con el fondo: sobre amarillo y cian el texto que contrasta
+	| es el oscuro, sobre verde y rojo el claro. Es lo que hace la propia
+	| plantilla en su ejemplo.
+	*/
+	$tarjetasSede = function(array $s){
+		return [
+			["clase" => "text-bg-info",    "enlacePie" => "link-dark",
+			 "valor" => $s["activos"],   "texto" => "Alumnos activos",
+			 "icono" => "fa-users",             "url" => APP_URL . "alumnoList/"],
+
+			["clase" => "text-bg-success", "enlacePie" => "link-light",
+			 "valor" => $s["cancelado"], "texto" => "Pagos receptados mes",
+			 "icono" => "fa-money-bill-wave",   "url" => APP_URL . "reportePagos/" . $s["id"]],
+
+			["clase" => "text-bg-warning", "enlacePie" => "link-dark",
+			 "valor" => $s["inactivos"], "texto" => "Alumnos inactivos",
+			 "icono" => "fa-user-slash",        "url" => APP_URL . "alumnoList/"],
+
+			["clase" => "text-bg-danger",  "enlacePie" => "link-light",
+			 "valor" => $s["pendiente"], "texto" => "Pagos pendientes",
+			 "icono" => "fa-file-invoice-dollar", "url" => APP_URL . "reportePendientes/" . $s["id"]],
+		];
+	};
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-  	<head>
-		<meta charset="UTF-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title><?php echo APP_NAME; ?>| Dashboard</title>
-		<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
-		<!-- Google Font: Source Sans Pro -->
-		<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-		<!-- Font Awesome -->
-		<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-		<!-- Ionicons -->
-		<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-		<!-- Tempusdominus Bootstrap 4 -->
-		<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-		<!-- Bootstrap 5 -->
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-		  integrity="sha256-9kPW/n5nn53j4WMRYAxe9c1rCY96Oogo/MKSVdKzPmI="
-		  crossorigin="anonymous"
-		/>
-		<!-- iCheck -->
-		<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-		<!-- JQVMap -->
-		<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/jqvmap/jqvmap.min.css">
-		<!-- Theme style -->
-		<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-		<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/apexcharts.css">
-		<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/bootstrap-icons.min.css">
-
-		<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-		<script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js" ></script>
-	
-  	</head>
-	<body class="hold-transition sidebar-mini layout-fixed">
-		<div class="wrapper">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Dashboard';
+	$extras      = array (0 => 'swal',);
+	require_once "app/views/inc/cabecera.php";
+?>
+	<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+		<?php /* ds-core activa aqui la identidad DigiSports. Fase 1: solo
+				 esta vista, para poder comparar antes de extenderlo. */ ?>
+		<div class="app-wrapper ds-core">
 
 			<!-- Navbar -->
 			<?php require_once "app/views/inc/navbar.php"; ?>
@@ -92,17 +128,17 @@
 			<!-- /.Main Sidebar Container -->  
 
 			<!-- vista -->
-			<div class="content-wrapper">
+			<div class="app-main">
 
 				<!-- Content Header (Page header) -->
-				<div class="content-header">
+				<div class="app-content-header">
 					<div class="container-fluid">
 					<div class="row mb-1">
 						<div class="col-sm-6">
 						<h1 class="m-0">Dashboard</h1>
 						</div><!-- /.col -->
 						<div class="col-sm-6">
-						<ol class="breadcrumb float-sm-right">
+						<ol class="breadcrumb float-sm-end">
 							<li class="breadcrumb-item"><a href="#">Inicio</a></li>
 							<li class="breadcrumb-item active">Dashboard v1</li>
 						</ol>
@@ -113,7 +149,7 @@
 				<!-- /.content-header -->
 
 				<!-- Main content -->
-				<section class="content">
+				<section class="app-content">
 					
 					<div class="container-fluid">
 
@@ -124,7 +160,7 @@
 
 					<?php if(!$verOperativo && !$verGerencial): ?>
 						<div class="alert alert-info">
-							<i class="fas fa-info-circle mr-1"></i>
+							<i class="fas fa-info-circle me-1"></i>
 							No hay indicadores que mostrar para su rol. Use el menú lateral
 							para ir a las pantallas que tenga asignadas.
 						</div>
@@ -135,165 +171,97 @@
 						<div class="alert alert-info">No hay sedes registradas. Registre una sede para ver sus indicadores.</div>
 					<?php endif; ?>
 
-					<?php foreach($sedes as $sede):
-						$sedeId          = $sede["sede_id"];
-						$totalActivos    = $valorEscalar($insDashboard->obtenerAlumnosActivos($sedeId),   "totalActivos");
-						$totalInactivos  = $valorEscalar($insDashboard->obtenerAlumnosInactivos($sedeId), "totalInactivos");
-						$totalCancelado  = $valorEscalar($insDashboard->obtenerPagosCancelados($sedeId),  "totalCancelados");
-						$totalPendiente  = $valorEscalar($insDashboard->obtenerPagosPendientes($sedeId),  "totalPendientes");
-						$totalPendientes += $totalPendiente; // acumula para el consolidado
-					?>
-						<div class="card card-default">
+					<?php if($verGerencial && $filasSede): ?>
+						<?php
+							/* El resumen va antes que el detalle. Cada metrica lleva el
+											 color y el icono que usa esa misma metrica en las
+											 tarjetas de cada sede, para que el color signifique lo
+											 mismo en toda la pantalla. */
+							$consolidado = [
+								["texto" => "Representantes",    "valor" => $totalRepresentantes,
+								 "clase" => "text-bg-primary",   "icono" => "fa-user-friends",
+								 "url"   => APP_URL . "representanteList/"],
+
+								["texto" => "Alumnos activos",   "valor" => $totalAlumnosActivos,
+								 "clase" => "text-bg-info",      "icono" => "fa-users",
+								 "url"   => APP_URL . "alumnoList/"],
+
+								["texto" => "Alumnos inactivos", "valor" => $totalAlumnosInactivos,
+								 "clase" => "text-bg-warning",   "icono" => "fa-user-slash",
+								 "url"   => APP_URL . "alumnoList/"],
+
+								["texto" => "Alumnos con mora",  "valor" => $totalPendientes,
+								 "clase" => "text-bg-danger",    "icono" => "fa-file-invoice-dollar",
+								 "url"   => APP_URL . "reportePendientes/"],
+							];
+						?>
+						<div class="card card-default mb-4">
 							<div class="card-header">
-								<h3 class="card-title"><?php echo strtoupper(htmlspecialchars($sede["sede_nombre"])); ?></h3>
+								<h3 class="card-title">CONSOLIDADO</h3>
 								<div class="card-tools">
-									<button type="button" class="btn btn-tool" data-card-widget="collapse">
-										<i class="fas fa-minus"></i>
-									</button>
+									<button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Plegar o desplegar" aria-label="Plegar o desplegar"><i data-lte-icon="expand" class="fas fa-plus"></i><i data-lte-icon="collapse" class="fas fa-minus"></i></button>
 								</div>
 							</div>
 
 							<div class="card-body">
 								<div class="row">
-									<div class="col-lg-3 col-6">
-									<!-- small box -->
-										<div class="small-box bg-info">
-											<div class="inner">
-											<h3><?php echo $totalActivos; ?></h3>
+									<?php foreach($consolidado as $c): ?>
+										<div class="col-12 col-sm-6 col-lg-3">
+											<?php /* text-reset conserva el color del texto: sin el, envolver
+													la caja en un enlace se lo lleva todo al azul de Bootstrap. */ ?>
+											<a href="<?php echo $c["url"]; ?>" class="text-decoration-none text-reset">
+												<div class="info-box">
+													<span class="info-box-icon <?php echo $c["clase"]; ?> shadow-sm">
+														<i class="fas <?php echo $c["icono"]; ?>" aria-hidden="true"></i>
+													</span>
+													<div class="info-box-content">
+														<span class="info-box-text"><?php echo $c["texto"]; ?></span>
+														<span class="info-box-number"><?php echo htmlspecialchars((string)$c["valor"]); ?></span>
+													</div>
+												</div>
+											</a>
+										</div>
+									<?php endforeach; ?>
+								</div>
+							</div>
+						</div>
+					<?php endif; ?>
+					<?php foreach($filasSede as $sede): ?>
+						<div class="card card-default mb-4">
+							<div class="card-header">
+								<h3 class="card-title"><?php echo strtoupper(htmlspecialchars($sede["nombre"])); ?></h3>
+								<div class="card-tools">
+									<button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Plegar o desplegar" aria-label="Plegar o desplegar"><i data-lte-icon="expand" class="fas fa-plus"></i><i data-lte-icon="collapse" class="fas fa-minus"></i></button>
+								</div>
+							</div>
 
-											<p>Alumnos activos</p>
+							<div class="card-body">
+								<div class="row">
+									<?php foreach($tarjetasSede($sede) as $t): ?>
+										<div class="col-lg-3 col-6">
+											<?php /* Marcado de AdminLTE 4. Tres cosas que la version 3
+													hacia de otra manera: el color va con text-bg-, que
+													ademas elige el texto que contrasta; el icono se
+													coloca solo con small-box-icon; y el pie necesita
+													las clases de enlace o Bootstrap lo subraya. */ ?>
+											<div class="small-box <?php echo $t["clase"]; ?>">
+												<div class="inner">
+													<h3><?php echo htmlspecialchars((string)$t["valor"]); ?></h3>
+													<p><?php echo $t["texto"]; ?></p>
+												</div>
+												<i class="fas <?php echo $t["icono"]; ?> small-box-icon" aria-hidden="true"></i>
+												<a href="<?php echo $t["url"]; ?>"
+												   class="small-box-footer <?php echo $t["enlacePie"]; ?> link-underline-opacity-0 link-underline-opacity-50-hover">
+													Ver detalle <i class="fas fa-arrow-circle-right ms-1"></i>
+												</a>
 											</div>
-											<div class="icon">
-											<i class="ion ion-person"></i>
-											</div>
-											<a href="<?php echo APP_URL;?>alumnoList/" class="small-box-footer">Ver detalle <i class="fas fa-arrow-circle-right"></i></a>
 										</div>
-									</div>
-									<!-- ./col -->
-									<div class="col-lg-3 col-6">
-									<!-- small box -->
-									<div class="small-box bg-success">
-										<div class="inner">
-										<h3><?php echo $totalCancelado; ?></h3>
-
-										<p>Pagos receptados mes</p>
-										</div>
-										<div class="icon">
-										<i class="ion ion-cash"></i>
-										</div>
-										<a href="<?php echo APP_URL;?>reportePagos/<?php echo $sedeId; ?>" class="small-box-footer">Ver detalle <i class="fas fa-arrow-circle-right"></i></a>
-									</div>
-									</div>
-									<!-- ./col -->
-									<div class="col-lg-3 col-6">
-									<!-- small box -->
-									<div class="small-box bg-warning">
-										<div class="inner">
-										<h3><?php echo $totalInactivos; ?></h3>
-
-										<p>Alumnos inactivos</p>
-										</div>
-										<div class="icon">
-										<i class="ion ion-android-warning"></i>
-										</div>
-										<a href="<?php echo APP_URL;?>alumnoList/" class="small-box-footer">Ver detalle <i class="fas fa-arrow-circle-right"></i></a>
-									</div>
-									</div>
-									<!-- ./col -->
-									<div class="col-lg-3 col-6">
-									<!-- small box -->
-									<div class="small-box bg-danger">
-										<div class="inner">
-										<h3><?php echo $totalPendiente; ?></h3>
-
-										<p>Pagos pendientes</p>
-										</div>
-										<div class="icon">
-										<i class="ion ion-cash"></i>
-										</div>
-										<a href="<?php echo APP_URL;?>reportePendientes/<?php echo $sedeId; ?>" class="small-box-footer">Ver detalle <i class="fas fa-arrow-circle-right"></i></a>
-									</div>
-									</div>
-									<!-- ./col -->
+									<?php endforeach; ?>
 								</div>
 							</div>
 						</div>
 					<?php endforeach; ?>
 
-					<?php if($verGerencial): ?>
-					<div class="card card-default" style="padding: 0.5rem;">
-					<div class="card-header" style="padding: 0.1rem 0.5rem;">
-						<h3 class="card-title">CONSOLIDADO</h3>
-						<div class="card-tools">
-							<button type="button" class="btn btn-tool" data-card-widget="collapse">
-								<i class="fas fa-minus"></i>
-							</button>
-						</div>
-					</div>
-					<div class="card-body" style="padding: 0.5rem;">
-						<div class="row">
-							<!-- Representantes activos -->
-							<div class="col-md-3 mb-3">
-								<a href="<?php echo APP_URL; ?>representanteList/" class="text-decoration-none">
-									<div class="info-box d-flex shadow-sm rounded border">
-										<span class="info-box-icon bg-warning text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-										<i class="bi bi-people-fill fs-5"></i>
-										</span>
-										<div class="info-box-content ms-2">
-											<span class="info-box-text h7 text-muted">Representantes</span>
-											<span class="info-box-number h5 text-dark"><?php echo $totalRepresentantes; ?></span>
-										</div>
-									</div>
-								</a>
-							</div>
-
-							<!-- Alumnos activos -->
-							<div class="col-md-3 mb-3 align-items-center">
-								<a href="#" class="text-decoration-none">
-									<div class="info-box d-flex shadow-sm rounded border">
-										<span class="info-box-icon bg-warning text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-										<i class="bi bi-people-fill fs-5"></i>
-										</span>
-										<div class="info-box-content ms-2">
-											<span class="info-box-text h7 text-muted">Alumnos activos</span>
-											<span class="info-box-number h5 text-dark"><?php echo $totalAlumnosActivos; ?></span>
-										</div>
-									</div>
-								</a>
-							</div>
-
-							<!-- Alumnos inactivos -->
-							<div class="col-md-3 mb-3 align-items-center">
-								<a href="#" class="text-decoration-none">
-									<div class="info-box d-flex shadow-sm rounded border">
-										<span class="info-box-icon bg-warning text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-										<i class="bi bi-people-fill fs-5"></i>
-										</span>
-										<div class="info-box-content ms-2">
-											<span class="info-box-text h7 text-muted">Alumnos Inactivos</span>
-											<span class="info-box-number h5 text-dark"><?php echo $totalAlumnosInactivos; ?></span>
-										</div>
-									</div>
-								</a>
-							</div>
-							<!-- Pendientes -->
-							<div class="col-md-3 mb-3 align-items-center">
-								<a href="#" class="text-decoration-none">
-									<div class="info-box d-flex shadow-sm rounded border">
-										<span class="info-box-icon bg-warning text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-										<i class="bi bi-people-fill fs-5"></i>
-										</span>
-										<div class="info-box-content ms-2">
-											<span class="info-box-text h7 text-muted">Alumnos con mora</span>
-											<span class="info-box-number h5 text-dark"><?php echo $totalPendientes; ?></span>
-										</div>
-									</div>
-								</a>
-							</div>
-						</div>	
-					</div>
-				</div>
-				<?php endif; ?>
 					<!-- /.row -->
 					</div><!-- /.container-fluid -->
 				</section>
@@ -313,28 +281,20 @@
 		<!-- ./wrapper -->
     
 		<!-- jQuery -->
-		<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 		<!-- jQuery UI 1.11.4 -->
-		<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery-ui/jquery-ui.min.js"></script>
 		<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 
 		<!-- Bootstrap 4 -->
-		<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+		<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 		<!-- ChartJS -->
-		<script src="<?php echo APP_URL; ?>app/views/dist/plugins/chart.js/Chart.min.js"></script>
 		<!-- Sparkline -->
-		<script src="<?php echo APP_URL; ?>app/views/dist/plugins/sparklines/sparkline.js"></script>
 		<!-- JQVMap -->
-		<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jqvmap/jquery.vmap.min.js"></script>
-		<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
 		<!-- jQuery Knob Chart -->
-		<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery-knob/jquery.knob.min.js"></script>
 		<!-- daterangepicker -->
-		<script src="<?php echo APP_URL; ?>app/views/dist/plugins/moment/moment.min.js"></script>
 		<!-- Tempusdominus Bootstrap 4 -->
-		<script src="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 		<!-- AdminLTE App -->
-		<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.js"></script>
+		<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 
 		<script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js" ></script>
 		<script src="<?php echo APP_URL; ?>app/views/dist/js/main.js" ></script>

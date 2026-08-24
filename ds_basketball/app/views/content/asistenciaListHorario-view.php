@@ -22,32 +22,14 @@
 ?>
 
 
-<html lang="es">
-  <head>
-    <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo APP_NAME; ?>| Horarios</title>
-	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-	<!-- DataTables -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-	<!-- Theme style -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-
-
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js" ></script>
-    
-  </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Horarios';
+	$extras      = array (0 => 'datatables',1 => 'swal',);
+	require_once "app/views/inc/cabecera.php";
+?>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
 
       <!-- Preloader -->
       <!--?php require_once "app/views/inc/preloader.php"; ?-->
@@ -62,17 +44,17 @@
       <!-- /.Main Sidebar Container -->  
 
       <!-- vista -->
-      <div class="content-wrapper">
+      <div class="app-main">
 
 		<!-- Content Header (Page header) -->
-		<div class="content-header">
+		<div class="app-content-header">
 			<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
 					<h4 class="m-0">Horarios</h4>
 				</div><!-- /.col -->
 				<div class="col-sm-6">
-					<ol class="breadcrumb float-sm-right">
+					<ol class="breadcrumb float-sm-end">
 						<li class="breadcrumb-item"><a href="#">Inicio</a></li>
 						<li class="breadcrumb-item active">Ficha Alumno</li>
 					</ol>					
@@ -83,10 +65,10 @@
 		<!-- /.content-header -->
 
 		<!-- Section listado de alumnos -->
-		<section class="content">			
+		<section class="app-content">			
 			<div class="container-fluid">
 				<div class="card card-default" style='height: 140px;'>
-					<div class="card-header" style='height: 40px;'>
+					<div class="card-header" style='min-height: 40px;'>
 						<h3 class="card-title">Búsqueda de horarios</h3>
 						<div class="card-tools">
 								<?php
@@ -94,7 +76,7 @@
 									echo '										
 										<form action="'.APP_URL.'asistenciaHorario/"  method="POST" autocomplete="off" target="_blank">								
 											<input type="hidden" name="horario_sedeid" value="'.$horario_sedeid.'">						
-											<button type="submit" class="btn float-right btn-ver btn-xs" >Nuevo</button>
+											<button type="submit" class="btn float-end btn-ver btn-xs" >Nuevo</button>
 										</form>	
 									';
 								}
@@ -107,21 +89,21 @@
 						<div class="card-body">
 							<div class="row" style='font-size: 14px; height: 60px;'>
 								<div class="col-sm-3">
-									<div class="form-group">
+									<div class="mb-3">
 										<label for="horario_nombre">Horario nombre</label>                        
 										<input type="text" class="form-control" style='font-size: 13px; height: 31px;' id="horario_nombre" name="horario_nombre" placeholder="Nombre" value="<?php echo $horario_nombre; ?>">
 									</div>        
 								</div>
 								<div class="col-sm-3">
-									<div class="form-group">
+									<div class="mb-3">
 										<label for="horario_detalle">Horario detalle</label>
 										<input type="text" class="form-control" style='font-size: 13px; height: 31px;' id="horario_detalle" name="horario_detalle" placeholder="Detalle" value="<?php echo $horario_detalle; ?>">
 									</div>         
 								</div>											
 								<div class="col-md-3">
-									<div class="form-group">
+									<div class="mb-3">
 										<label for="horario_sedeid">Sede</label>
-										<select class="form-control select2" style='font-size: 13px; height: 31px;' id="horario_sedeid" name="horario_sedeid">
+										<select class="form-control" style='font-size: 13px; height: 31px;' id="horario_sedeid" name="horario_sedeid">
 											<?php
 												if($horario_sedeid == 0){	
 													echo "<option value='0' selected='selected'>Seleccionar sede</option>";
@@ -135,7 +117,7 @@
 								</div>
 
 								<div class="col-md-3">
-									<div class="form-group">
+									<div class="mb-3">
 										<label for="alumno_sedeid">.</label>
 										<?php echo ds_boton_buscar(); ?>
 									</div>
@@ -148,12 +130,10 @@
 			<div class="container-fluid">
 			<!-- Small boxes (Stat box) -->
 				<div class="card card-default">
-					<div class="card-header" style='height: 40px;'>
+					<div class="card-header" style='min-height: 40px;'>
 						<h3 class="card-title">Resultado de la búsqueda</h3>
 						<div class="card-tools">
-							<button type="button" class="btn btn-tool" data-card-widget="collapse">
-								<i class="fas fa-minus"></i>
-							</button>
+							<button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Plegar o desplegar" aria-label="Plegar o desplegar"><i data-lte-icon="expand" class="fas fa-plus"></i><i data-lte-icon="collapse" class="fas fa-minus"></i></button>
 						</div>
 					</div>
 
@@ -202,27 +182,29 @@
 	<!-- jQuery -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 	<!-- DataTables  & Plugins -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables/jquery.dataTables.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jszip/jszip.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/pdfmake/pdfmake.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/pdfmake/vfs_fonts.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.bootstrap5.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.responsive.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/responsive.bootstrap5.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.buttons.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.bootstrap5.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.html5.min.js"></script>
+	<?php /* pdfmake y jszip pesan 2,2 MB y sirven a dos botones: se traen
+			 al pulsarlos, no en cada carga. Va DESPUES de buttons.html5, que es
+			 quien define esos botones. */ ?>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/exportar.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.print.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.colVis.min.js"></script>
 	<!-- AdminLTE App -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 	
 	<!-- Page specific script -->
 	<script>
-		$(function () {
-			$("#example1").DataTable({
+		document.addEventListener('DOMContentLoaded', function () {
+			new DataTable("#example1", {
 			"responsive": true, "lengthChange": false, "autoWidth": false,
 			"language": {
 				"decimal": "",
@@ -248,7 +230,7 @@
 					"sortDescending": ": activar para ordenar la columna descendente"
 				}
 			},
-			}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');			    
+			});			    
 		});
 	</script>
 

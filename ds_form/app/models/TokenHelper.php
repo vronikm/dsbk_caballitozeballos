@@ -3,7 +3,7 @@
 /**
  * TokenHelper — Validación de tokens HMAC de los enlaces de inscripción.
  *
- * Los tokens los emite el sistema principal (adfpedrolarrea). Aquí solo se
+ * Los tokens los emite el sistema principal Aquí solo se
  * verifican: firma HMAC-SHA256 y fecha de expiración.
  *
  * Formato del token:  base64url(payload).base64url(signature)

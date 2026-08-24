@@ -23,9 +23,9 @@ require_once __DIR__ . "/inc/layout-top.php";
         <h3 class="card-title mb-0"><?php echo count($menus); ?> vista<?php echo count($menus) === 1 ? '' : 's'; ?> registradas</h3>
 
         <div class="d-flex align-items-center" style="gap:12px;">
-            <form method="GET" action="<?php echo APP_URL; ?>menuList/" class="form-inline">
-                <label for="modulo" class="mr-2 mb-0">Módulo</label>
-                <select name="modulo" id="modulo" class="form-control form-control-sm" onchange="this.form.submit()">
+            <form method="GET" action="<?php echo APP_URL; ?>menuList/" class="d-flex flex-wrap align-items-center gap-2">
+                <label for="modulo" class="me-2 mb-0">Módulo</label>
+                <select name="modulo" id="modulo" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
                     <option value="">Todos</option>
                     <?php foreach ($modulos as $clave => $nombre): ?>
                         <option value="<?php echo $clave; ?>" <?php echo $modSel === $clave ? 'selected' : ''; ?>><?php echo $nombre; ?></option>
@@ -36,7 +36,7 @@ require_once __DIR__ . "/inc/layout-top.php";
             <?php if (puede_crear('menuList')): ?>
                 <a href="<?php echo APP_URL; ?>menuForm/<?php echo $modSel !== '' ? '?modulo=' . $modSel : ''; ?>"
                    class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus mr-1"></i> Nuevo menú
+                    <i class="fas fa-plus me-1"></i> Nuevo menú
                 </a>
             <?php endif; ?>
         </div>
@@ -55,7 +55,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <th>Orden</th>
                         <th>Roles con acceso</th>
                         <th>Estado</th>
-                        <th class="text-right">Acciones</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,7 +72,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </span>
                         </td>
                         <td>
-                            <i class="<?php echo htmlspecialchars($m['menu_icono'], ENT_QUOTES, 'UTF-8'); ?> mr-2 text-muted"></i>
+                            <i class="<?php echo htmlspecialchars($m['menu_icono'], ENT_QUOTES, 'UTF-8'); ?> me-2 text-muted"></i>
                             <?php echo htmlspecialchars($m['menu_nombre'], ENT_QUOTES, 'UTF-8'); ?>
                         </td>
                         <td><code><?php echo htmlspecialchars($m['menu_vista'], ENT_QUOTES, 'UTF-8'); ?></code></td>
@@ -80,7 +80,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <td><?php echo (int)$m['menu_orden']; ?></td>
                         <td><?php echo (int)$m['roles']; ?></td>
                         <td>
-                            <span class="badge badge-<?php echo $m['menu_estado'] === 'A' ? 'success' : 'secondary'; ?>">
+                            <span class="badge text-bg-<?php echo $m['menu_estado'] === 'A' ? 'success' : 'secondary'; ?>">
                                 <?php echo $m['menu_estado'] === 'A' ? 'Activo' : 'Inactivo'; ?>
                             </span>
                         </td>
@@ -89,7 +89,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             /* Una vista huérfana (el menú apunta a una ruta que ya no
                                existe en el módulo) se señala aquí, que es donde se corrige. */
                             if (!ds_vista_existe($m['menu_modulo'], $m['menu_vista'])): ?>
-                                <span class="badge badge-danger mr-1" title="La vista no existe en el módulo">
+                                <span class="badge text-bg-danger me-1" title="La vista no existe en el módulo">
                                     <i class="fas fa-unlink"></i> huérfano
                                 </span>
                             <?php endif; ?>

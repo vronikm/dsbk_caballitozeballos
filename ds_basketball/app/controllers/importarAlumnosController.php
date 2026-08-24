@@ -499,17 +499,17 @@
 		private function generarHTMLReporte($r) {
 			$res = $r['resumen'];
 			$html  = '<div class="row mb-3">';
-			$html .= '<div class="col-md-3"><div class="small-box bg-info"><div class="inner"><h3>'.$res['total_filas'].'</h3><p>Filas en CSV</p></div></div></div>';
-			$html .= '<div class="col-md-3"><div class="small-box bg-success"><div class="inner"><h3>'.$res['alumnos_a_insertar'].'</h3><p>Alumnos a insertar</p></div></div></div>';
-			$html .= '<div class="col-md-3"><div class="small-box bg-primary"><div class="inner"><h3>'.$res['representantes_nuevos'].'</h3><p>Repres. nuevos</p></div></div></div>';
-			$html .= '<div class="col-md-3"><div class="small-box bg-warning"><div class="inner"><h3>'.$res['errores_bloqueantes'].'</h3><p>Filas bloqueadas</p></div></div></div>';
+			$html .= '<div class="col-md-3"><div class="small-box text-bg-info"><div class="inner"><h3>'.$res['total_filas'].'</h3><p>Filas en CSV</p></div></div></div>';
+			$html .= '<div class="col-md-3"><div class="small-box text-bg-success"><div class="inner"><h3>'.$res['alumnos_a_insertar'].'</h3><p>Alumnos a insertar</p></div></div></div>';
+			$html .= '<div class="col-md-3"><div class="small-box text-bg-primary"><div class="inner"><h3>'.$res['representantes_nuevos'].'</h3><p>Repres. nuevos</p></div></div></div>';
+			$html .= '<div class="col-md-3"><div class="small-box text-bg-warning"><div class="inner"><h3>'.$res['errores_bloqueantes'].'</h3><p>Filas bloqueadas</p></div></div></div>';
 			$html .= '</div>';
 
 			$html .= '<div class="row mb-3">';
-			$html .= '<div class="col-md-3"><span class="badge badge-secondary">Repres. únicos en CSV: '.$res['representantes_unicos'].'</span></div>';
-			$html .= '<div class="col-md-3"><span class="badge badge-secondary">Repres. reutilizados: '.$res['representantes_reuso'].'</span></div>';
-			$html .= '<div class="col-md-3"><span class="badge badge-secondary">Advertencias: '.$res['advertencias'].'</span></div>';
-			$html .= '<div class="col-md-3"><span class="badge badge-secondary">Sin cédula (SINCEDULA): '.$res['alumnos_sin_cedula'].'</span></div>';
+			$html .= '<div class="col-md-3"><span class="badge text-bg-secondary">Repres. únicos en CSV: '.$res['representantes_unicos'].'</span></div>';
+			$html .= '<div class="col-md-3"><span class="badge text-bg-secondary">Repres. reutilizados: '.$res['representantes_reuso'].'</span></div>';
+			$html .= '<div class="col-md-3"><span class="badge text-bg-secondary">Advertencias: '.$res['advertencias'].'</span></div>';
+			$html .= '<div class="col-md-3"><span class="badge text-bg-secondary">Sin cédula (SINCEDULA): '.$res['alumnos_sin_cedula'].'</span></div>';
 			$html .= '</div>';
 
 			$html .= '<table class="table table-sm table-bordered table-striped"><thead class="thead-dark"><tr>'
@@ -518,8 +518,8 @@
 
 			foreach ($r['filas'] as $f) {
 				$badge = $f['bloquear']
-					? '<span class="badge badge-danger">BLOQUEADO</span>'
-					: '<span class="badge badge-success">OK</span>';
+					? '<span class="badge text-bg-danger">BLOQUEADO</span>'
+					: '<span class="badge text-bg-success">OK</span>';
 
 				$obsHtml = '';
 				foreach ($f['obs'] as $o) {

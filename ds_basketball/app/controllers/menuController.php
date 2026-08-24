@@ -76,7 +76,22 @@
 			return $menus;
 		}
 
-		public function ConstruirMenu($menus, $vistaActual = ''){
+		/**
+		 * @param array $contadores  vista => numero. Se pinta una insignia en
+		 *                           las entradas que aparezcan aqui con un
+		 *                           numero mayor que cero.
+		 */
+		public function ConstruirMenu($menus, $vistaActual = '', array $contadores = []){
+			/* La insignia de una entrada del menu, si tiene algo que contar. */
+			$insignia = function ($vista) use ($contadores) {
+				$v = trim((string) $vista, "/ \t\n\r\0\x0B");
+				$n = (int) ($contadores[$v] ?? 0);
+				if ($n <= 0) { return ''; }
+				/* aria-label porque un numero suelto no dice de que es. */
+				return ' <span class="nav-badge badge text-bg-warning ms-auto"'
+				     . ' aria-label="' . $n . ' pendientes">' . $n . '</span>';
+			};
+
 			$html = '';
 			$padreActual = null; // Variable para rastrear el padre actual
             $vistaActual = trim((string) $vistaActual, "/ \t\n\r\0\x0B");
@@ -106,7 +121,7 @@
 						// Menú principal sin hijos
 						$html .= '<li class="nav-item">';
 						$html .= '<a href="' . APP_URL . $menu['menu_vista'] . '/" class="nav-link' . ($vistaActiva($menu['menu_vista']) ? ' active' : '') . '">';
-						$html .= '<i class="'.$menu['menu_icono'].'"></i> <p>' . $menu['menu_nombre'] . '</p>';
+						$html .= '<i class="'.$menu['menu_icono'].'"></i> <p>' . $menu['menu_nombre'] . $insignia($menu['menu_vista']) . '</p>';
 						$html .= '</a>';
 						$html .= '</li>';
 					} else {
@@ -123,7 +138,11 @@
 							$html .= '<li class="nav-item' . ($grupoActivo($menu['menu_padreid']) ? ' menu-open' : '') . '">';
                             $html .= '<a href="#" class="nav-link' . ($grupoActivo($menu['menu_padreid']) ? ' active' : '') . '">';
 							$html .= '<i class="'.$menu['menu_icono'].'"></i>';
-							$html .= '<p>' . $menu['padre'] . '<i class="fas fa-angle-left right"></i></p>';
+							/* nav-arrow, no «right»: la clase que rota la flecha al
+							   abrir el grupo se llama asi en AdminLTE 4, y «right»
+							   ya no existe. Sin ella la flecha se queda quieta y
+							   nada indica si la rama esta abierta o cerrada. */
+							$html .= '<p>' . $menu['padre'] . '<i class="fas fa-angle-left nav-arrow"></i></p>';
 							$html .= '</a>';
 							$html .= '<ul class="nav nav-treeview">';
 							$padreActual = $menu['padre']; // Actualiza el rastreador de padre actual
@@ -133,7 +152,7 @@
 						$html .= '<li class="nav-item">';
 						$html .= '<a href="' . APP_URL . $menu['menu_vista'] . '/" class="nav-link' . ($vistaActiva($menu['menu_vista']) ? ' active' : '') . '">';
 						$html .= '<i class="nav-icon far fa-circle text-info"></i>';
-						$html .= '<p>' . $menu['menu_nombre'] . '</p>';
+						$html .= '<p>' . $menu['menu_nombre'] . $insignia($menu['menu_vista']) . '</p>';
 						$html .= '</a>';
 						$html .= '</li>';
 					}
@@ -148,7 +167,7 @@
 
 			$html .= '<li class="nav-header">Salir</li>';
 			$html .= '	<li class="nav-item">';
-			$html .= '	  <a href="'.APP_URL.'logOut/" class="nav-link" id="btn_exit">';
+			$html .= '	  <a href="'.APP_URL.'logOut/" class="nav-link js-salir">';
 			$html .= '		<i class="nav-icon far fa-circle text-danger"></i>';
 			$html .= '		<p class="text">Salir</p>';
 			$html .= '	  </a>';

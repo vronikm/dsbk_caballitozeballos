@@ -5,6 +5,7 @@
 	$insAgenda = new agendaController();
 	
 ?>
+<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8">
@@ -13,18 +14,21 @@
 	<title><?php echo APP_NAME; ?>| Eventos</title>
 	<!-- Google Font: Source Sans Pro -->
 	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/fontawesome6/css/all.min.css">
 	  <!-- fullCalendar -->
 	  <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fullcalendar/main.css">
 	<!-- Theme style -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/css/overlayscrollbars.min.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/css/adminlte.min.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
     
+	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
   </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
       <!-- Navbar -->
       <?php require_once "app/views/inc/navbar.php"; ?>
       <!-- /.navbar -->
@@ -34,17 +38,17 @@
       <!-- /.Main Sidebar Container -->  
 
       <!-- vista -->
-      <div class="content-wrapper">
+      <div class="app-main">
 
 		<!-- Content Header (Page header) -->
-		<div class="content-header">
+		<div class="app-content-header">
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
 						<h1 class="m-0">Registro de eventos</h1>
 					</div><!-- /.col -->
 					<div class="col-sm-6">
-						<ol class="breadcrumb float-sm-right">
+						<ol class="breadcrumb float-sm-end">
 							<li class="breadcrumb-item"><a href="#">Nuevo</a></li>
 							<li class="breadcrumb-item active">Dashboard v1</li>
 						</ol>
@@ -55,7 +59,7 @@
 		<!-- /.content-header -->
 
 		<!-- Section listado de alumnos -->
-		<section class="content">						
+		<section class="app-content">						
 			<!-- card-body -->                
 			<div class="card-body">
 				<div class="row">
@@ -80,38 +84,36 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<h4 class="modal-title" id="modal-title">Registrar Evento</h4> <!-- Cambiará dinámicamente -->
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 						</div>
 						<div class="modal-body">
-							<div class="form-group">
+							<div class="mb-3">
 								<input type="hidden" name="modulo_agenda" id="modulo_agenda" value="registrar"> <!-- Cambiado a dinámico -->
 								<input type="hidden" name="agenda_id" id="agenda_id" value=""> <!-- Campo oculto para el ID -->
 							</div>
-								<div class="form-group">
+								<div class="mb-3">
 								<label for="agenda_title">Título del Evento:</label>
 								<input type="text" id="agenda_title" name="agenda_title" class="form-control" required>
 							</div>								
-							<div class="form-group">
+							<div class="mb-3">
 								<label for="agenda_detail">Detalle del Evento:</label>
 								<textarea id="agenda_detail" name="agenda_detail" class="form-control"></textarea>
 							</div>
-							<div class="form-group">
+							<div class="mb-3">
 								<label for="agenda_start">Fecha y Hora de Inicio:</label>
 								<input type="datetime-local" id="agenda_start" name="agenda_start" class="form-control" required>
 							</div>
-							<div class="form-group">
+							<div class="mb-3">
 								<label for="agenda_end">Fecha y Hora de Fin:</label>
 								<input type="datetime-local" id="agenda_end" name="agenda_end" class="form-control" required>
 							</div>
-							<div class="form-group">
+							<div class="mb-3">
 								<label for="agenda_color">Color del Evento:</label>
 								<input type="color" id="agenda_color" name="agenda_color" class="form-control">
 							</div>
 						</div>
 						<div class="modal-footer justify-content-between">
-							<button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+							<button type="button" class="btn btn-default" data-bs-dismiss="modal">Cerrar</button>
 							<button type="submit" class="btn btn-primary" id="btn-submit">Guardar</button>
 						</div>
 					</div>
@@ -134,16 +136,15 @@
 	<!-- jQuery -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 	<!-- jQuery UI -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery-ui/jquery-ui.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js" ></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js" ></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/main.js" ></script>	
 	<!-- fullCalendar 2.2.5 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/moment/moment.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/fullcalendar/main.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/fullcalendar/locales/es.js"></script>
 	

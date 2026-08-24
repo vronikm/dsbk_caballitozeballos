@@ -273,10 +273,10 @@
 							'.$this->siPuede('eliminar','ingresoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/balanceAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_ingreso" value="eliminar">
 								<input type="hidden" name="ingreso_id" value="'.$rows['ingreso_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 3px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 3px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'
 
-							'.$this->siPuede('editar','ingresoList','<a href="'.APP_URL.'ingresoList/'.$rows['ingreso_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 3px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+							'.$this->siPuede('editar','ingresoList','<a href="'.APP_URL.'ingresoList/'.$rows['ingreso_id'].'/" class="btn float-end btn-success btn-xs" style="margin-right: 3px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 						</td>
 					</tr>';	
 			}
@@ -582,10 +582,10 @@
 							'.$this->siPuede('eliminar','egresoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/balanceAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_egreso" value="eliminar">
 								<input type="hidden" name="egreso_id" value="'.$rows['egreso_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-xs" style="margin-right: 3px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 3px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'
 
-							'.$this->siPuede('editar','egresoList','<a href="'.APP_URL.'egresoList/'.$rows['egreso_id'].'/" class="btn float-right btn-success btn-xs" style="margin-right: 3px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+							'.$this->siPuede('editar','egresoList','<a href="'.APP_URL.'egresoList/'.$rows['egreso_id'].'/" class="btn float-end btn-success btn-xs" style="margin-right: 3px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 						</td>
 					</tr>';	
 			}

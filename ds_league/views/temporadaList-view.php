@@ -26,7 +26,7 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="col-lg-7 mb-3">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Temporadas</h3>
+                <h3 class="card-title"><i class="fas fa-calendar-alt me-2"></i>Temporadas</h3>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -36,7 +36,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <th>Temporada</th>
                                 <th>Desde</th>
                                 <th>Hasta</th>
-                                <th class="text-right">Torneos</th>
+                                <th class="text-end">Torneos</th>
                                 <th class="ds-tabla-acciones"></th>
                             </tr>
                         </thead>
@@ -50,7 +50,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <td><strong><?php echo $h($t['temporada_nombre']); ?></strong></td>
                                 <td><?php echo $h($t['temporada_desde']); ?></td>
                                 <td><?php echo $h($t['temporada_hasta']); ?></td>
-                                <td class="text-right"><?php echo (int)$t['torneos']; ?></td>
+                                <td class="text-end"><?php echo (int)$t['torneos']; ?></td>
                                 <td class="ds-tabla-acciones">
                                     <a href="<?php echo APP_URL; ?>torneoList/<?php echo (int)$t['temporada_id']; ?>/"
                                        class="btn btn-sm btn-ver" title="Ver torneos">
@@ -89,22 +89,22 @@ require_once __DIR__ . "/inc/layout-top.php";
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title" id="tituloForm">
-                        <i class="fas fa-plus mr-2"></i>Nueva temporada
+                        <i class="fas fa-plus me-2"></i>Nueva temporada
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="temporada_nombre">Nombre</label>
                         <input type="text" name="temporada_nombre" id="temporada_nombre"
                                class="form-control" maxlength="80" placeholder="Temporada 2026" required>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-6">
+                    <div class="row g-2">
+                        <div class="mb-3 col-6">
                             <label for="temporada_desde">Desde</label>
                             <input type="date" name="temporada_desde" id="temporada_desde"
                                    class="form-control" required>
                         </div>
-                        <div class="form-group col-6 mb-0">
+                        <div class="mb-3 col-6 mb-0">
                             <label for="temporada_hasta">Hasta</label>
                             <input type="date" name="temporada_hasta" id="temporada_hasta"
                                    class="form-control" required>

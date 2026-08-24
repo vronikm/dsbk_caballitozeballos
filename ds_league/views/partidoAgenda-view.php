@@ -37,7 +37,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-whistle mr-2"></i>Partidos en los que participo</h3>
+        <h3 class="card-title"><i class="fas fa-whistle me-2"></i>Partidos en los que participo</h3>
     </div>
     <div class="card-body p-0">
         <?php if (!$partidos): ?>
@@ -107,7 +107,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php echo $h($funciones[$p['designacion_funcion']] ?? '—'); ?>
                         </td>
                         <td>
-                            <span class="badge badge-<?php echo $tono[$p['estado_tono']] ?? 'secondary'; ?>">
+                            <span class="badge text-bg-<?php echo $tono[$p['estado_tono']] ?? 'secondary'; ?>">
                                 <?php echo $h($p['estado_nombre']); ?>
                             </span>
                         </td>

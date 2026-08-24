@@ -29,7 +29,7 @@ $fotoUsuario = !empty($_SESSION['foto'])
 
 /* Vendor compartido: FontAwesome vive todavia en el modulo Basketball.
    Cuando haya un segundo modulo conviene subirlo a ds_core/assets/. */
-$vendorCss = DS_BASKETBALL_URL . 'app/views/dist/plugins/fontawesome-free/css/all.min.css';
+$vendorCss = DS_HUB_URL . 'ds_core/assets/vendor/fontawesome6/css/all.min.css';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -44,6 +44,8 @@ $vendorCss = DS_BASKETBALL_URL . 'app/views/dist/plugins/fontawesome-free/css/al
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
     <link rel="stylesheet" href="<?php echo $vendorCss; ?>">
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/digisports.css">
+	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
 </head>
 <body class="ds-body">
 
@@ -74,6 +76,18 @@ $vendorCss = DS_BASKETBALL_URL . 'app/views/dist/plugins/fontawesome-free/css/al
                         <span class="ds-user__role"><?php echo htmlspecialchars((string)($_SESSION['sede'] ?: 'Todas las sedes'), ENT_QUOTES, 'UTF-8'); ?></span>
                     </span>
                 </div>
+
+                <?php /* Acceso a la seguridad de la propia cuenta. Va en la
+                         cabecera del Hub porque es la unica pantalla por la
+                         que pasan todos los usuarios, con independencia de
+                         los modulos que tengan concedidos. */ ?>
+                <a href="<?php echo DS_HUB_URL; ?>?p=seguridad" class="ds-iconbtn"
+                   title="Mi seguridad<?php echo dosf_activo(usuario_actual_id())
+                       ? ' · verificación en dos pasos activa'
+                       : ' · sin verificación en dos pasos'; ?>">
+                    <i class="fas fa-shield-alt"
+                       <?php if (dosf_activo(usuario_actual_id())): ?>style="color:#34d399;"<?php endif; ?>></i>
+                </a>
 
                 <a href="<?php echo DS_BASKETBALL_URL; ?>logOut/" class="ds-iconbtn" title="Cerrar sesión">
                     <i class="fas fa-sign-out-alt"></i>

@@ -31,18 +31,21 @@
 	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 	<!-- Google Font -->
 	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/fontawesome6/css/all.min.css">
 	<!-- AdminLTE -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/css/overlayscrollbars.min.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/css/adminlte.min.css">
+	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<!-- SweetAlert2 -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/cumples.css">
+	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<div class="app-wrapper ds-core">
 
 	<!-- Navbar -->
 	<?php require_once "app/views/inc/navbar.php"; ?>
@@ -50,20 +53,20 @@
 	<?php require_once "app/views/inc/main-sidebar.php"; ?>
 
 	<!-- Content Wrapper -->
-	<div class="content-wrapper">
+	<div class="app-main">
 
 		<!-- Content Header -->
-		<div class="content-header">
+		<div class="app-content-header">
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
-						<h3 class="m-0" style="color:var(--azul);">
+						<h3 class="m-0" style="color:var(--cumple-acento);">
 							<i class="fas fa-birthday-cake" style="color:var(--amarillo);"></i>
 							Cumpleaños
 						</h3>
 					</div>
 					<div class="col-sm-6">
-						<ol class="breadcrumb float-sm-right">
+						<ol class="breadcrumb float-sm-end">
 							<li class="breadcrumb-item"><a href="<?php echo APP_URL; ?>dashboard/">Inicio</a></li>
 							<li class="breadcrumb-item active">Cumpleaños</li>
 						</ol>
@@ -73,7 +76,7 @@
 		</div>
 
 		<!-- Main content -->
-		<section class="content">
+		<section class="app-content">
 			<div class="container-fluid">
 				<!-- Barra unificada: filtro + fecha -->
 				<div class="cumple-filtro mb-4">
@@ -161,9 +164,9 @@
 </div>
 
 <!-- Scripts -->
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js"></script>
 

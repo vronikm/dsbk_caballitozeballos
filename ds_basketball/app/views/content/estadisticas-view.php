@@ -28,21 +28,11 @@
 	$meses   = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 	$mesAnio = $meses[(int)date('n')] . ' ' . date('Y');
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?php echo APP_NAME; ?> | Estadísticas</title>
-  <link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/1104523691001_2.png">
-  <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-  <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-  <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-  <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-  <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Estadísticas';
+	$extras      = array (0 => 'datatables',);
+	$cabeceraExtra = <<<'CSS'
   <style>
     /* ── KPI cards ─────────────────────────────────── */
     .kpi-card            { border-left: 4px solid; position: relative; overflow: hidden; }
@@ -65,9 +55,9 @@
     .pct-rojo            { background: #f8d7da; color: #721c24; }
 
     /* ── Color filas ───────────────────────────────── */
-    tr.fila-verde   td   { background-color: #f0fff4 !important; }
-    tr.fila-amarillo td  { background-color: #fffdf0 !important; }
-    tr.fila-rojo    td   { background-color: #fff5f5 !important; }
+    tr.fila-verde   td   { background-color: var(--bs-success-bg-subtle) !important; color: var(--bs-success-text-emphasis) !important; }
+    tr.fila-amarillo td  { background-color: var(--bs-warning-bg-subtle) !important; color: var(--bs-warning-text-emphasis) !important; }
+    tr.fila-rojo    td   { background-color: var(--bs-danger-bg-subtle) !important; color: var(--bs-danger-text-emphasis) !important; }
 
     /* ── Tabla ─────────────────────────────────────── */
     .tabla-estadisticas th {
@@ -75,7 +65,7 @@
       text-align: center; vertical-align: middle; font-size: 0.8rem;
     }
     .tabla-estadisticas td  { vertical-align: middle; font-size: 0.86rem; }
-    .tabla-estadisticas tfoot td { background-color: #e9ecef; font-weight: 700; text-align: center; }
+    .tabla-estadisticas tfoot td { background-color: var(--bs-secondary-bg); color: var(--bs-body-color); font-weight: 700; text-align: center; }
 
     /* ── Mini progress-bar ─────────────────────────── */
     .prog-wrap           { min-width: 80px; }
@@ -93,17 +83,19 @@
     /* ── Barra progreso recaudo en KPI ─────────────── */
     .kpi-progress        { height: 6px; border-radius: 3px; margin-top: 6px; }
   </style>
-</head>
-<body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
+CSS;
+	require_once "app/views/inc/cabecera.php";
+?>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<div class="app-wrapper ds-core">
 
   <?php require_once "app/views/inc/navbar.php"; ?>
   <?php require_once "app/views/inc/main-sidebar.php"; ?>
 
-  <div class="content-wrapper">
+  <div class="app-main">
 
     <!-- Content Header -->
-    <div class="content-header">
+    <div class="app-content-header">
       <div class="container-fluid">
         <div class="row mb-1">
           <div class="col-sm-6">
@@ -114,7 +106,7 @@
             </h1>
           </div>
           <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
+            <ol class="breadcrumb float-sm-end">
               <li class="breadcrumb-item"><a href="<?php echo APP_URL; ?>dashboard/">Inicio</a></li>
               <li class="breadcrumb-item active">Estadísticas <?php echo $mesAnio; ?></li>
             </ol>
@@ -123,7 +115,7 @@
       </div>
     </div>
 
-    <section class="content">
+    <section class="app-content">
       <div class="container-fluid">
 
         <?php if(empty($lugar)): ?>
@@ -205,12 +197,12 @@
         <!-- ── Card tabla ────────────────────────────────── -->
         <div class="card card-default">
           <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-table mr-1"></i> Detalle por lugar de entrenamiento</h3>
+            <h3 class="card-title"><i class="fas fa-table me-1"></i> Detalle por lugar de entrenamiento</h3>
             <div class="card-tools d-flex align-items-center flex-wrap" style="gap:6px;">
               <!-- Leyenda semáforo -->
-              <span class="badge-pct pct-verde d-none d-md-inline"><i class="fas fa-circle mr-1"></i> ≥ 80%</span>
-              <span class="badge-pct pct-amarillo d-none d-md-inline"><i class="fas fa-circle mr-1"></i> 50–79%</span>
-              <span class="badge-pct pct-rojo d-none d-md-inline"><i class="fas fa-circle mr-1"></i> &lt; 50%</span>
+              <span class="badge-pct pct-verde d-none d-md-inline"><i class="fas fa-circle me-1"></i> ≥ 80%</span>
+              <span class="badge-pct pct-amarillo d-none d-md-inline"><i class="fas fa-circle me-1"></i> 50–79%</span>
+              <span class="badge-pct pct-rojo d-none d-md-inline"><i class="fas fa-circle me-1"></i> &lt; 50%</span>
               <div style="width:1px; height:20px; background:#dee2e6;" class="d-none d-md-inline-block mx-1"></div>
               <button onclick="exportarTablaAExcel('tablaDatos','SC-Estadisticas-<?php echo date('Y-m'); ?>')"
                       class="boton-icono"
@@ -220,9 +212,7 @@
                       class="boton-icono"
                       style="background-image: url('<?php echo APP_URL; ?>app/views/imagenes/iconos/Pdf.png');"
                       title="Exportar a PDF"></button>
-              <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Colapsar">
-                <i class="fas fa-minus"></i>
-              </button>
+              <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Plegar o desplegar" aria-label="Plegar o desplegar"><i data-lte-icon="expand" class="fas fa-plus"></i><i data-lte-icon="collapse" class="fas fa-minus"></i></button>
             </div>
           </div>
           <div class="card-body p-0">
@@ -255,9 +245,9 @@
                     <td class="text-center"><?php echo $alumnos[$i]; ?></td>
                     <td class="text-center"><?php echo $alumnosad[$i]; ?></td>
                     <td class="text-center"><?php echo $sinregpago[$i]; ?></td>
-                    <td class="text-right">$<?php echo number_format($pensiones[$i], 2); ?></td>
-                    <td class="text-right">$<?php echo number_format($recaudado[$i], 2); ?></td>
-                    <td class="text-right <?php echo $porRecaudar > 0 ? 'text-danger' : 'text-success'; ?>">
+                    <td class="text-end">$<?php echo number_format($pensiones[$i], 2); ?></td>
+                    <td class="text-end">$<?php echo number_format($recaudado[$i], 2); ?></td>
+                    <td class="text-end <?php echo $porRecaudar > 0 ? 'text-danger' : 'text-success'; ?>">
                       <?php echo $porRecaudar > 0 ? '$'.number_format($porRecaudar, 2) : '<i class="fas fa-check-circle text-success"></i>'; ?>
                     </td>
                     <td class="text-center">
@@ -275,13 +265,13 @@
                     $barTotal   = $pctTotal >= 80 ? 'bg-success' : ($pctTotal >= 50 ? 'bg-warning'  : 'bg-danger');
                   ?>
                   <tr>
-                    <td colspan="2" class="text-right">Totales:</td>
+                    <td colspan="2" class="text-end">Totales:</td>
                     <td><?php echo $totalAlumnos; ?></td>
                     <td><?php echo $totalAlumnosAd; ?></td>
                     <td><?php echo $totalAlSinPagos; ?></td>
-                    <td class="text-right">$<?php echo number_format($totalPensiones, 2); ?></td>
-                    <td class="text-right">$<?php echo number_format($totalRecaudado, 2); ?></td>
-                    <td class="text-right <?php echo $totalPorRecaudar > 0 ? 'text-danger' : 'text-success'; ?>">
+                    <td class="text-end">$<?php echo number_format($totalPensiones, 2); ?></td>
+                    <td class="text-end">$<?php echo number_format($totalRecaudado, 2); ?></td>
+                    <td class="text-end <?php echo $totalPorRecaudar > 0 ? 'text-danger' : 'text-success'; ?>">
                       $<?php echo number_format($totalPorRecaudar, 2); ?>
                     </td>
                     <td class="text-center">
@@ -299,11 +289,9 @@
         <!-- ── Card gráficos ─────────────────────────────── -->
         <div class="card card-default">
           <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> Gráficos por lugar de entrenamiento</h3>
+            <h3 class="card-title"><i class="fas fa-chart-bar me-1"></i> Gráficos por lugar de entrenamiento</h3>
             <div class="card-tools">
-              <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Colapsar">
-                <i class="fas fa-minus"></i>
-              </button>
+              <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Plegar o desplegar" aria-label="Plegar o desplegar"><i data-lte-icon="expand" class="fas fa-plus"></i><i data-lte-icon="collapse" class="fas fa-minus"></i></button>
             </div>
           </div>
           <div class="card-body">
@@ -311,14 +299,14 @@
               <!-- Gráfico 1: Monetario -->
               <div class="col-12 col-xl-6 mb-3 mb-xl-0">
                 <p class="text-center text-muted mb-1" style="font-size:0.82rem; text-transform:uppercase; letter-spacing:.5px;">
-                  <i class="fas fa-dollar-sign mr-1"></i> Pensiones estimadas vs. Recaudado ($)
+                  <i class="fas fa-dollar-sign me-1"></i> Pensiones estimadas vs. Recaudado ($)
                 </p>
                 <canvas id="graficoMonetario"></canvas>
               </div>
               <!-- Gráfico 2: Conteos -->
               <div class="col-12 col-xl-6">
                 <p class="text-center text-muted mb-1" style="font-size:0.82rem; text-transform:uppercase; letter-spacing:.5px;">
-                  <i class="fas fa-users mr-1"></i> Alumnos entrenando / adeudan / sin registro
+                  <i class="fas fa-users me-1"></i> Alumnos entrenando / adeudan / sin registro
                 </p>
                 <canvas id="graficoAlumnos"></canvas>
               </div>
@@ -328,9 +316,9 @@
 
         <!-- Leyenda semáforo mobile (visible solo en móvil) -->
         <div class="d-flex d-md-none mb-3" style="gap:8px; flex-wrap:wrap;">
-          <span class="badge-pct pct-verde"><i class="fas fa-circle mr-1"></i> ≥ 80% recaudado</span>
-          <span class="badge-pct pct-amarillo"><i class="fas fa-circle mr-1"></i> 50–79%</span>
-          <span class="badge-pct pct-rojo"><i class="fas fa-circle mr-1"></i> &lt; 50%</span>
+          <span class="badge-pct pct-verde"><i class="fas fa-circle me-1"></i> ≥ 80% recaudado</span>
+          <span class="badge-pct pct-amarillo"><i class="fas fa-circle me-1"></i> 50–79%</span>
+          <span class="badge-pct pct-rojo"><i class="fas fa-circle me-1"></i> &lt; 50%</span>
         </div>
 
         <?php endif; ?>
@@ -346,22 +334,24 @@
 <!-- jQuery -->
 <script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables -->
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jszip/jszip.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/pdfmake/pdfmake.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/pdfmake/vfs_fonts.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.bootstrap5.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.responsive.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/responsive.bootstrap5.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.buttons.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.bootstrap5.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.html5.min.js"></script>
+	<?php /* pdfmake y jszip pesan 2,2 MB y sirven a dos botones: se traen
+			 al pulsarlos, no en cada carga. Va DESPUES de buttons.html5, que es
+			 quien define esos botones. */ ?>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/exportar.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.print.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/buttons.colVis.min.js"></script>
 <!-- AdminLTE -->
-<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
@@ -372,9 +362,9 @@
 
 <?php if(!empty($lugar)): ?>
 <script>
-$(function () {
+document.addEventListener('DOMContentLoaded', function () {
   // ── DataTables ────────────────────────────────────
-  $("#tablaDatos").DataTable({
+  new DataTable("#tablaDatos", {
     "paging":       false,
     "lengthChange": false,
     "searching":    false,
@@ -393,10 +383,11 @@ $(function () {
       "infoFiltered": "(filtrado de _MAX_ entradas totales)",
       "thousands":    ",",
       "zeroRecords":  "No se encontraron registros coincidentes",
-      "buttons": { "copy":"Copiar","print":"Imprimir","colvis":"Columnas" }
+			"buttons": { "copy":"Copiar","print":"Imprimir","colvis":"Columnas" }
     },
+    layout: { topStart: 'buttons' },
     "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-  }).buttons().container().appendTo('#tablaDatos_wrapper .col-md-6:eq(0)');
+  });
 });
 
 // ── Gráfico 1: Monetario ──────────────────────────

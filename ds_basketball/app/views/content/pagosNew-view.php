@@ -19,10 +19,10 @@
 
 		if($datos['pendiente']==1){
 			$pendiente = 'Pendiente';
-			$clase = '<a class="float-right text-danger">';
+			$clase = '<a class="float-end text-danger">';
 		}else{
 			$pendiente = 'Al día';
-			$clase = '<a class="float-right">';
+			$clase = '<a class="float-end">';
 		}
 	
 		$sede=$insAlumno->informacionSede($datos['alumno_sedeid']);
@@ -111,7 +111,7 @@
 			$pension = $insAlumno->pensionesPendientes($alumno);
 			if($pension != ""){
 				$pendiente = "Pendiente";
-				$clase = '<a class="float-right text-danger">';
+				$clase = '<a class="float-end text-danger">';
 			}
 		}else{
 			$pension = "";
@@ -126,50 +126,11 @@
 	}
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo APP_NAME; ?> | Registro de pagos</title>
-	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-	
-	<!-- daterange picker -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.css">
-	<!-- iCheck for checkboxes and radio inputs -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-	<!-- Bootstrap Color Picker -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
-	<!-- Tempusdominus Bootstrap 4 -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-	<!-- Select2 -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2/css/select2.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-	<!-- Bootstrap4 Duallistbox -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
-	<!-- BS Stepper -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/bs-stepper/css/bs-stepper.min.css">
-	
-	<!-- Theme style -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-
-
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js" ></script>
-
-	<!-- fileinput -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fileinput/fileinput.css">
-
-	<!-- Ekko Lightbox -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/ekko-lightbox/ekko-lightbox.css">
-
-    
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Registro de pagos';
+	$extras      = array (0 => 'lightbox',1 => 'swal',);
+	$cabeceraExtra = <<<'CSS'
 	<style>
 		.oculto{
 			display: none;
@@ -196,10 +157,11 @@
 		  box-shadow: none;
 		}
 	</style>
-
-  </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+CSS;
+	require_once "app/views/inc/cabecera.php";
+?>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
 
 		<!-- Preloader -->
 		<!--?php require_once "app/views/inc/preloader.php"; ?-->
@@ -214,17 +176,17 @@
 		<!-- /.Main Sidebar Container -->  
 
 		<!-- vista -->
-		<div class="content-wrapper">
+		<div class="app-main">
 
 			<!-- Content Header (Page header) -->
-			<div class="content-header">
+			<div class="app-content-header">
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
 							<h1 class="m-0">Pagos alumno</h1>
 						</div><!-- /.col -->
 						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
+							<ol class="breadcrumb float-sm-end">
 								<li class="breadcrumb-item"><a href="#">Inicio</a></li>
 								<li class="breadcrumb-item active">Ficha Alumno</li>
 							</ol>
@@ -235,7 +197,7 @@
 			<!-- /.content-header -->
 
 			<!-- Main content -->
-			<section class="content">				
+			<section class="app-content">				
 				<!-- /.container-fluid información alumno -->
 				<div class="container-fluid">
 
@@ -245,7 +207,7 @@
 							<div class="card card-primary card-outline">
 								<div class="card-body box-profile">
 									<div class="text-center">
-										<img class="profile-user-img img-fluid img-circle"
+										<img class="profile-user-img img-fluid rounded-circle"
 											src="<?php echo $foto; ?>"
 											alt="User profile picture">
 									</div>
@@ -256,13 +218,13 @@
 
 									<ul class="list-group list-group-unbordered mb-3">
 										<li class="list-group-item">
-											<b>Categoría</b> <a class="float-right"><?php echo $datos['anio']; ?></a>
+											<b>Categoría</b> <a class="float-end"><?php echo $datos['anio']; ?></a>
 										</li>
 										<li class="list-group-item">
-											<b>Estado alumno</b> <a class="float-right"><?php echo $datos['estado']; ?></a>
+											<b>Estado alumno</b> <a class="float-end"><?php echo $datos['estado']; ?></a>
 										</li>
 										<li class="list-group-item">
-											<b>Fecha de ingreso</b> <a class="float-right"><?php echo $datos['alumno_fechaingreso']; ?></a>
+											<b>Fecha de ingreso</b> <a class="float-end"><?php echo $datos['alumno_fechaingreso']; ?></a>
 										</li>
 										<li class="list-group-item">
 											<b>Estado pagos</b> 												
@@ -291,12 +253,12 @@
 							<div class="card">
 								<div class="card-header p-2">
 									<ul class="nav nav-pills">
-										<li class="nav-item"><a class="nav-link active" href="#pension" data-toggle="tab">Pensiones</a></li>
-										<li class="nav-item"><a class="nav-link" href="#inscripcion" data-toggle="tab">Inscripción</a></li>
-										<li class="nav-item"><a class="nav-link" href="#torneo" data-toggle="tab">Campeonato</a></li>
-										<li class="nav-item"><a class="nav-link" href="#uniforme" data-toggle="tab">Nuevo Uniforme</a></li>										
-										<li class="nav-item"><a class="nav-link" href="#kit" data-toggle="tab">Adicionales entrenamiento</a></li>									
-										<li class="nav-item"><a class="nav-link" href="#otros" data-toggle="tab">Otros</a></li>									
+										<li class="nav-item"><a class="nav-link active" href="#pension" data-bs-toggle="tab">Pensiones</a></li>
+										<li class="nav-item"><a class="nav-link" href="#inscripcion" data-bs-toggle="tab">Inscripción</a></li>
+										<li class="nav-item"><a class="nav-link" href="#torneo" data-bs-toggle="tab">Campeonato</a></li>
+										<li class="nav-item"><a class="nav-link" href="#uniforme" data-bs-toggle="tab">Nuevo Uniforme</a></li>										
+										<li class="nav-item"><a class="nav-link" href="#kit" data-bs-toggle="tab">Adicionales entrenamiento</a></li>									
+										<li class="nav-item"><a class="nav-link" href="#otros" data-bs-toggle="tab">Otros</a></li>									
 									</ul>
 								</div><!-- /.card-header -->
 							
@@ -311,54 +273,52 @@
 																	<!-- Post -->
 											<div class="row">
 												<div class="col-md-4">
-													<div class="form-group campo">
+													<div class="mb-3 campo">
 														<label for="pago_fecha">Fecha de pago</label>
 														<div class="input-group">
-															<div class="input-group-prepend">
-																<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-															</div>
-															<input type="date" class="form-control" id="pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask value="<?php echo $fechahoy; ?>" <?php echo $disabled; ?> required>
+																											<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+											
+															<input type="date" class="form-control js-fecha-en-palabras" id="pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask value="<?php echo $fechahoy; ?>" <?php echo $disabled; ?> required>
 															
 														</div>
 														<!-- /.input group -->
 													</div>
 												</div>
 												<div class="col-md-4">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="pago_fecharegistro">Fecha de registro</label>
 														<div class="input-group">
-															<div class="input-group-prepend">
-																<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-															</div>
+																											<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+											
 															<input type="date" class="form-control" id="pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask value="<?php echo $fechahoy; ?>" <?php echo $disabled; ?> required>
 														</div>
 														<!-- /.input group -->
 													</div>								
 												</div>
 												<div class="col-md-4">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="pago_periodo">Periodo(mes/año)</label>															
 														<input type="text" class="form-control" id="pago_periodo" name="pago_periodo" value="<?php echo $nombreMes; ?>" <?php echo $disabled; ?> required>															
 													</div>								
 												</div>
 												<div class="col-md-4">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="pago_valor">Pago</label>
-														<input type="text" class="pull-right form-control" style="text-align:right;" id="pago_valor" name="pago_valor" placeholder="0.00" pattern="^\d+(\.\d{1,2})?$" <?php echo ' value="'.$rubro_valor.'" '.$disabled; ?>  required>
+														<input type="text" class="form-control text-end" id="pago_valor" name="pago_valor" placeholder="0.00" pattern="^\d+(\.\d{1,2})?$" <?php echo ' value="'.$rubro_valor.'" '.$disabled; ?>  required>
 													</div>
 												</div>
 
 												<div class="col-md-4">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="pago_saldo">Saldo pendiente</label>
-														<input type="text" class="form-control" style="text-align:right;" id="pago_saldo" name="pago_saldo" placeholder="0.00" <?php echo ' value="'.$saldo.'" '.$disabled; ?>>
+														<input type="text" class="form-control text-end" id="pago_saldo" name="pago_saldo" placeholder="0.00" <?php echo ' value="'.$saldo.'" '.$disabled; ?>>
 													</div>
 												</div>
 												
 												<div class="col-md-4">
-													<div class="form-group">
+													<div class="mb-3">
 													<label for="pago_formapagoid">Forma de pago</label>
-													<select class="form-control select2" id="pago_formapagoid" name="pago_formapagoid" <?php echo $disabled; ?>>																									
+													<select class="form-control" id="pago_formapagoid" name="pago_formapagoid" <?php echo $disabled; ?>>																									
 														<?php echo $insAlumno->listarOptionPago(); ?>
 													</select>	
 													</div>
@@ -366,11 +326,11 @@
 												<div class="container-fluid">
 													<div class="row mb-2">
 														<div class="col-md-2">
-															<div class="form-group">
+															<div class="mb-3">
 																<label for="pago_archivo">Imagen Pago</label>		
 																<div class="input-group">											
 																	<div class="fileinput fileinput-new" data-provides="fileinput">
-																	<div class="fileinput-new thumbnail" style="width: 130px; height: 158px;" data-trigger="fileinput"><img src="" id="miImagen"></div>
+																	<div class="fileinput-new thumbnail" style="width: 130px; min-height: 158px;" data-trigger="fileinput"><img src="<?php echo APP_URL; ?>app/views/dist/img/sinpago.jpg" alt="" id="miImagen"></div>
 																			<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 130px; max-height: 158px"></div>
 																		<div>
 																			<span class="bton bton-white bton-file">
@@ -378,16 +338,16 @@
 																				<span class="fileinput-exists">Cambiar</span>
 																				<input type="file" name="pago_archivo" id="pago_archivo" <?php echo $disabled; ?>>
 																			</span>
-																			<a href="#" class="bton bton-orange fileinput-exists" data-dismiss="fileinput">X</a>
+																			<a href="#" class="bton bton-orange fileinput-exists" data-bs-dismiss="fileinput">X</a>
 																		</div>
 																	</div>
 																</div>		
 															</div>
-														<!-- /.form-group -->	
+														<!-- /.mb-3 -->	
 														</div>
 														<div class="col-md-10">
 															<div class="col-md-12">
-																<div class="form-group">
+																<div class="mb-3">
 																<label for="pago_concepto">Detalle</label>
 																<textarea class="form-control" id="pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3" <?php echo $disabled; ?>></textarea>
 																</div>
@@ -397,7 +357,7 @@
 																	echo '
 																	<div class="col-md-12">
 																		<div class="alert '.$alert.' alert-dismissible">
-																			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+																			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
 																			<h5><i class="icon fas fa-info"></i> Aviso!</h5>
 																			'.$textodescuento.$textodescripcion.'
 																		</div>
@@ -458,54 +418,52 @@
 																	<!-- Post -->
 												<div class="row">
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_fecha">Fecha pago inscripción</label>
+														<div class="mb-3">
+															<label for="inscripcion_pago_fecha">Fecha pago inscripción</label>
 															<div class="input-group">
-																<div class="input-group-prepend">
-																	<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-																</div>
-																<input type="date" class="form-control" id="pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask <?php echo $disabled; ?> required>
+																													<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+												
+																<input type="date" class="form-control js-fecha-en-palabras" id="inscripcion_pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask <?php echo $disabled; ?> required>
 															</div>
 															<!-- /.input group -->
 														</div>
 													</div>
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_fecharegistro">Fecha registro inscripción</label>
+														<div class="mb-3">
+															<label for="inscripcion_pago_fecharegistro">Fecha registro inscripción</label>
 															<div class="input-group">
-																<div class="input-group-prepend">
-																	<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-																</div>
-																<input type="date" class="form-control" id="pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask <?php echo $disabled; ?> required>
+																													<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+												
+																<input type="date" class="form-control" id="inscripcion_pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask <?php echo $disabled; ?> required>
 															</div>
 															<!-- /.input group -->
 														</div>								
 													</div>
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_periodo">Periodo inscripción</label>															
-															<input type="text" class="form-control" id="pago_periodo" name="pago_periodo" <?php echo $disabled; ?> required>															
+														<div class="mb-3">
+															<label for="inscripcion_pago_periodo">Periodo inscripción</label>															
+															<input type="text" class="form-control" id="inscripcion_pago_periodo" name="pago_periodo" <?php echo $disabled; ?> required>															
 														</div>								
 													</div>
 													
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_valor">Pago inscripción</label>
-															<input type="text" class="pull-right form-control" style="text-align:right;" id="pago_valor" name="pago_valor" placeholder="0.00" <?php echo ' value="'.$rubro_inscripcion.'" '.$disabled; ?>  required>
+														<div class="mb-3">
+															<label for="inscripcion_pago_valor">Pago inscripción</label>
+															<input type="text" class="form-control text-end" id="inscripcion_pago_valor" name="pago_valor" placeholder="0.00" <?php echo ' value="'.$rubro_inscripcion.'" '.$disabled; ?>  required>
 														</div>
 													</div>
 
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_saldo">Saldo inscripción</label>
-															<input type="text" class="form-control" style="text-align:right;" id="pago_saldo" name="pago_saldo" placeholder="0.00"  <?php echo ' value="'.$saldo.'" '.$disabled; ?> >
+														<div class="mb-3">
+															<label for="inscripcion_pago_saldo">Saldo inscripción</label>
+															<input type="text" class="form-control text-end" id="inscripcion_pago_saldo" name="pago_saldo" placeholder="0.00"  <?php echo ' value="'.$saldo.'" '.$disabled; ?> >
 														</div>
 													</div>
 													
 													<div class="col-md-4">
-														<div class="form-group">
-														<label for="pago_formapagoid">Forma de pago inscripción</label>
-														<select class="form-control select2" id="pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" <?php echo $disabled; ?>>																									
+														<div class="mb-3">
+														<label for="inscripcion_pago_formapagoid">Forma de pago inscripción</label>
+														<select class="form-control" id="inscripcion_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" <?php echo $disabled; ?>>																									
 															<?php echo $insAlumno->listarOptionPago(); ?>
 														</select>	
 														</div>
@@ -515,30 +473,30 @@
 														<div class="row mb-2">
 
 															<div class="col-2">
-																<div class="form-group">
-																	<label for="pago_archivo">Imagen pago</label>		
+																<div class="mb-3">
+																	<label for="inscripcion_pago_archivo">Imagen pago</label>		
 																	<div class="input-group">											
 																		<div class="fileinput fileinput-new" data-provides="fileinput">
-																		<div class="fileinput-new thumbnail" style="width: 130px; height: 158px;" data-trigger="fileinput"><img src="" id="miImagen"></div>
+																		<div class="fileinput-new thumbnail" style="width: 130px; min-height: 158px;" data-trigger="fileinput"><img src="<?php echo APP_URL; ?>app/views/dist/img/sinpago.jpg" alt="" id="inscripcion_miImagen"></div>
 																			<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 130px; max-height: 158px"></div>
 																			<div>
 																				<span class="bton bton-white bton-file">
 																					<span class="fileinput-new">Subir Pago</span>
 																					<span class="fileinput-exists">Cambiar</span>
-																					<input type="file" name="pago_archivo" id="pago_archivo" <?php echo $disabled; ?>>
+																					<input type="file" name="pago_archivo" id="inscripcion_pago_archivo" <?php echo $disabled; ?>>
 																				</span>
-																				<a href="#" class="bton bton-orange fileinput-exists" data-dismiss="fileinput">X</a>
+																				<a href="#" class="bton bton-orange fileinput-exists" data-bs-dismiss="fileinput">X</a>
 																			</div>
 																		</div>
 																	</div>		
 																</div>
-															<!-- /.form-group -->	
+															<!-- /.mb-3 -->	
 															</div>
 															<div class="col-10">
 																<div class="col-12">
-																	<div class="form-group">
-																	<label for="pago_concepto">Detalle inscripción</label>
-																	<textarea class="form-control" id="pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3" <?php echo $disabled; ?>></textarea>
+																	<div class="mb-3">
+																	<label for="inscripcion_pago_concepto">Detalle inscripción</label>
+																	<textarea class="form-control" id="inscripcion_pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3" <?php echo $disabled; ?>></textarea>
 																	</div>
 																</div>
 																<?php 
@@ -546,7 +504,7 @@
 																		echo '
 																		<div class="col-md-12">
 																			<div class="alert '.$alert.' alert-dismissible">
-																				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+																				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
 																				<h5><i class="icon fas fa-info"></i> Aviso!</h5>
 																				'.$textodescuento.$textodescripcion.'
 																			</div>
@@ -573,8 +531,8 @@
 											<div class="tab-custom-content">
 												<p class="lead mb-0">Pagos realizados de inscripción</p>
 											</div>
-											<div class="tab-content" id="custom-content-above-tabContent">
-												<table id="example1" class="table table-bordered table-striped table-sm">
+											<div class="tab-content" id="inscripcion_custom-content-above-tabContent">
+												<table id="inscripcion_example1" class="table table-bordered table-striped table-sm">
 													<thead>
 														<tr>
 															<th>No</th>															
@@ -605,56 +563,54 @@
 																	<!-- Post -->
 											<div class="row">
 												<div class="col-md-4">
-													<div class="form-group campo">
-														<label for="pago_fecha">Fecha de pago campeonato</label>
+													<div class="mb-3 campo">
+														<label for="torneo_pago_fecha">Fecha de pago campeonato</label>
 														<div class="input-group">
-															<div class="input-group-prepend">
-																<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-															</div>
-															<input type="date" class="form-control" id="pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask value="<?php echo $fechahoy; ?>" required>
+																											<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+											
+															<input type="date" class="form-control js-fecha-en-palabras" id="torneo_pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask value="<?php echo $fechahoy; ?>" required>
 															
 														</div>
 														<!-- /.input group -->
 													</div>
 												</div>
 												<div class="col-md-4">
-													<div class="form-group">
-														<label for="pago_fecharegistro">Fecha de registro campeonato</label>
+													<div class="mb-3">
+														<label for="torneo_pago_fecharegistro">Fecha de registro campeonato</label>
 														<div class="input-group">
-															<div class="input-group-prepend">
-																<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-															</div>
-															<input type="date" class="form-control" id="pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask value="<?php echo $fechahoy; ?>" required>
+																											<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+											
+															<input type="date" class="form-control" id="torneo_pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask value="<?php echo $fechahoy; ?>" required>
 														</div>
 														<!-- /.input group -->
 													</div>								
 												</div>
 												<div class="col-md-4">
-													<div class="form-group">
-													<label for="pago_campeonatoid">Campeonato</label>
-													<select id="pago_campeonatoid" class="form-control select2" name="pago_campeonatoid" <?php echo $disabled; ?>>																									
+													<div class="mb-3">
+													<label for="torneo_pago_campeonatoid">Campeonato</label>
+													<select id="torneo_pago_campeonatoid" class="form-control" name="pago_campeonatoid" <?php echo $disabled; ?>>																									
 														<?php echo $insAlumno->listarCampeonatos(); ?>
 													</select>	
 													</div>
 												</div>
 												<div class="col-md-4">
-													<div class="form-group">
-														<label for="pago_valor">Pago campeonato</label>
-														<input type="text" class="pull-right form-control" style="text-align:right;" id="pago_valor" name="pago_valor" placeholder="0.00" pattern="^\d+(\.\d{1,2})?$" value="" required>
+													<div class="mb-3">
+														<label for="torneo_pago_valor">Pago campeonato</label>
+														<input type="text" class="form-control text-end" id="torneo_pago_valor" name="pago_valor" placeholder="0.00" pattern="^\d+(\.\d{1,2})?$" value="" required>
 													</div>
 												</div>
 
 												<div class="col-md-4">
-													<div class="form-group">
-														<label for="pago_saldo">Saldo campeonato</label>
-														<input type="text" class="form-control" style="text-align:right;" id="pago_saldo" name="pago_saldo" placeholder="0.00" value="0.00"; >
+													<div class="mb-3">
+														<label for="torneo_pago_saldo">Saldo campeonato</label>
+														<input type="text" class="form-control text-end" id="torneo_pago_saldo" name="pago_saldo" placeholder="0.00" value="0.00"; >
 													</div>
 												</div>
 												
 												<div class="col-md-4">
-													<div class="form-group">
-													<label for="pago_formapagoid">Forma de pago campeonato</label>
-													<select class="form-control select2" id="pago_formapagoid" name="pago_formapagoid">																									
+													<div class="mb-3">
+													<label for="torneo_pago_formapagoid">Forma de pago campeonato</label>
+													<select class="form-control" id="torneo_pago_formapagoid" name="pago_formapagoid">																									
 														<?php echo $insAlumno->listarOptionPago(); ?>
 													</select>	
 													</div>
@@ -662,30 +618,30 @@
 												<div class="container-fluid">
 													<div class="row mb-2">
 														<div class="col-md-2">
-															<div class="form-group">
-																<label for="pago_archivo">Imagen Pago</label>		
+															<div class="mb-3">
+																<label for="torneo_pago_archivo">Imagen Pago</label>		
 																<div class="input-group">											
 																	<div class="fileinput fileinput-new" data-provides="fileinput">
-																	<div class="fileinput-new thumbnail" style="width: 130px; height: 158px;" data-trigger="fileinput"><img src="" id="miImagen"></div>
+																	<div class="fileinput-new thumbnail" style="width: 130px; min-height: 158px;" data-trigger="fileinput"><img src="<?php echo APP_URL; ?>app/views/dist/img/sinpago.jpg" alt="" id="torneo_miImagen"></div>
 																			<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 130px; max-height: 158px"></div>
 																		<div>
 																			<span class="bton bton-white bton-file">
 																				<span class="fileinput-new">Subir Pago</span>
 																				<span class="fileinput-exists">Cambiar</span>
-																				<input type="file" name="pago_archivo" id="pago_archivo">
+																				<input type="file" name="pago_archivo" id="torneo_pago_archivo">
 																			</span>
-																			<a href="#" class="bton bton-orange fileinput-exists" data-dismiss="fileinput">X</a>
+																			<a href="#" class="bton bton-orange fileinput-exists" data-bs-dismiss="fileinput">X</a>
 																		</div>
 																	</div>
 																</div>		
 															</div>
-														<!-- /.form-group -->	
+														<!-- /.mb-3 -->	
 														</div>
 														<div class="col-md-10">
 															<div class="col-md-12">
-																<div class="form-group">
-																<label for="pago_concepto">Detalle campeonato</label>
-																<textarea class="form-control" id="pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3"></textarea>
+																<div class="mb-3">
+																<label for="torneo_pago_concepto">Detalle campeonato</label>
+																<textarea class="form-control" id="torneo_pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3"></textarea>
 																</div>
 															</div>															
 														</div>														
@@ -700,8 +656,8 @@
 											<div class="tab-custom-content">
 												<p class="lead mb-0">Pagos realizados de campeonatos</p>
 											</div>
-											<div class="tab-content" id="custom-content-above-tabContent">
-												<table id="example1" class="table table-bordered table-striped table-sm">
+											<div class="tab-content" id="torneo_custom-content-above-tabContent">
+												<table id="torneo_example1" class="table table-bordered table-striped table-sm">
 													<thead>
 														<tr>
 															<th>No</th>															
@@ -733,94 +689,92 @@
 																	<!-- Post -->
 												<div class="row">
 													<div class="col-md-3">
-														<div class="form-group">
-															<label for="pago_fecha">Fecha pago uniforme</label>
+														<div class="mb-3">
+															<label for="uniforme_pago_fecha">Fecha pago uniforme</label>
 															<div class="input-group">
-																<div class="input-group-prepend">
-																	<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-																</div>
-																<input type="date" class="form-control" id="pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
+																													<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+												
+																<input type="date" class="form-control js-fecha-en-palabras" id="uniforme_pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
 															</div>
 															<!-- /.input group -->
 														</div>
 													</div>
 													<div class="col-md-3">
-														<div class="form-group">
-															<label for="pago_fecharegistro">Fecha registro uniforme</label>
+														<div class="mb-3">
+															<label for="uniforme_pago_fecharegistro">Fecha registro uniforme</label>
 															<div class="input-group">
-																<div class="input-group-prepend">
-																	<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-																</div>
-																<input type="date" class="form-control" id="pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
+																													<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+												
+																<input type="date" class="form-control" id="uniforme_pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
 															</div>
 															<!-- /.input group -->
 														</div>								
 													</div>
 													<div class="col-md-3">
-														<div class="form-group">
-															<label for="pago_periodo">Periodo uniforme</label>															
-															<input type="text" class="form-control" id="pago_periodo" name="pago_periodo" required>															
+														<div class="mb-3">
+															<label for="uniforme_pago_periodo">Periodo uniforme</label>															
+															<input type="text" class="form-control" id="uniforme_pago_periodo" name="pago_periodo" required>															
 														</div>								
 													</div>
 																									
 													<div class="col-md-3">
-														<div class="form-group">
-														<label for="pago_talla">Talla</label>
-														<select class="form-control select2" id="pago_talla" name="pago_talla" required>																									
+														<div class="mb-3">
+														<label for="uniforme_pago_talla">Talla</label>
+														<select class="form-control" id="uniforme_pago_talla" name="pago_talla" required>																									
 															<?php echo $insAlumno->listarOptionTalla(""); ?>
 														</select>	
 														</div>
 													</div>
 													
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_valor">Pago uniforme</label>
-															<input type="text" class="pull-right form-control" style="text-align:right;" id="pago_valor" name="pago_valor" placeholder="0.00" required>
+														<div class="mb-3">
+															<label for="uniforme_pago_valor">Pago uniforme</label>
+															<input type="text" class="form-control text-end" id="uniforme_pago_valor" name="pago_valor" placeholder="0.00" required>
 														</div>
 													</div>
 
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_saldo">Saldo uniforme</label>
-															<input type="text" class="form-control" style="text-align:right;" id="pago_saldo" name="pago_saldo" placeholder="0.00">
+														<div class="mb-3">
+															<label for="uniforme_pago_saldo">Saldo uniforme</label>
+															<input type="text" class="form-control text-end" id="uniforme_pago_saldo" name="pago_saldo" placeholder="0.00">
 														</div>
 													</div>
 													
 													<div class="col-md-4">
-														<div class="form-group">
-														<label for="pago_formapagoid">Forma de pago uniforme</label>
-														<select class="form-control select2" id="pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
+														<div class="mb-3">
+														<label for="uniforme_pago_formapagoid">Forma de pago uniforme</label>
+														<select class="form-control" id="uniforme_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
 															<?php echo $insAlumno->listarOptionPago(); ?>
 														</select>	
 														</div>
 													</div>													
 													
-													<div class="col-md-2" id="miDiv">
-														<div class="form-group">
-															<label for="pago_archivo">Imagen Pago</label>		
+													<div class="col-md-2" id="uniforme_miDiv">
+														<div class="mb-3">
+															<label for="uniforme_pago_archivo">Imagen Pago</label>		
 															<div class="input-group">											
 																<div class="fileinput fileinput-new" data-provides="fileinput">
-																	<div class="fileinput-new thumbnail" style="width: 130px; height: 158px;" data-trigger="fileinput"><img src="" id="miImagen"></div>
+																	<div class="fileinput-new thumbnail" style="width: 130px; min-height: 158px;" data-trigger="fileinput"><img src="<?php echo APP_URL; ?>app/views/dist/img/sinpago.jpg" alt="" id="uniforme_miImagen"></div>
 																	<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 130px; max-height: 158px"></div>
 																	<div>
 																		<span class="bton bton-white bton-file">
 																			<span class="fileinput-new">Subir Pago</span>
 																			<span class="fileinput-exists">Cambiar</span>
-																			<input type="file" name="pago_archivo" id="pago_archivo">
+																			<input type="file" name="pago_archivo" id="uniforme_pago_archivo">
 																		</span>
-																		<a href="#" class="bton bton-orange fileinput-exists" data-dismiss="fileinput">X</a>
+																		<a href="#" class="bton bton-orange fileinput-exists" data-bs-dismiss="fileinput">X</a>
 																	</div>
 																</div>
 															</div>		
 														</div>
-													<!-- /.form-group -->	
+													<!-- /.mb-3 -->	
 													</div>
 
 													<div class="col-md-10">
 														<div class="col-md-12">
-															<div class="form-group">
-																<label for="pago_concepto">Detalle uniforme</label>
-																<textarea class="form-control" id="pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3" ></textarea>
+															<div class="mb-3">
+																<label for="uniforme_pago_concepto">Detalle uniforme</label>
+																<textarea class="form-control" id="uniforme_pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3" ></textarea>
 															</div>
 														</div>
 													</div>
@@ -832,8 +786,8 @@
 											<div class="tab-custom-content">
 												<p class="lead mb-0">Pagos de Nuevo Uniforme realizados</p>
 											</div>
-											<div class="tab-content" id="custom-content-above-tabContent">
-												<table id="example1" class="table table-bordered table-striped table-sm">
+											<div class="tab-content" id="uniforme_custom-content-above-tabContent">
+												<table id="uniforme_example1" class="table table-bordered table-striped table-sm">
 													<thead>
 														<tr>
 															<th>No</th>
@@ -865,85 +819,83 @@
 																	<!-- Post -->
 												<div class="row">
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_fecha">Fecha pago accesorio entrenamiento</label>
+														<div class="mb-3">
+															<label for="kit_pago_fecha">Fecha pago accesorio entrenamiento</label>
 															<div class="input-group">
-																<div class="input-group-prepend">
-																	<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-																</div>
-																<input type="date" class="form-control" id="pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
+																													<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+												
+																<input type="date" class="form-control js-fecha-en-palabras" id="kit_pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
 															</div>
 															<!-- /.input group -->
 														</div>
 													</div>
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_fecharegistro">Fecha registro accesorio entrenamiento</label>
+														<div class="mb-3">
+															<label for="kit_pago_fecharegistro">Fecha registro accesorio entrenamiento</label>
 															<div class="input-group">
-																<div class="input-group-prepend">
-																	<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-																</div>
-																<input type="date" class="form-control" id="pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
+																													<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+												
+																<input type="date" class="form-control" id="kit_pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
 															</div>
 															<!-- /.input group -->
 														</div>								
 													</div>
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_periodo">Periodo accesorio entrenamiento</label>															
-															<input type="text" class="form-control" id="pago_periodo" name="pago_periodo" required>															
+														<div class="mb-3">
+															<label for="kit_pago_periodo">Periodo accesorio entrenamiento</label>															
+															<input type="text" class="form-control" id="kit_pago_periodo" name="pago_periodo" required>															
 														</div>								
 													</div>
 													
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_valor">Pago accesorio entrenamiento</label>
-															<input type="text" class="pull-right form-control" style="text-align:right;" id="pago_valor" name="pago_valor" placeholder="0.00" required>
+														<div class="mb-3">
+															<label for="kit_pago_valor">Pago accesorio entrenamiento</label>
+															<input type="text" class="form-control text-end" id="kit_pago_valor" name="pago_valor" placeholder="0.00" required>
 														</div>
 													</div>
 
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_saldo">Saldo accesorio entrenamiento</label>
-															<input type="text" class="form-control" style="text-align:right;" id="pago_saldo" name="pago_saldo" placeholder="0.00">
+														<div class="mb-3">
+															<label for="kit_pago_saldo">Saldo accesorio entrenamiento</label>
+															<input type="text" class="form-control text-end" id="kit_pago_saldo" name="pago_saldo" placeholder="0.00">
 														</div>
 													</div>
 													
 													<div class="col-md-4">
-														<div class="form-group">
-														<label for="pago_formapagoid">Forma de pago</label>
-														<select class="form-control select2" id="pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
+														<div class="mb-3">
+														<label for="kit_pago_formapagoid">Forma de pago</label>
+														<select class="form-control" id="kit_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
 															<?php echo $insAlumno->listarOptionPago(); ?>
 														</select>	
 														</div>
 													</div>													
 													
-													<div class="col-md-2" id="miDiv">
-														<div class="form-group">
-															<label for="pago_archivo">Imagen Pago</label>		
+													<div class="col-md-2" id="kit_miDiv">
+														<div class="mb-3">
+															<label for="kit_pago_archivo">Imagen Pago</label>		
 															<div class="input-group">											
 																<div class="fileinput fileinput-new" data-provides="fileinput">
-																	<div class="fileinput-new thumbnail" style="width: 130px; height: 158px;" data-trigger="fileinput"><img src="" id="miImagen"></div>
+																	<div class="fileinput-new thumbnail" style="width: 130px; min-height: 158px;" data-trigger="fileinput"><img src="<?php echo APP_URL; ?>app/views/dist/img/sinpago.jpg" alt="" id="kit_miImagen"></div>
 																	<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 130px; max-height: 158px"></div>
 																	<div>
 																		<span class="bton bton-white bton-file">
 																			<span class="fileinput-new">Subir Pago</span>
 																			<span class="fileinput-exists">Cambiar</span>
-																			<input type="file" name="pago_archivo" id="pago_archivo">
+																			<input type="file" name="pago_archivo" id="kit_pago_archivo">
 																		</span>
-																		<a href="#" class="bton bton-orange fileinput-exists" data-dismiss="fileinput">X</a>
+																		<a href="#" class="bton bton-orange fileinput-exists" data-bs-dismiss="fileinput">X</a>
 																	</div>
 																</div>
 															</div>		
 														</div>
-													<!-- /.form-group -->	
+													<!-- /.mb-3 -->	
 													</div>
 
 													<div class="col-md-10">
 														<div class="col-md-12">
-															<div class="form-group">
-																<label for="pago_concepto">Detalle accesorios entrenamiento</label>
-																<textarea class="form-control" id="pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3" ></textarea>
+															<div class="mb-3">
+																<label for="kit_pago_concepto">Detalle accesorios entrenamiento</label>
+																<textarea class="form-control" id="kit_pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3" ></textarea>
 															</div>
 														</div>
 													</div>
@@ -955,8 +907,8 @@
 											<div class="tab-custom-content">
 												<p class="lead mb-0">Pagos realizados por accesorios de entrenamiento</p>
 											</div>
-											<div class="tab-content" id="custom-content-above-tabContent">
-												<table id="example1" class="table table-bordered table-striped table-sm">
+											<div class="tab-content" id="kit_custom-content-above-tabContent">
+												<table id="kit_example1" class="table table-bordered table-striped table-sm">
 													<thead>
 														<tr>
 															<th>No</th>
@@ -987,85 +939,83 @@
 																	<!-- Post -->
 												<div class="row">
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_fecha">Fecha pago Otros</label>
+														<div class="mb-3">
+															<label for="otros_pago_fecha">Fecha pago Otros</label>
 															<div class="input-group">
-																<div class="input-group-prepend">
-																	<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-																</div>
-																<input type="date" class="form-control" id="pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
+																													<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+												
+																<input type="date" class="form-control js-fecha-en-palabras" id="otros_pago_fecha" name="pago_fecha" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
 															</div>
 															<!-- /.input group -->
 														</div>
 													</div>
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_fecharegistro">Fecha registro Otros</label>
+														<div class="mb-3">
+															<label for="otros_pago_fecharegistro">Fecha registro Otros</label>
 															<div class="input-group">
-																<div class="input-group-prepend">
-																	<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-																</div>
-																<input type="date" class="form-control" id="pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
+																													<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+												
+																<input type="date" class="form-control" id="otros_pago_fecharegistro" name="pago_fecharegistro" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask required>
 															</div>
 															<!-- /.input group -->
 														</div>								
 													</div>
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_periodo">Periodo Otros</label>															
-															<input type="text" class="form-control" id="pago_periodo" name="pago_periodo" required>															
+														<div class="mb-3">
+															<label for="otros_pago_periodo">Periodo Otros</label>															
+															<input type="text" class="form-control" id="otros_pago_periodo" name="pago_periodo" required>															
 														</div>								
 													</div>
 													
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_valor">Pago Otros</label>
-															<input type="text" class="pull-right form-control" style="text-align:right;" id="pago_valor" name="pago_valor" placeholder="0.00" required>
+														<div class="mb-3">
+															<label for="otros_pago_valor">Pago Otros</label>
+															<input type="text" class="form-control text-end" id="otros_pago_valor" name="pago_valor" placeholder="0.00" required>
 														</div>
 													</div>
 
 													<div class="col-md-4">
-														<div class="form-group">
-															<label for="pago_saldo">Saldo Otros</label>
-															<input type="text" class="form-control" style="text-align:right;" id="pago_saldo" name="pago_saldo" placeholder="0.00">
+														<div class="mb-3">
+															<label for="otros_pago_saldo">Saldo Otros</label>
+															<input type="text" class="form-control text-end" id="otros_pago_saldo" name="pago_saldo" placeholder="0.00">
 														</div>
 													</div>
 													
 													<div class="col-md-4">
-														<div class="form-group">
-														<label for="pago_formapagoid">Forma de pago Otros</label>
-														<select class="form-control select2" id="pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
+														<div class="mb-3">
+														<label for="otros_pago_formapagoid">Forma de pago Otros</label>
+														<select class="form-control" id="otros_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
 															<?php echo $insAlumno->listarOptionPago(); ?>
 														</select>	
 														</div>
 													</div>										
 
-													<div class="col-md-2" id="miDiv">
-														<div class="form-group">
-															<label for="pago_archivo">Imagen Pago</label>		
+													<div class="col-md-2" id="otros_miDiv">
+														<div class="mb-3">
+															<label for="otros_pago_archivo">Imagen Pago</label>		
 															<div class="input-group">											
 																<div class="fileinput fileinput-new" data-provides="fileinput">
-																	<div class="fileinput-new thumbnail" style="width: 130px; height: 158px;" data-trigger="fileinput"><img src="" id="miImagen"></div>
+																	<div class="fileinput-new thumbnail" style="width: 130px; min-height: 158px;" data-trigger="fileinput"><img src="<?php echo APP_URL; ?>app/views/dist/img/sinpago.jpg" alt="" id="otros_miImagen"></div>
 																	<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 130px; max-height: 158px"></div>
 																	<div>
 																		<span class="bton bton-white bton-file">
 																			<span class="fileinput-new">Subir Pago</span>
 																			<span class="fileinput-exists">Cambiar</span>
-																			<input type="file" name="pago_archivo" id="pago_archivo">
+																			<input type="file" name="pago_archivo" id="otros_pago_archivo">
 																		</span>
-																		<a href="#" class="bton bton-orange fileinput-exists" data-dismiss="fileinput">X</a>
+																		<a href="#" class="bton bton-orange fileinput-exists" data-bs-dismiss="fileinput">X</a>
 																	</div>
 																</div>
 															</div>		
 														</div>
-													<!-- /.form-group -->	
+													<!-- /.mb-3 -->	
 													</div>
 
 													<div class="col-md-10">
 														<div class="col-md-12">
-															<div class="form-group">
-																<label for="pago_concepto">Detalle Otros</label>
-																<textarea class="form-control" id="pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3" ></textarea>
+															<div class="mb-3">
+																<label for="otros_pago_concepto">Detalle Otros</label>
+																<textarea class="form-control" id="otros_pago_concepto" name="pago_concepto" placeholder="Detalle del pago" rows="3" ></textarea>
 															</div>
 														</div>
 													</div>
@@ -1078,8 +1028,8 @@
 											<div class="tab-custom-content">
 												<p class="lead mb-0">Pagos Otros realizados</p>
 											</div>
-											<div class="tab-content" id="custom-content-above-tabContent">
-												<table id="example1" class="table table-bordered table-striped table-sm">
+											<div class="tab-content" id="otros_custom-content-above-tabContent">
+												<table id="otros_example1" class="table table-bordered table-striped table-sm">
 													<thead>
 														<tr>
 															<th>No</th>
@@ -1128,35 +1078,27 @@
 	<!-- jQuery -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>	
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>	
 	<!-- Select2 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/select2/js/select2.full.min.js"></script>
 	<!-- Bootstrap4 Duallistbox -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
 	<!-- InputMask -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/moment/moment.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- bootstrap color picker -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
 	<!-- Tempusdominus Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 	<!-- Bootstrap Switch -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 	<!-- BS-Stepper -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bs-stepper/js/bs-stepper.min.js"></script>
 	<!-- AdminLTE App -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>		
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>		
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js" ></script>	
 	<!-- fileinput -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/fileinput/fileinput.js"></script>    
 
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/ekko-lightbox/ekko-lightbox.min.js"></script>
 		
 	<script>
 		$(document).ready(function () {
-			$("#pago_fecha").keyup(function () {
+			$(".js-fecha-en-palabras").keyup(function () {
 				var value = $(this).val();
 				
 				// Dividir la fecha manualmente para evitar problemas de zona horaria
@@ -1182,14 +1124,13 @@
 
 	<script>	
 		$(function () {
-			$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+			$(document).on('click', '[data-bs-toggle="lightbox"]', function(event) {
 			event.preventDefault();
 			$(this).ekkoLightbox({
 				alwaysShowClose: true
 			});
 			});
 
-			$('.filter-container').filterizr({gutterPixels: 3});
 			$('.btn[data-filter]').on('click', function() {
 			$('.btn[data-filter]').removeClass('active');
 			$(this).addClass('active');
@@ -1199,89 +1140,18 @@
 
 	<script>
 		$(function () {
-			//Initialize Select2 Elements
-			$('.select2').select2()
-
-			//Initialize Select2 Elements
-			$('.select2bs4').select2({
-			theme: 'bootstrap4'
-			})
-
-			//Datemask dd/mm/yyyy
-			$('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
-			//Datemask2 mm/dd/yyyy
-			$('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
-			//Money Euro
+			/* Lo único del bloque de ejemplo de AdminLTE que esta página
+			   usaba de verdad. El resto —tempusdominus, daterangepicker,
+			   duallistbox, colorpicker, bootstrap-switch y bs-stepper—
+			   apuntaba a selectores inexistentes: se descargaban seis
+			   librerías para ejecutar código contra nada. */
 			$('[data-mask]').inputmask()
-
-			//Date picker
-			$('#reservationdate').datetimepicker({
-				format: 'L'
-			});
-
-			//Date and time picker
-			$('#reservationdatetime').datetimepicker({ icons: { time: 'far fa-clock' } });
-
-			//Date range picker
-			$('#reservation').daterangepicker()
-			//Date range picker with time picker
-			$('#reservationtime').daterangepicker({
-			timePicker: true,
-			timePickerIncrement: 30,
-			locale: {
-				format: 'MM/DD/YYYY hh:mm A'
-			}
-			})
-			//Date range as a button
-			$('#daterange-btn').daterangepicker(
-			{
-				ranges   : {
-				'Today'       : [moment(), moment()],
-				'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-				'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-				'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-				'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-				'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-				},
-				startDate: moment().subtract(29, 'days'),
-				endDate  : moment()
-			},
-			function (start, end) {
-				$('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-			}
-			)
-
-			//Timepicker
-			$('#timepicker').datetimepicker({
-			format: 'LT'
-			})
-
-			//Bootstrap Duallistbox
-			$('.duallistbox').bootstrapDualListbox()
-
-			//Colorpicker
-			$('.my-colorpicker1').colorpicker()
-			//color picker with addon
-			$('.my-colorpicker2').colorpicker()
-
-			$('.my-colorpicker2').on('colorpickerChange', function(event) {
-			$('.my-colorpicker2 .fa-square').css('color', event.color.toString());
-			})
-
-			$("input[data-bootstrap-switch]").each(function(){
-			$(this).bootstrapSwitch('state', $(this).prop('checked'));
-			})
-
-		})
-		// BS-Stepper Init
-		document.addEventListener('DOMContentLoaded', function () {
-			window.stepper = new Stepper(document.querySelector('.bs-stepper'))
 		})
 	</script>
 
 	<script>
 		// Guardar el tab activo cuando el usuario cambia de pestaña
-		document.querySelectorAll('a[data-toggle="tab"]').forEach(tab => {
+		document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(tab => {
 			tab.addEventListener('shown.bs.tab', function (e) {
 				localStorage.setItem('activeTab', e.target.getAttribute('href'));
 			});
@@ -1309,5 +1179,6 @@
 		});
 	</script>
 	
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/foto.js"></script>
   </body>
 </html>

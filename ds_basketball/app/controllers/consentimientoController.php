@@ -210,13 +210,13 @@
 				  . '</tr></thead><tbody>';
 
 			foreach ($historial as $h) {
-				$badgeTipo  = ($h['consent_tipo'] === 'DATOS') ? 'badge-danger' : 'badge-success';
+				$badgeTipo  = ($h['consent_tipo'] === 'DATOS') ? 'text-bg-danger' : 'text-bg-success';
 				$accion     = ($h['consent_otorgado'] === 'S')
-							? '<span class="badge badge-success">Otorgado</span>'
-							: '<span class="badge badge-secondary">Revocado</span>';
+							? '<span class="badge text-bg-success">Otorgado</span>'
+							: '<span class="badge text-bg-secondary">Revocado</span>';
 				$origen     = ($h['consent_origen'] === 'FORMULARIO')
-							? '<span class="badge badge-info">Formulario de inscripción</span>'
-							: '<span class="badge badge-warning">Registrado por administrador</span>';
+							? '<span class="badge text-bg-info">Formulario de inscripción</span>'
+							: '<span class="badge text-bg-warning">Registrado por administrador</span>';
 
 				$html .= '<tr>'
 					  . '<td><span class="badge ' . $badgeTipo . '">' . htmlspecialchars($h['consent_tipo']) . '</span></td>'

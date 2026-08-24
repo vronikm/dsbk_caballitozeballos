@@ -110,17 +110,17 @@
 					$estadop=$estadop->fetch(); 
 					if($estadop['pendiente']==1){
 						$pendiente = 'Pendiente';
-						$clase = '<a class="float-left text-danger">';
+						$clase = '<a class="float-start text-danger">';
 					}else{
 						$pendiente = 'Al día';
-						$clase = '<a class="float-left">';
+						$clase = '<a class="float-start">';
 					}
 				}
 
 				$pension = $this->pensionesPendientes($rows['alumno_id']);
 				if($pension != ""){
 					$pendiente = "Pendiente";
-					$clase = '<a class="float-left text-danger">';
+					$clase = '<a class="float-start text-danger">';
 				}
 
 				$tabla.='
@@ -131,8 +131,8 @@
 						<td>'.$rows['alumno_fechanacimiento'].'</td>
 						<td>'.$clase.$pendiente.'</a></td>
 						<td>
-							<a href="'.APP_URL.'pagosNew/'.$rows['alumno_id'].'/" class="btn float-right '.$botonpago.' btn-xs" target="_blank"><i class="fas fa-dollar-sign mr-1"></i>Registrar pagos</a>
-							<a href="'.APP_URL.'pagosDescuento/'.$rows['alumno_id'].'/" class="btn float-right '.$boton.' btn-xs" style="margin-right: 5px;" target="_blank"><i class="fas fa-dollar-sign mr-1"></i>Descuentos</a>
+							<a href="'.APP_URL.'pagosNew/'.$rows['alumno_id'].'/" class="btn float-end '.$botonpago.' btn-xs" target="_blank"><i class="fas fa-dollar-sign me-1"></i>Registrar pagos</a>
+							<a href="'.APP_URL.'pagosDescuento/'.$rows['alumno_id'].'/" class="btn float-end '.$boton.' btn-xs" style="margin-right: 5px;" target="_blank"><i class="fas fa-dollar-sign me-1"></i>Descuentos</a>
 						</td>
 					</tr>';	
 			}
@@ -1568,7 +1568,7 @@
 					<td>'.$rows['fila_numero'].'</td>
 					<td>'.$rows['transaccion_fecha'].'</td>
 					<td>'.$rows['transaccion_periodo'].'</td>
-					<td><a href="'.$imagen.'" data-toggle="lightbox" data-title="Pago" data-gallery="gallery">'.$rows['transaccion_valor'].'</a></td>				
+					<td><a href="'.$imagen.'" data-bs-toggle="lightbox" data-title="Pago" data-gallery="gallery">'.$rows['transaccion_valor'].'</a></td>				
 					<td>'.$rows['transaccion_valorcalculado'].'</td>	
 					<td>'.$rows['transaccion_recibo'].'</td>	
 					<td>
@@ -1576,11 +1576,11 @@
 							<input type="hidden" name="modulo_pagos" value="eliminarpendiente">
 							<input type="hidden" name="transaccion_id" value="'.$rows['transaccion_id'].'">	
 							<input type="hidden" name="transaccion_pagoid" value="'.$rows['transaccion_pagoid'].'">						
-							<button type="submit" class="btn float-right btn-danger btn-sm" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+							<button type="submit" class="btn float-end btn-danger btn-sm" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 						</form>').'							
 
-						'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagospendienteUpdate/'.$rows['transaccion_id'].'/" class="btn float-right btn-success btn-sm" style="margin-right: 5px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
-						<a href="'.APP_URL.'pagospendienteRecibo/'.$rows['transaccion_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print mr-1"></i>Recibo</a>
+						'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagospendienteUpdate/'.$rows['transaccion_id'].'/" class="btn float-end btn-success btn-sm" style="margin-right: 5px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+						<a href="'.APP_URL.'pagospendienteRecibo/'.$rows['transaccion_id'].'/" class="btn float-end btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print me-1"></i>Recibo</a>
 					</td>
 				</tr>';	
 			}
@@ -1616,9 +1616,9 @@
 				}
 
 				if($rows['pago_saldo'] > 0 ){
-					$btnPagar = '<a href="'.APP_URL.'pagosPendiente/'.$rows['pago_id'].'/" class="btn float-right btn-info btn-sm" style="margin-right: 5px;"><i class="fas fa-dollar-sign mr-1"></i>Pagar</a>';
+					$btnPagar = '<a href="'.APP_URL.'pagosPendiente/'.$rows['pago_id'].'/" class="btn float-end btn-info btn-sm" style="margin-right: 5px;"><i class="fas fa-dollar-sign me-1"></i>Pagar</a>';
 				}elseif($rows['pago_saldo'] == 0 && $rows['PAGOS_PENDIENTES']>0){
-					$btnPagar = '<a href="'.APP_URL.'pagosPendiente/'.$rows['pago_id'].'/" class="btn float-right btn-dark btn-sm" style="margin-right: 5px;"><i class="fas fa-dollar-sign mr-1"></i>Pagos</a>';
+					$btnPagar = '<a href="'.APP_URL.'pagosPendiente/'.$rows['pago_id'].'/" class="btn float-end btn-dark btn-sm" style="margin-right: 5px;"><i class="fas fa-dollar-sign me-1"></i>Pagos</a>';
 				}else{				
 					$btnPagar ="";
 				}
@@ -1641,7 +1641,7 @@
 							<td>'.$rows['fila_numero'].'</td>
 							<td>'.$rows['pago_fecharegistro'].'</td>
 							<td>'.$rows['pago_periodo'].'</td>								
-							<td><a href="'.$imagen.'" data-toggle="lightbox" data-title="Pago" data-gallery="gallery">'.$rows['pago_valor'].'</a></td>
+							<td><a href="'.$imagen.'" data-bs-toggle="lightbox" data-title="Pago" data-gallery="gallery">'.$rows['pago_valor'].'</a></td>
 							<td>'.$rows['pago_saldo'].'</td>						
 							<td>'.$rows['pago_recibo'].'</td>								
 							<td>'.$estado.'</td>
@@ -1649,12 +1649,12 @@
 								'.$this->siPuede('eliminar','pagosList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/pagosAjax.php" method="POST" autocomplete="off" >
 									<input type="hidden" name="modulo_pagos" value="eliminar">
 									<input type="hidden" name="pago_id" value="'.$rows['pago_id'].'">						
-									<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+									<button type="submit" class="btn float-end btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 								</form>').'							
 
-								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-end btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 								'.$btnPagar.'
-								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print mr-1"></i>Recibo</a>
+								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-end btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print me-1"></i>Recibo</a>
 							</td>
 						</tr>';	
 				}elseif($rubro == 'RPC'){
@@ -1663,7 +1663,7 @@
 							<td>'.$rows['fila_numero'].'</td>
 							<td>'.$rows['pago_fecharegistro'].'</td>							
 							<td>'.$rows['torneo_nombre'].'</td>							
-							<td><a href="'.$imagen.'" data-toggle="lightbox" data-title="Pago" data-gallery="gallery">'.$rows['pago_valor'].'</a></td>
+							<td><a href="'.$imagen.'" data-bs-toggle="lightbox" data-title="Pago" data-gallery="gallery">'.$rows['pago_valor'].'</a></td>
 							<td>'.$rows['pago_saldo'].'</td>						
 							<td>'.$rows['pago_recibo'].'</td>
 							<td>'.$estado.'</td>
@@ -1671,12 +1671,12 @@
 								'.$this->siPuede('eliminar','pagosList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/pagosAjax.php" method="POST" autocomplete="off" >
 									<input type="hidden" name="modulo_pagos" value="eliminar">
 									<input type="hidden" name="pago_id" value="'.$rows['pago_id'].'">						
-									<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+									<button type="submit" class="btn float-end btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 								</form>').'							
 
-								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-end btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 								'.$btnPagar.'
-								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print mr-1"></i>Recibo</a>
+								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-end btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print me-1"></i>Recibo</a>
 							</td>
 						</tr>';	
 				}elseif($rubro == 'RNU'){
@@ -1686,7 +1686,7 @@
 							<td>'.$rows['pago_fecharegistro'].'</td>
 							<td>'.$rows['pago_periodo'].'</td>
 							<td>'.$rows['pago_talla'].'</td>
-							<td><a href="'.$imagen.'" data-toggle="lightbox" data-title="Pago" data-gallery="gallery">'.$rows['pago_valor'].'</a></td>
+							<td><a href="'.$imagen.'" data-bs-toggle="lightbox" data-title="Pago" data-gallery="gallery">'.$rows['pago_valor'].'</a></td>
 							<td>'.$rows['pago_saldo'].'</td>
 							<td>'.$rows['pago_recibo'].'</td>							
 							<td>'.$estado.'</td>
@@ -1694,12 +1694,12 @@
 								'.$this->siPuede('eliminar','pagosList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/pagosAjax.php" method="POST" autocomplete="off" >
 									<input type="hidden" name="modulo_pagos" value="eliminar">
 									<input type="hidden" name="pago_id" value="'.$rows['pago_id'].'">						
-									<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+									<button type="submit" class="btn float-end btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 								</form>').'							
 
-								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+								'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-end btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 								'.$btnPagar.'
-								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print mr-1"></i>Recibo</a>
+								<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-end btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print me-1"></i>Recibo</a>
 							</td>
 						</tr>';	
 				}else{
@@ -1708,7 +1708,7 @@
 						<td>'.$rows['fila_numero'].'</td>
 						<td>'.$rows['pago_fecharegistro'].'</td>
 						<td>'.$rows['pago_periodo'].'</td>
-						<td><a href="'.$imagen.'" data-toggle="lightbox" data-title="Pago" data-gallery="gallery">'.$rows['pago_valor'].'</a></td>
+						<td><a href="'.$imagen.'" data-bs-toggle="lightbox" data-title="Pago" data-gallery="gallery">'.$rows['pago_valor'].'</a></td>
 						<td>'.$rows['pago_saldo'].'</td>
 						<td>'.$rows['pago_recibo'].'</td>						
 						<td>'.$estado.'</td>
@@ -1716,12 +1716,12 @@
 							'.$this->siPuede('eliminar','pagosList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/pagosAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_pagos" value="eliminar">
 								<input type="hidden" name="pago_id" value="'.$rows['pago_id'].'">						
-								<button type="submit" class="btn float-right btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn float-end btn-danger btn-sm " style="margin-right: 5px;" '.$eliminarpago.' title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'							
 
-							'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-right btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+							'.$this->siPuede('editar','pagosList','<a href="'.APP_URL.'pagosUpdate/'.$rows['pago_id'].'/" class="btn float-end btn-success btn-sm '.$eliminarpago.'" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 							'.$btnPagar.'
-							<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-right btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print mr-1"></i>Recibo</a>
+							<a href="'.APP_URL.'pagosRecibo/'.$rows['pago_id'].'/" class="btn float-end btn-secondary btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-print me-1"></i>Recibo</a>
 						</td>
 					</tr>';	
 				}

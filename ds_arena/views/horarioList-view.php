@@ -41,7 +41,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         <div>
             <strong>Todavía no hay instalaciones registradas.</strong><br>
             Cree una cancha o residencia antes de definir su disponibilidad.
-            <a href="<?php echo APP_URL; ?>instalacionList/" class="ml-2">Ir a Instalaciones →</a>
+            <a href="<?php echo APP_URL; ?>instalacionList/" class="ms-2">Ir a Instalaciones →</a>
         </div>
     </div>
 
@@ -52,9 +52,9 @@ require_once __DIR__ . "/inc/layout-top.php";
             <h3 class="card-title mb-0">Disponibilidad semanal</h3>
 
             <div class="d-flex align-items-center" style="gap:12px;">
-                <form method="GET" action="<?php echo APP_URL; ?>horarioList/" class="form-inline">
-                    <label for="instalacion" class="mr-2 mb-0">Instalación</label>
-                    <select name="instalacion" id="instalacion" class="form-control form-control-sm"
+                <form method="GET" action="<?php echo APP_URL; ?>horarioList/" class="d-flex flex-wrap align-items-center gap-2">
+                    <label for="instalacion" class="me-2 mb-0">Instalación</label>
+                    <select name="instalacion" id="instalacion" class="form-select form-select-sm w-auto"
                             onchange="this.form.submit()">
                         <?php foreach ($instalaciones as $i): ?>
                             <option value="<?php echo (int)$i['instalacion_id']; ?>"
@@ -66,8 +66,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                 </form>
 
                 <?php if ($puedeCrear): ?>
-                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalFranja">
-                        <i class="fas fa-plus mr-1"></i> Añadir franja
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalFranja">
+                        <i class="fas fa-plus me-1"></i> Añadir franja
                     </button>
                 <?php endif; ?>
             </div>
@@ -82,7 +82,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <div style="padding:10px 14px;border-bottom:1px solid var(--core-borde);
                                         font-weight:700;font-size:.85rem;">
                                 <?php echo $nombre; ?>
-                                <span class="float-right text-muted" style="font-weight:400;">
+                                <span class="float-end text-muted" style="font-weight:400;">
                                     <?php echo count($porDia[$num]); ?>
                                 </span>
                             </div>
@@ -95,7 +95,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php foreach ($porDia[$num] as $h): ?>
                                     <div class="d-flex align-items-center justify-content-between mb-1">
                                         <span style="font-size:.86rem;">
-                                            <i class="far fa-clock text-muted mr-1"></i>
+                                            <i class="far fa-clock text-muted me-1"></i>
                                             <?php echo substr($h['horario_desde'], 0, 5); ?>–<?php echo substr($h['horario_hasta'], 0, 5); ?>
                                         </span>
 
@@ -137,11 +137,11 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="modal-header">
                             <h5 class="modal-title">Añadir franja de disponibilidad</h5>
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
 
                         <div class="modal-body">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label>Días <span class="text-danger">*</span></label>
                                 <div class="d-flex flex-wrap" style="gap:8px;">
                                     <?php foreach ($dias as $num => $nombre): ?>
@@ -156,12 +156,12 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <small class="text-muted">Se creará la misma franja en cada día marcado.</small>
                             </div>
 
-                            <div class="form-row">
-                                <div class="form-group col-6">
+                            <div class="row g-2">
+                                <div class="mb-3 col-6">
                                     <label for="horario_desde">Desde <span class="text-danger">*</span></label>
                                     <input type="time" class="form-control" id="horario_desde" name="horario_desde" required>
                                 </div>
-                                <div class="form-group col-6 mb-0">
+                                <div class="mb-3 col-6 mb-0">
                                     <label for="horario_hasta">Hasta <span class="text-danger">*</span></label>
                                     <input type="time" class="form-control" id="horario_hasta" name="horario_hasta" required>
                                 </div>
@@ -169,7 +169,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="submit" class="btn btn-primary">Guardar</button>
                         </div>
                     </form>

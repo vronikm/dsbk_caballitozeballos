@@ -53,7 +53,7 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="col-lg-7 mb-3">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-hashtag mr-2"></i>Asignación actual</h3>
+                <h3 class="card-title"><i class="fas fa-hashtag me-2"></i>Asignación actual</h3>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -62,8 +62,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <tr>
                                 <th>Módulo</th>
                                 <th>Punto</th>
-                                <th class="text-right">Desde</th>
-                                <th class="text-right">Emitidos</th>
+                                <th class="text-end">Desde</th>
+                                <th class="text-end">Emitidos</th>
                                 <th>Estado</th>
                                 <th class="ds-tabla-acciones"></th>
                             </tr>
@@ -87,15 +87,15 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <td class="text-monospace">
                                     <?php echo $h($p['punto_establecimiento'] . '-' . $p['punto_codigo']); ?>
                                 </td>
-                                <td class="text-right"><?php echo (int)$p['punto_secuencialinicio']; ?></td>
-                                <td class="text-right">
+                                <td class="text-end"><?php echo (int)$p['punto_secuencialinicio']; ?></td>
+                                <td class="text-end">
                                     <?php echo (int)$p['emitidos']; ?>
                                     <?php if ((int)$p['contador'] > 0): ?>
                                         <br><small class="text-muted">contador: <?php echo (int)$p['contador']; ?></small>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <span class="badge badge-<?php echo $activo ? 'success' : 'secondary'; ?>">
+                                    <span class="badge text-bg-<?php echo $activo ? 'success' : 'secondary'; ?>">
                                         <?php echo $activo ? 'Activo' : 'Inactivo'; ?>
                                     </span>
                                 </td>
@@ -130,7 +130,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
         <?php if ($sinAsignar): ?>
         <div class="callout callout-warning mt-3">
-            <h6 class="mb-1"><i class="fas fa-exclamation-circle mr-2"></i>Módulos sin punto asignado</h6>
+            <h6 class="mb-1"><i class="fas fa-exclamation-circle me-2"></i>Módulos sin punto asignado</h6>
             <p class="mb-0 text-muted">
                 <?php echo $h(implode(', ', $sinAsignar)); ?>.
                 Mientras no lo tengan, no pueden emitir comprobantes.
@@ -149,12 +149,12 @@ require_once __DIR__ . "/inc/layout-top.php";
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title" id="tituloFormPunto">
-                        <i class="fas fa-plus mr-2"></i>Nuevo punto de emisión
+                        <i class="fas fa-plus me-2"></i>Nuevo punto de emisión
                     </h3>
                 </div>
                 <div class="card-body">
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="punto_modulo">Módulo</label>
                         <select name="punto_modulo" id="punto_modulo" class="form-control" required>
                             <option value="">Seleccione…</option>
@@ -168,14 +168,14 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </small>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-6">
+                    <div class="row g-2">
+                        <div class="mb-3 col-6">
                             <label for="punto_establecimiento">Establecimiento</label>
                             <input type="text" name="punto_establecimiento" id="punto_establecimiento"
                                    class="form-control text-monospace" maxlength="3" pattern="\d{3}"
                                    value="<?php echo $h($cfg['codigo_establecimiento']); ?>" required>
                         </div>
-                        <div class="form-group col-6">
+                        <div class="mb-3 col-6">
                             <label for="punto_codigo">Punto de emisión</label>
                             <input type="text" name="punto_codigo" id="punto_codigo"
                                    class="form-control text-monospace" maxlength="3" pattern="\d{3}"
@@ -183,7 +183,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="punto_secuencialinicio">Numerar desde</label>
                         <input type="number" name="punto_secuencialinicio" id="punto_secuencialinicio"
                                class="form-control" min="1" max="999999999" value="1" required>
@@ -193,14 +193,14 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </small>
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="punto_descripcion">Descripción</label>
                         <input type="text" name="punto_descripcion" id="punto_descripcion"
                                class="form-control" maxlength="100"
                                placeholder="Qué se factura desde aquí">
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="mb-3 mb-0">
                         <label for="punto_estado">Estado</label>
                         <select name="punto_estado" id="punto_estado" class="form-control">
                             <option value="I">Inactivo — reserva el número, no permite emitir</option>
@@ -240,7 +240,7 @@ require_once __DIR__ . "/inc/layout-top.php";
             }
 
             document.getElementById('tituloFormPunto').innerHTML =
-                '<i class="fas fa-pen mr-2"></i>Editar ' + d.estab + '-' + d.codigo;
+                '<i class="fas fa-pen me-2"></i>Editar ' + d.estab + '-' + d.codigo;
 
             /* Si el punto ya emitió, el número inicial no puede bajar de ahí.
                El servidor lo rechaza igualmente; esto sólo evita el viaje. */
@@ -258,7 +258,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         setTimeout(function () {
             document.getElementById('punto_id').value = '0';
             document.getElementById('tituloFormPunto').innerHTML =
-                '<i class="fas fa-plus mr-2"></i>Nuevo punto de emisión';
+                '<i class="fas fa-plus me-2"></i>Nuevo punto de emisión';
             var inicio = document.getElementById('punto_secuencialinicio');
             if (inicio) { inicio.min = 1; }
         }, 0);

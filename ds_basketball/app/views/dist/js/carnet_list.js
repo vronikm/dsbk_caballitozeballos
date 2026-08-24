@@ -1,6 +1,6 @@
 $(function () {
     // Inicializar DataTable
-    $("#example1").DataTable({
+    new DataTable("#example1", {
         "order": [[4, "asc"]], // Ordena por la columna "Impresion" (Pendiente primero)
         "responsive": true, 
         "lengthChange": false, 

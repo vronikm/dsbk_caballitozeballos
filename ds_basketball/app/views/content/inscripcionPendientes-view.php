@@ -12,45 +12,39 @@
     /* Badge de un requisito: verde si está cubierto, rojo si falta */
     function badgePendiente($cubierto, $textoOk, $textoFalta) {
         return $cubierto
-            ? '<span class="badge badge-success"><i class="fas fa-check"></i> '.$textoOk.'</span>'
-            : '<span class="badge badge-danger"><i class="fas fa-times"></i> '.$textoFalta.'</span>';
+            ? '<span class="badge text-bg-success"><i class="fas fa-check"></i> '.$textoOk.'</span>'
+            : '<span class="badge text-bg-danger"><i class="fas fa-times"></i> '.$textoFalta.'</span>';
     }
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo APP_NAME; ?> | Inscripciones en línea pendientes</title>
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Inscripciones en línea pendientes';
+	$extras      = array (0 => 'datatables',);
+	$cabeceraExtra = <<<'CSS'
     <style>
         .dias-espera { font-weight: 600; }
         .dias-alerta { color: #dc3545; }
         .dias-aviso  { color: #fd7e14; }
     </style>
-</head>
-<body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
+CSS;
+	require_once "app/views/inc/cabecera.php";
+?>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<div class="app-wrapper ds-core">
 
     <?php require_once "app/views/inc/navbar.php"; ?>
     <?php require_once "app/views/inc/main-sidebar.php"; ?>
 
-    <div class="content-wrapper">
+    <div class="app-main">
 
-        <div class="content-header">
+        <div class="app-content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h4 class="m-0">Inscripciones en línea pendientes</h4>
                     </div>
                     <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
+                        <ol class="breadcrumb float-sm-end">
                             <li class="breadcrumb-item"><a href="<?php echo APP_URL.'dashboard/'; ?>">Dashboard</a></li>
                             <li class="breadcrumb-item active">Inscripciones pendientes</li>
                         </ol>
@@ -59,7 +53,7 @@
             </div>
         </div>
 
-        <section class="content">
+        <section class="app-content">
             <div class="container-fluid">
 
                 <div class="callout callout-warning">
@@ -76,11 +70,11 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-user-clock"></i> Por completar
-                            <span class="badge badge-warning ml-1"><?php echo count($filas); ?></span>
+                            <span class="badge text-bg-warning ms-1"><?php echo count($filas); ?></span>
                         </h3>
                         <div class="card-tools">
                             <form method="GET" class="form-inline">
-                                <select name="sede" class="form-control form-control-sm mr-2">
+                                <select name="sede" class="form-control form-control-sm me-2">
                                     <option value="">Todas las sedes</option>
                                     <?php foreach ($sedes as $sede): ?>
                                         <option value="<?php echo $sede['sede_id']; ?>"
@@ -92,9 +86,8 @@
                                 <div class="input-group input-group-sm" style="width:240px;">
                                     <input type="text" name="q" class="form-control" placeholder="Buscar alumno o cédula"
                                            value="<?php echo htmlspecialchars($busqueda); ?>">
-                                    <div class="input-group-append">
-                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
-                                    </div>
+                                                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                
                                 </div>
                             </form>
                         </div>
@@ -127,11 +120,11 @@
                                     /* El rubro puede existir pero seguir impago: se distingue,
                                        porque "inscrito" y "cobrado" no son lo mismo. */
                                     if ((int) $f['tiene_inscripcion'] === 0) {
-                                        $badgeIns = '<span class="badge badge-danger"><i class="fas fa-times"></i> Sin registrar</span>';
+                                        $badgeIns = '<span class="badge text-bg-danger"><i class="fas fa-times"></i> Sin registrar</span>';
                                     } elseif ($f['estado_inscripcion'] === 'P') {
-                                        $badgeIns = '<span class="badge badge-warning"><i class="fas fa-clock"></i> Por cobrar</span>';
+                                        $badgeIns = '<span class="badge text-bg-warning"><i class="fas fa-clock"></i> Por cobrar</span>';
                                     } else {
-                                        $badgeIns = '<span class="badge badge-success"><i class="fas fa-check"></i> Registrada</span>';
+                                        $badgeIns = '<span class="badge text-bg-success"><i class="fas fa-check"></i> Registrada</span>';
                                     }
                                 ?>
                                 <tr>
@@ -180,15 +173,16 @@
 </div>
 
 <script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.min.js"></script>
+<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/datatables2/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-$(function () {
-    $('#tablaPendientes').DataTable({
+document.addEventListener('DOMContentLoaded', function () {
+    new DataTable('#tablaPendientes', {
         "pageLength": 25,
         "order": [[6, "desc"]],   // los que llevan más tiempo esperando, primero
         "autoWidth": false,

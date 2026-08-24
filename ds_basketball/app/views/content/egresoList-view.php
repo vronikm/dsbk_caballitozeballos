@@ -2,7 +2,7 @@
 	use app\controllers\balanceController;
 	$insEgreso = new balanceController();
 	
-	$egresoid = ($url[1] != "") ? $url[1] : 0;	
+	$egresoid = (($url[1] ?? "") != "") ? $url[1] : 0;	
 
 	$foto = media_url('fegreso', 'egreso_default.jpg');
 
@@ -40,36 +40,14 @@
 	}
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo APP_NAME; ?>| Egresos</title>
-	<link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
-	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fontawesome-free/css/all.min.css">
-		<!-- daterange picker -->
-		<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/daterangepicker/daterangepicker.css">
-	<!-- iCheck for checkboxes and radio inputs -->
-	 <!-- DataTables -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-	
-	<!-- Theme style -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/adminlte.css">
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js" ></script>
-    <!-- fileinput -->
-	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/plugins/fileinput/fileinput.css">
-  </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+<?php
+	/* La cabecera es comun a todas las vistas: ds_basketball/app/views/inc/cabecera.php */
+	$tituloVista = 'Egresos';
+	$extras      = array (0 => 'swal',);
+	require_once "app/views/inc/cabecera.php";
+?>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper ds-core">
 
       <!-- Preloader -->
       <!--?php require_once "app/views/inc/preloader.php"; ?-->
@@ -84,16 +62,16 @@
       <!-- /.Main Sidebar Container -->  
 
       <!-- vista -->
-      <div class="content-wrapper">
+      <div class="app-main">
 		<!-- Content Header (Page header) -->
-		<div class="content-header">
+		<div class="app-content-header">
 			<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
 					<h4 class="m-0">Egresos</h4>
 				</div><!-- /.col -->
 				<div class="col-sm-6">
-					<ol class="breadcrumb float-sm-right">
+					<ol class="breadcrumb float-sm-end">
 						<li class="breadcrumb-item"><a href="#">Inicio</a></li>
 						<li class="breadcrumb-item active"><a href="<?php echo APP_URL."dashboard/" ?>">Dashboard</a></li>
 					</ol>
@@ -104,16 +82,14 @@
 		<!-- /.content-header -->
 
 		<!-- Main content -->
-		<section class="content">
+		<section class="app-content">
 			<div class="container-fluid">
 			<!-- Small boxes (Stat box) -->
 				<div class="card card-default">
-					<div class="card-header" style='height: 40px;'>
+					<div class="card-header" style='min-height: 40px;'>
 						<h4 class="card-title">Registro de nuevo egreso</h4>
 						<div class="card-tools">							
-							<button type="button" class="btn btn-tool" data-card-widget="collapse">
-								<i class="fas fa-minus"></i>
-							</button>
+							<button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Plegar o desplegar" aria-label="Plegar o desplegar"><i data-lte-icon="expand" class="fas fa-plus"></i><i data-lte-icon="collapse" class="fas fa-minus"></i></button>
 						</div>
 					</div>
 
@@ -123,13 +99,13 @@
 								<form class="FormularioAjax" id="quickForm" action="<?php echo APP_URL; ?>app/ajax/balanceAjax.php" method="POST" autocomplete="off" enctype="multipart/form-data" >
 									<input type="hidden" name="modulo_egreso" value="<?php echo $modulo_egreso; ?>">
 									<input type="hidden" name="egreso_id" value="<?php echo $egresoid; ?>">
-									<div class="row" style="font-size: 13px; height: 187px;">
+									<div class="row" style="font-size: 13px; min-height: 187px;">
 										<div class="col-md-2">
-											<div class="form-group">
+											<div class="mb-3">
 												<label for="egreso_imagenpago">Foto</label>		
 												<div class="input-group">											
 													<div class="fileinput fileinput-new" data-provides="fileinput">
-														<div class="fileinput-new thumbnail" style="width: 110px; height: 130px;" data-trigger="fileinput"><img src="<?php echo $foto; ?>"> </div>
+														<div class="fileinput-new thumbnail" style="width: 110px; min-height: 130px;" data-trigger="fileinput"><img src="<?php echo $foto; ?>"> </div>
 														<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 116px; max-height: 144px"></div>
 														<div>
 															<span class="bton bton-white bton-file" style="font-size: 13px;">
@@ -137,65 +113,64 @@
 																<span class="fileinput-exists">Cambiar</span>
 																<input type="file" name="egreso_imagenpago" id="foto" accept="image/*">
 															</span>
-															<a href="#" class="bton bton-orange fileinput-exists" data-dismiss="fileinput">Remover</a>
+															<a href="#" class="bton bton-orange fileinput-exists" data-bs-dismiss="fileinput">Remover</a>
 														</div>
 													</div>
 												</div>		
 											</div>
-										<!-- /.form-group -->								
+										<!-- /.mb-3 -->								
 										</div>
 										<div class="col-sm-10">
 											<div class="row" style="font-size: 13px;">
 												<div class="col-md-3">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="egreso_sedeid">Sede</label>
-														<select class="form-control select2" id="egreso_sedeid" name="egreso_sedeid" onchange="ocultarDiv()" >																									
+														<select class="form-control" id="egreso_sedeid" name="egreso_sedeid" onchange="ocultarDiv()" >																									
 															<?php echo $insEgreso->listarOptionSede($egreso_sedeid); ?>
 														</select>	
 													</div>
 												</div>
 												<div class="col-md-3">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="egreso_fechapago">Fecha de pago</label>
 														<div class="input-group">
-															<div class="input-group-prepend">
-																<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-															</div>
+																											<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+											
 															<input type="date" class="form-control" name="egreso_fechapago" id="egreso_fechapago" data-inputmask-alias="datetime" data-inputmask-inputformat="mm/dd/yyyy" data-mask value="<?php echo $egreso_fechapago; ?>">
 														</div>
 													</div>
 												</div>
 												<div class="col-md-4">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="egreso_empresa">Nombre empresa</label>
-														<input type="text"  class="form-control select2" id="egreso_empresa" name="egreso_empresa" value="<?php echo $egreso_empresa; ?>">
+														<input type="text"  class="form-control" id="egreso_empresa" name="egreso_empresa" value="<?php echo $egreso_empresa; ?>">
 													</div> 
 												</div>
 												<div class="col-md-2">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="egreso_monto">Monto USD</label>
 														<input type="text" class="form-control" id="egreso_monto" name="egreso_monto" value="<?php echo $egreso_monto; ?>" required>
 													</div> 
 												</div>
 																									
 												<div class="col-md-3">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="egreso_formaentrega">Forma de pago</label>
-														<select class="form-control select2" id="egreso_formaentrega" name="egreso_formaentrega" onchange="ocultarDiv()" >																									
+														<select class="form-control" id="egreso_formaentrega" name="egreso_formaentrega" onchange="ocultarDiv()" >																									
 															<?php echo $insEgreso->listarFormaEntregaIngreso($egreso_formaentrega); ?>
 														</select>	
 													</div>
 												</div>	
 												<div class="col-md-3">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="egreso_concepto">Concepto</label>
-														<select class="form-control select2" id="egreso_concepto" name="egreso_concepto" onchange="ocultarDiv()" >																									
+														<select class="form-control" id="egreso_concepto" name="egreso_concepto" onchange="ocultarDiv()" >																									
 															<?php echo $insEgreso->listarTipoEgreso($egreso_concepto); ?>
 														</select>	
 													</div>
 												</div>											
 												<div class="col-md-6">
-													<div class="form-group">
+													<div class="mb-3">
 														<label for="egreso_descripcion">Detalle</label>
 														<input type="text" class="form-control" id="egreso_descripcion" name="egreso_descripcion" value="<?php echo $egreso_descripcion; ?>">
 													</div>	
@@ -251,27 +226,17 @@
 	<!-- jQuery -->
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
 	<!-- DataTables  & Plugins -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables/jquery.dataTables.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/jszip/jszip.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/pdfmake/pdfmake.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/pdfmake/vfs_fonts.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+	<?php /* pdfmake y jszip pesan 2,2 MB y sirven a dos botones: se traen
+			 al pulsarlos, no en cada carga. Va DESPUES de buttons.html5, que es
+			 quien define esos botones. */ ?>
 	<!-- InputMask -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/moment/moment.min.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- AdminLTE App -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/js/adminlte.min.js"></script>
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
 	<!-- fileinput -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/fileinput/fileinput.js"></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js" ></script>
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/main.js" ></script>
 
@@ -289,6 +254,7 @@
             }).mask("#egreso_monto");
         });
     </script>    
+	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/foto.js"></script>
   </body>
 </html>
 

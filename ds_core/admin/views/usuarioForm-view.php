@@ -75,13 +75,12 @@ require_once __DIR__ . "/inc/layout-top.php";
                         Identidad
                     </h6>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-6">
                             <label for="usuario_usuario">Usuario <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                </div>
+                                                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            
                                 <input type="text" class="form-control" id="usuario_usuario" name="usuario_usuario"
                                        value="<?php echo $h($usuario['usuario_usuario'] ?? ''); ?>"
                                        pattern="[a-zA-Z0-9]{4,20}" maxlength="20" required autocomplete="off">
@@ -89,12 +88,11 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <small class="text-muted">4 a 20 caracteres, sólo letras y números.</small>
                         </div>
 
-                        <div class="form-group col-md-6">
+                        <div class="mb-3 col-md-6">
                             <label for="usuario_empleadoid">Persona vinculada</label>
                             <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
-                                </div>
+                                                                <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                            
                                 <select class="form-control" id="usuario_empleadoid" name="usuario_empleadoid">
                                     <option value="0">Sin vincular</option>
                                     <?php foreach ($empleados as $e): ?>
@@ -118,8 +116,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                         Acceso
                     </h6>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-6">
                             <label for="usuario_rolid">Rol <span class="text-danger">*</span></label>
                             <?php
                             /* El rol que ya tiene el usuario se ofrece siempre, aunque quien
@@ -151,14 +149,13 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php endif; ?>
                         </div>
 
-                        <div class="form-group col-md-6">
+                        <div class="mb-3 col-md-6">
                             <label for="usuario_clave">
                                 Contraseña <?php echo $esAlta ? '<span class="text-danger">*</span>' : ''; ?>
                             </label>
                             <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                </div>
+                                                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                            
                                 <input type="password" class="form-control" id="usuario_clave" name="usuario_clave"
                                        minlength="<?php echo clave_longitud_minima(); ?>"
                                        maxlength="<?php echo clave_longitud_maxima(); ?>"
@@ -167,10 +164,9 @@ require_once __DIR__ . "/inc/layout-top.php";
                                            ? 'Mínimo ' . clave_longitud_minima() . ' caracteres'
                                            : 'Dejar vacía para no cambiarla'; ?>"
                                        <?php echo $esAlta ? 'required' : ''; ?>>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-outline-secondary" id="btnVerClave"
-                                            title="Mostrar u ocultar"><i class="fas fa-eye"></i></button>
-                                </div>
+                                                                <button type="button" class="btn btn-outline-secondary" id="btnVerClave"
+                                        title="Mostrar u ocultar"><i class="fas fa-eye"></i></button>
+                            
                             </div>
                             <small class="text-muted">
                                 <?php echo clave_regla_texto(); ?>
@@ -181,8 +177,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6 mb-0">
+                    <div class="row g-2">
+                        <div class="mb-3 col-md-6 mb-0">
                             <label for="usuario_estado">Estado</label>
                             <select class="form-control" id="usuario_estado" name="usuario_estado">
                                 <option value="A" <?php echo ($usuario['usuario_estado'] ?? 'A') === 'A' ? 'selected' : ''; ?>>Activo</option>
@@ -191,7 +187,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <small class="text-muted">Un usuario inactivo no puede iniciar sesión.</small>
                         </div>
 
-                        <div class="form-group col-md-6 mb-0">
+                        <div class="mb-3 col-md-6 mb-0">
                             <label for="usuario_tienebloqueo">Bloqueado</label>
                             <select class="form-control" id="usuario_tienebloqueo" name="usuario_tienebloqueo">
                                 <option value="N" <?php echo ($usuario['usuario_tienebloqueo'] ?? 'N') === 'N' ? 'selected' : ''; ?>>No</option>

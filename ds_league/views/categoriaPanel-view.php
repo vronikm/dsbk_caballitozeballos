@@ -24,7 +24,7 @@ if (!$categoria) {
     $vistaActual = 'categoriaPanel';
     require_once __DIR__ . "/inc/layout-top.php";
     echo '<div class="callout callout-warning"><h6 class="mb-1">'
-       . '<i class="fas fa-exclamation-circle mr-2"></i>Categoría no encontrada</h6>'
+       . '<i class="fas fa-exclamation-circle me-2"></i>Categoría no encontrada</h6>'
        . '<p class="mb-0 text-muted">Elija una desde '
        . '<a href="' . APP_URL . 'categoriaList/">el listado de categorías</a>.</p></div>';
     require_once __DIR__ . "/inc/layout-bottom.php";
@@ -73,7 +73,7 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="col-lg-5 mb-3">
         <div class="card h-100">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-clipboard-list mr-2"></i>Equipos inscritos</h3>
+                <h3 class="card-title"><i class="fas fa-clipboard-list me-2"></i>Equipos inscritos</h3>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -89,11 +89,11 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <tr>
                                 <td>
                                     <strong><?php echo $h($i['equipo_nombre']); ?></strong>
-                                    <span class="badge badge-<?php echo $tono[$i['estado_tono']] ?? 'secondary'; ?> ml-1">
+                                    <span class="badge text-bg-<?php echo $tono[$i['estado_tono']] ?? 'secondary'; ?> ms-1">
                                         <?php echo $h($i['estado_nombre']); ?>
                                     </span>
                                     <a href="<?php echo APP_URL; ?>plantillaPanel/<?php echo (int)$i['inscripcion_id']; ?>/"
-                                       class="btn btn-xs btn-ver ml-1" title="Ver plantilla">
+                                       class="btn btn-xs btn-ver ms-1" title="Ver plantilla">
                                         <i class="fas fa-id-card"></i>
                                     </a>
                                     <?php if ($movs && puede_editar('categoriaPanel')): ?>
@@ -133,11 +133,15 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
+                        <?php /* En Bootstrap 5 el botón va suelto dentro del
+                                 input-group: el div envolvente que llevaba en
+                                 la versión 4 ya no existe. (Escrito sin la
+                                 etiqueta literal a propósito: con ella, el
+                                 script que retira esos envoltorios la trataba
+                                 como código y se comía un cierre de verdad.) */ ?>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -149,7 +153,7 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="col-lg-7 mb-3">
         <div class="card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title mb-0"><i class="fas fa-list-ol mr-2"></i>Clasificación</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-list-ol me-2"></i>Clasificación</h3>
                 <span class="text-muted" style="font-size:.82rem;">
                     <?php echo (int)$categoria['categoria_ptsvictoria']; ?> victoria ·
                     <?php echo (int)$categoria['categoria_ptsderrota']; ?> derrota
@@ -167,13 +171,13 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <tr>
                                 <th style="width:2rem;">#</th>
                                 <th>Equipo</th>
-                                <th class="text-right">PJ</th>
-                                <th class="text-right">PG</th>
-                                <th class="text-right">PP</th>
-                                <th class="text-right">PF</th>
-                                <th class="text-right">PC</th>
-                                <th class="text-right">DIF</th>
-                                <th class="text-right">PTS</th>
+                                <th class="text-end">PJ</th>
+                                <th class="text-end">PG</th>
+                                <th class="text-end">PP</th>
+                                <th class="text-end">PF</th>
+                                <th class="text-end">PC</th>
+                                <th class="text-end">DIF</th>
+                                <th class="text-end">PTS</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -183,17 +187,17 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <td>
                                     <?php echo $h($f['equipo']); ?>
                                     <?php if ($f['desempate'] !== ''): ?>
-                                        <i class="fas fa-info-circle text-muted ml-1"
+                                        <i class="fas fa-info-circle text-muted ms-1"
                                            title="Posición resuelta por <?php echo $h($f['desempate']); ?>"></i>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-right"><?php echo (int)$f['pj']; ?></td>
-                                <td class="text-right"><?php echo (int)$f['pg']; ?></td>
-                                <td class="text-right"><?php echo (int)$f['pp']; ?></td>
-                                <td class="text-right"><?php echo (int)$f['pf']; ?></td>
-                                <td class="text-right"><?php echo (int)$f['pc']; ?></td>
-                                <td class="text-right"><?php echo ($f['dif'] > 0 ? '+' : '') . (int)$f['dif']; ?></td>
-                                <td class="text-right"><strong><?php echo (int)$f['pts']; ?></strong></td>
+                                <td class="text-end"><?php echo (int)$f['pj']; ?></td>
+                                <td class="text-end"><?php echo (int)$f['pg']; ?></td>
+                                <td class="text-end"><?php echo (int)$f['pp']; ?></td>
+                                <td class="text-end"><?php echo (int)$f['pf']; ?></td>
+                                <td class="text-end"><?php echo (int)$f['pc']; ?></td>
+                                <td class="text-end"><?php echo ($f['dif'] > 0 ? '+' : '') . (int)$f['dif']; ?></td>
+                                <td class="text-end"><strong><?php echo (int)$f['pts']; ?></strong></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -212,14 +216,14 @@ require_once __DIR__ . "/inc/layout-top.php";
 <!-- ==================== Calendario ==================== -->
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title mb-0"><i class="fas fa-calendar-day mr-2"></i>Calendario</h3>
+        <h3 class="card-title mb-0"><i class="fas fa-calendar-day me-2"></i>Calendario</h3>
         <?php if ($faseId > 0 && usuario_tiene_permiso('sorteoPanel')): ?>
             <a href="<?php echo APP_URL; ?>sorteoPanel/<?php echo $faseId; ?>/"
-               class="ds-link mr-auto ml-3"><i class="fas fa-random mr-1"></i>Sorteo de grupos</a>
+               class="ds-link me-auto ms-3"><i class="fas fa-random me-1"></i>Sorteo de grupos</a>
             <a href="<?php echo APP_URL; ?>playoffPanel/<?php echo $categoriaId; ?>/"
-               class="ds-link mr-auto"><i class="fas fa-sitemap mr-1"></i>Eliminatorias</a>
+               class="ds-link me-auto"><i class="fas fa-sitemap me-1"></i>Eliminatorias</a>
             <a href="<?php echo APP_URL; ?>rankingPanel/<?php echo $categoriaId; ?>/"
-               class="ds-link mr-auto"><i class="fas fa-medal mr-1"></i>Líderes</a>
+               class="ds-link me-auto"><i class="fas fa-medal me-1"></i>Líderes</a>
         <?php endif; ?>
         <?php if ($faseId > 0 && !$partidos && puede_crear('categoriaPanel')): ?>
         <form class="FormularioAjax" method="POST" action="<?php echo APP_URL; ?>ajax/leagueAjax.php"
@@ -231,7 +235,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <input type="checkbox" name="ida_vuelta" value="S"> ida y vuelta
                 </label>
                 <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="fas fa-magic mr-1"></i>Generar calendario
+                    <i class="fas fa-magic me-1"></i>Generar calendario
                 </button>
             </div>
         </form>
@@ -307,17 +311,17 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         data-fecha="<?php echo $h((string)$p['partido_fecha']); ?>"
                                         data-hora="<?php echo $h(substr((string)$p['partido_hora'], 0, 5)); ?>"
                                         data-inst="<?php echo (int)$p['partido_instalacionid']; ?>">
-                                    <i class="fas fa-calendar-check mr-1"></i><?php echo $p['partido_fecha'] ? 'Cambiar' : 'Programar'; ?>
+                                    <i class="fas fa-calendar-check me-1"></i><?php echo $p['partido_fecha'] ? 'Cambiar' : 'Programar'; ?>
                                 </button>
                             <?php endif; ?>
                         </td>
 
                         <td>
-                            <span class="badge badge-<?php echo $tono[$p['estado_tono']] ?? 'secondary'; ?>">
+                            <span class="badge text-bg-<?php echo $tono[$p['estado_tono']] ?? 'secondary'; ?>">
                                 <?php echo $h($p['estado_nombre']); ?>
                             </span>
                             <a href="<?php echo APP_URL; ?>actaPartido/<?php echo (int)$p['partido_id']; ?>/"
-                               class="btn btn-xs btn-ver ml-1" title="Acta del partido">
+                               class="btn btn-xs btn-ver ms-1" title="Acta del partido">
                                 <i class="fas fa-clipboard-list"></i>
                             </a>
                         </td>

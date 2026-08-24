@@ -47,8 +47,8 @@ require_once __DIR__ . "/inc/layout-top.php";
             </h3>
 
             <div class="d-flex align-items-center" style="gap:12px;">
-                <form method="GET" action="<?php echo APP_URL; ?>bloqueoList/" class="form-inline">
-                    <select name="instalacion" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
+                <form method="GET" action="<?php echo APP_URL; ?>bloqueoList/" class="d-flex flex-wrap align-items-center gap-2">
+                    <select name="instalacion" class="form-select form-select-sm me-2 w-auto" onchange="this.form.submit()">
                         <option value="0">Todas las instalaciones</option>
                         <?php foreach ($instalaciones as $i): ?>
                             <option value="<?php echo (int)$i['instalacion_id']; ?>"
@@ -64,8 +64,8 @@ require_once __DIR__ . "/inc/layout-top.php";
                 </form>
 
                 <?php if ($puedeCrear): ?>
-                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalBloqueo">
-                        <i class="fas fa-plus mr-1"></i> Nuevo bloqueo
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalBloqueo">
+                        <i class="fas fa-plus me-1"></i> Nuevo bloqueo
                     </button>
                 <?php endif; ?>
             </div>
@@ -81,7 +81,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <th>Desde</th>
                             <th>Hasta</th>
                             <th>Motivo</th>
-                            <th class="text-right">Acciones</th>
+                            <th class="text-end">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -98,14 +98,14 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <small class="d-block text-muted"><?php echo htmlspecialchars((string)$b['sede_nombre'], ENT_QUOTES, 'UTF-8'); ?></small>
                             </td>
                             <td>
-                                <span class="badge badge-<?php echo $color[$b['bloqueo_tipo']] ?? 'secondary'; ?>">
+                                <span class="badge text-bg-<?php echo $color[$b['bloqueo_tipo']] ?? 'secondary'; ?>">
                                     <?php echo $tipos[$b['bloqueo_tipo']] ?? $b['bloqueo_tipo']; ?>
                                 </span>
                             </td>
                             <td><?php echo $b['bloqueo_inicio']; ?></td>
                             <td><?php echo $b['bloqueo_fin']; ?></td>
                             <td><?php echo htmlspecialchars((string)$b['bloqueo_motivo'] ?: '—', ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td class="text-right">
+                            <td class="text-end">
                                 <?php if ($puedeEliminar): ?>
                                     <form class="FormularioAjax d-inline" method="POST"
                                           action="<?php echo APP_URL; ?>ajax/arenaAjax.php"
@@ -136,13 +136,13 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="modal-header">
                             <h5 class="modal-title">Nuevo bloqueo</h5>
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
 
                         <div class="modal-body">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="bloqueo_instalacionid">Instalación <span class="text-danger">*</span></label>
-                                <select class="form-control" id="bloqueo_instalacionid" name="bloqueo_instalacionid" required>
+                                <select class="form-select w-auto" id="bloqueo_instalacionid" name="bloqueo_instalacionid" required>
                                     <option value="">Seleccione…</option>
                                     <?php foreach ($instalaciones as $i): ?>
                                         <option value="<?php echo (int)$i['instalacion_id']; ?>"
@@ -153,34 +153,34 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 </select>
                             </div>
 
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="bloqueo_tipo">Tipo</label>
-                                <select class="form-control" id="bloqueo_tipo" name="bloqueo_tipo">
+                                <select class="form-select w-auto" id="bloqueo_tipo" name="bloqueo_tipo">
                                     <?php foreach ($tipos as $k => $v): ?>
                                         <option value="<?php echo $k; ?>"><?php echo $v; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
 
-                            <div class="form-row">
-                                <div class="form-group col-6">
+                            <div class="row g-2">
+                                <div class="mb-3 col-6">
                                     <label for="bloqueo_inicio">Desde <span class="text-danger">*</span></label>
                                     <input type="datetime-local" class="form-control" id="bloqueo_inicio" name="bloqueo_inicio" required>
                                 </div>
-                                <div class="form-group col-6">
+                                <div class="mb-3 col-6">
                                     <label for="bloqueo_fin">Hasta <span class="text-danger">*</span></label>
                                     <input type="datetime-local" class="form-control" id="bloqueo_fin" name="bloqueo_fin" required>
                                 </div>
                             </div>
 
-                            <div class="form-group mb-0">
+                            <div class="mb-3 mb-0">
                                 <label for="bloqueo_motivo">Motivo</label>
                                 <input type="text" class="form-control" id="bloqueo_motivo" name="bloqueo_motivo" maxlength="150">
                             </div>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="submit" class="btn btn-primary">Guardar</button>
                         </div>
                     </form>
