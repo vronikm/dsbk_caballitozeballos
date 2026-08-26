@@ -332,25 +332,25 @@
 						<td>'.$rows['empleado_correo'].'</td>
 						<td>'.$rows['empleado_celular'].'</td>
 						<td>
-							<a href="'.APP_URL.'empleadoIE/'.$rows['empleado_id'].'/" class="btn float-start btn-warning btn-xs" style="margin-right: 5px;" target="_blank">Registrar</a>
+							<a href="'.APP_URL.'empleadoIE/'.$rows['empleado_id'].'/" class="btn float-start btn-warning btn-sm" style="margin-right: 5px;" target="_blank">Registrar</a>
 					    </td>
 						<td>
-							'.($accesoCore ? '<a href="'.DS_HUB_URL.'ds_core/admin/usuarioForm/?empleado='.$rows['empleado_id'].'" class="btn float-start '.$botonasignar.' '.$habilitado.' btn-xs" style="margin-right: 5px;" target="_blank"> '.$asignarsistema.'</a>' : '').'
+							'.($accesoCore ? '<a href="'.DS_HUB_URL.'ds_core/admin/usuarioForm/?empleado='.$rows['empleado_id'].'" class="btn float-start '.$botonasignar.' '.$habilitado.' btn-sm" style="margin-right: 5px;" target="_blank"> '.$asignarsistema.'</a>' : '').'
 						</td>
 						<td>
 							'.$this->siPuede('eliminar','empleadoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/empleadoAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_empleado" value="eliminar">
 								<input type="hidden" name="empleado_id" value="'.$rows['empleado_id'].'">						
-								<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn float-end btn-danger btn-sm" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'
 							
 							'.$this->siPuede('editar','empleadoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/empleadoAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_empleado" value="actualizarestado">
 								<input type="hidden" name="empleado_id" value="'.$rows['empleado_id'].'">						
-								<button type="submit" class="btn float-end '.$boton.' btn-xs" style="margin-right: 5px;"> '.$texto.' </button>
+								<button type="submit" class="btn float-end '.$boton.' btn-sm" style="margin-right: 5px;"> '.$texto.' </button>
 							</form>').'
 
-							'.$this->siPuede('editar','empleadoList','<a href="'.APP_URL.'empleadoList/'.$rows['empleado_id'].'/" class="btn float-end btn-success btn-xs" style="margin-right: 5px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+							'.$this->siPuede('editar','empleadoList','<a href="'.APP_URL.'empleadoList/'.$rows['empleado_id'].'/" class="btn float-end btn-success btn-sm" style="margin-right: 5px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
 						</td>
 						</td>
 					</tr>';	

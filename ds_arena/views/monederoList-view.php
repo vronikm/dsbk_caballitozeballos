@@ -117,7 +117,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="cliente_id">Cliente <span class="text-danger">*</span></label>
-                        <select class="form-control" id="cliente_id" name="cliente_id" required>
+                        <select class="form-select" id="cliente_id" name="cliente_id" required>
                             <option value="">Seleccione…</option>
                             <?php foreach ($clientes as $c): ?>
                                 <option value="<?php echo (int)$c['cliente_id']; ?>">
@@ -130,7 +130,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2">
                         <div class="mb-3 col-7">
                             <label for="origen">Origen</label>
-                            <select class="form-control" id="origen" name="origen">
+                            <select class="form-select" id="origen" name="origen">
                                 <option value="TRA">Transferencia del cliente</option>
                                 <option value="AJU">Ajuste manual</option>
                             </select>

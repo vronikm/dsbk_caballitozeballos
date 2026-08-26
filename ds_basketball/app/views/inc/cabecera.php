@@ -93,7 +93,5 @@ $swalEnCabecera = in_array('swal', $extras, true);
 <?php endif; ?>
 <?php echo $cabeceraExtra; ?>
 
-    <?php /* El tema, antes del primer pintado: sin defer a proposito. Con
-             defer la pagina se dibuja clara y salta a oscura. */ ?>
-    <script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
+    <?php require DS_HUB_PATH . "ds_core/inc/tema-init.php"; ?>
   </head>

@@ -161,7 +161,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                     <div class="mb-3 mb-0">
                         <label for="catalogo_estado">Estado</label>
-                        <select class="form-control" id="catalogo_estado" name="catalogo_estado">
+                        <select class="form-select" id="catalogo_estado" name="catalogo_estado">
                             <option value="A">Activo</option>
                             <option value="I">Inactivo</option>
                         </select>

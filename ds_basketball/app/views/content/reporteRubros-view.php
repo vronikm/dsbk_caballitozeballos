@@ -69,7 +69,7 @@
 							<div class="col-md-3">
 								<div class="mb-3">
 								<label for="pago_rubro">Rubro</label>
-								<select class="form-control" id="pago_rubro" name="pago_rubro" required>																									
+								<select class="form-select" id="pago_rubro" name="pago_rubro" required>																									
 									<?php echo $insRubros->listarOptionRubro($pago_rubro); ?>
 								</select>	
 								</div>
@@ -77,15 +77,14 @@
 							<div class="col-md-3">
 								<div class="mb-3">
 								<label for="alumno_sedeid">Sede</label>
-								<select class="form-control" id="alumno_sedeid" name="alumno_sedeid" required>																									
+								<select class="form-select" id="alumno_sedeid" name="alumno_sedeid" required>																									
 									<?php echo $insRubros->listarSedebusqueda($alumno_sedeid); ?>
 								</select>	
 								</div>
 							</div>							
-							<div class="col-md-3">
-								<div class="mb-3">
-									<label for="alumno_sedeid">.</label>
-									<?php echo ds_boton_buscar(); ?>
+							<div class="col-md-3 d-flex align-items-end">
+								<div class="mb-3 w-100">
+																		<?php echo ds_boton_buscar(); ?>
 								</div>
 							</div>
 						</div>					

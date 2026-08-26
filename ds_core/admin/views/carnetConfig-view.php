@@ -152,7 +152,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <select class="form-control color-mes" data-mes="<?php echo $num; ?>"
+                                        <select class="form-select color-mes" data-mes="<?php echo $num; ?>"
                                                 name="color_mes[<?php echo $num; ?>]"
                                                 <?php echo $bloqueado ? 'disabled' : ''; ?>>
                                             <option value="0" data-color="#FFFFFF">— Sin asignar —</option>

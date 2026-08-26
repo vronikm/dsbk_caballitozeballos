@@ -39,7 +39,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2">
                         <div class="mb-3 col-md-4">
                             <label for="instalacion_clase">Tipo <span class="text-danger">*</span></label>
-                            <select class="form-control" id="instalacion_clase" name="instalacion_clase" required>
+                            <select class="form-select" id="instalacion_clase" name="instalacion_clase" required>
                                 <option value="C" <?php echo ($inst['instalacion_clase'] ?? 'C') === 'C' ? 'selected' : ''; ?>>Cancha</option>
                                 <option value="R" <?php echo ($inst['instalacion_clase'] ?? '') === 'R' ? 'selected' : ''; ?>>Residencia</option>
                             </select>
@@ -47,7 +47,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="mb-3 col-md-8">
                             <label for="instalacion_sedeid">Sede <span class="text-danger">*</span></label>
-                            <select class="form-control" id="instalacion_sedeid" name="instalacion_sedeid" required>
+                            <select class="form-select" id="instalacion_sedeid" name="instalacion_sedeid" required>
                                 <option value="">Seleccione…</option>
                                 <?php foreach ($sedes as $s): ?>
                                     <option value="<?php echo (int)$s['sede_id']; ?>"
@@ -96,7 +96,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2" id="camposCancha">
                         <div class="mb-3 col-md-6">
                             <label for="instalacion_cubierta">Cubierta</label>
-                            <select class="form-control" id="instalacion_cubierta" name="instalacion_cubierta">
+                            <select class="form-select" id="instalacion_cubierta" name="instalacion_cubierta">
                                 <option value="S" <?php echo ($inst['instalacion_cubierta'] ?? 'S') === 'S' ? 'selected' : ''; ?>>Sí, techada</option>
                                 <option value="N" <?php echo ($inst['instalacion_cubierta'] ?? '') === 'N' ? 'selected' : ''; ?>>No, al aire libre</option>
                             </select>
@@ -104,7 +104,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="mb-3 col-md-6">
                             <label for="instalacion_pisoid">Tipo de piso</label>
-                            <select class="form-control" id="instalacion_pisoid" name="instalacion_pisoid">
+                            <select class="form-select" id="instalacion_pisoid" name="instalacion_pisoid">
                                 <option value="0">Sin especificar</option>
                                 <?php foreach ($pisos as $p): ?>
                                     <option value="<?php echo (int)$p['piso_id']; ?>"
@@ -135,7 +135,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="mb-3 col-md-4">
                             <label for="instalacion_estado">Estado</label>
-                            <select class="form-control" id="instalacion_estado" name="instalacion_estado">
+                            <select class="form-select" id="instalacion_estado" name="instalacion_estado">
                                 <option value="A" <?php echo ($inst['instalacion_estado'] ?? 'A') === 'A' ? 'selected' : ''; ?>>Activa</option>
                                 <option value="I" <?php echo ($inst['instalacion_estado'] ?? '') === 'I' ? 'selected' : ''; ?>>Inactiva</option>
                             </select>

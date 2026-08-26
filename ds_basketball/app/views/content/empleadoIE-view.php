@@ -379,13 +379,13 @@ CSS;
 															<div class="col-md-3">
 																<div class="mb-3">
 																	<label for="ingreso_formapagoid">Forma de pago</label>
-																	<select class="form-control" id="ingreso_formapagoid" name="ingreso_formapagoid">																									
+																	<select class="form-select" id="ingreso_formapagoid" name="ingreso_formapagoid">																									
 																		<?php echo $insEmpleado->listarOptionPago($ingreso_formapagoid); ?>
 																	</select>	
 																</div>												
 																<div class="mb-3">
 																	<label for="ingreso_tipoingresoid">Tipo de ingreso</label>
-																	<select class="form-control" id="ingreso_tipoingresoid" name="ingreso_tipoingresoid">																									
+																	<select class="form-select" id="ingreso_tipoingresoid" name="ingreso_tipoingresoid">																									
 																		<?php echo $insEmpleado->listarTipoIngreso($ingreso_tipoingresoid); ?>
 																	</select>	
 																</div>
@@ -471,7 +471,7 @@ CSS;
 													<div class="col-md-2">
 														<div class="mb-3">
 															<label for="egreso_tipoid">Tipo de egreso</label>
-															<select class="form-control" id="egreso_tipoid" name="egreso_tipoid">																									
+															<select class="form-select" id="egreso_tipoid" name="egreso_tipoid">																									
 																<?php echo $insEmpleado->listarTipoEgreso($egreso_tipoid); ?>
 															</select>	
 														</div>
@@ -485,7 +485,7 @@ CSS;
 													<div class="col-md-3">
 														<div class="mb-3">
 															<label for="egreso_formaegresoid">Periodicidad de descuento</label>
-															<select class="form-control" id="egreso_formaegresoid" name="egreso_formaegresoid">																									
+															<select class="form-select" id="egreso_formaegresoid" name="egreso_formaegresoid">																									
 																<?php echo $insEmpleado->listarPeriodicidadDescuento($egreso_formaegresoid); ?>
 															</select>	
 														</div>

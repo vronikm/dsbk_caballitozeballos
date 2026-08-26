@@ -156,7 +156,7 @@ CSS;
 										<div class="col-sm-3">
 											<div class="mb-3">
 												<label for="repre_tipoidentificacion">Tipo identificación</label>
-												<select class="form-control" id="repre_tipoidentificacion" name="repre_tipoidentificacion" >
+												<select class="form-select" id="repre_tipoidentificacion" name="repre_tipoidentificacion" >
 													<?php echo $insRepre->listarOptionTipoIdentificacion($repre_tipoidentificacion); ?>
 												</select>
 											</div>          
@@ -190,7 +190,7 @@ CSS;
 										<div class="col-md-3">
 											<div class="mb-3">
 												<label for="repre_parentesco">Parentesco</label>
-												<select class="form-control" style="width: 100%;" id="repre_parentesco" name="repre_parentesco" >													
+												<select class="form-select" style="width: 100%;" id="repre_parentesco" name="repre_parentesco" >													
 													<?php echo $insRepre->listarCatalogoParentesco($repre_parentesco); ?>
 												</select>
 											</div> 
@@ -198,11 +198,15 @@ CSS;
 										<div class="col-md-3">
 											<div class="mb-3">
 												<label for="repre_sexo">Género</label>
-												<div class="form-check">
-													<input class="col-sm-1 form-check-input" type="radio" id="repre_sexoM" name="repre_sexo" value="M" <?php echo $repre_sexoM;?> >
-													<label class="col-sm-5 form-check-label" for="repre_sexoM" style="font-size: 14px;">Masculino</label>
-													<input class="col-sm-1 form-check-input" type="radio" id="repre_sexoF" name="repre_sexo" value="F" <?php echo $repre_sexoF;?> >
-													<label class="col-sm-4 form-check-label" for="repre_sexoF" style="font-size: 14px;">Femenino</label>
+												<div class="d-flex flex-wrap gap-4">
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="repre_sexoM" name="repre_sexo" value="M" <?php echo $repre_sexoM;?>>
+												        <label class="form-check-label" for="repre_sexoM" style="font-size: 14px;">Masculino</label>
+												    </div>
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="repre_sexoF" name="repre_sexo" value="F" <?php echo $repre_sexoF;?>>
+												        <label class="form-check-label" for="repre_sexoF" style="font-size: 14px;">Femenino</label>
+												    </div>
 												</div> 
 											</div>
 										</div>
@@ -227,11 +231,15 @@ CSS;
 										<div class="col-md-3">
 											<div class="mb-3">
 												<label for="repre_factura">Requiere factura</label>
-												<div class="form-check">
-													<input class="col-sm-1 form-check-input" type="radio" id="repre_facturaS" value="S" name="repre_factura" <?php echo $repre_facturaS;?>>
-													<label class="col-sm-5 form-check-label" for="repre_facturaS">Si</label>
-													<input class="col-sm-1 form-check-input" type="radio" id="repre_facturaN" value="N" name="repre_factura" <?php echo $repre_facturaN;?>>
-													<label class="col-sm-4 form-check-label" for="repre_facturaN">No</label>
+												<div class="d-flex flex-wrap gap-4">
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="repre_facturaS" value="S" name="repre_factura" <?php echo $repre_facturaS;?>>
+												        <label class="form-check-label" for="repre_facturaS">Si</label>
+												    </div>
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="repre_facturaN" value="N" name="repre_factura" <?php echo $repre_facturaN;?>>
+												        <label class="form-check-label" for="repre_facturaN">No</label>
+												    </div>
 												</div> 
 											</div>
 										</div>
@@ -244,7 +252,7 @@ CSS;
 										<div class="col-md-3">											
 											<div class="mb-3">
 												<label for="TidentificacionCRep">Tipo identificación</label>
-												<select class="form-control" id="conyuge_tipoidentificacion" name="conyuge_tipoidentificacion" >
+												<select class="form-select" id="conyuge_tipoidentificacion" name="conyuge_tipoidentificacion" >
 													<?php echo $insRepre->listarOptionTipoIdentificacion($conyuge_tipoidentificacion); ?> 
 												</select>
 											</div>
@@ -296,11 +304,15 @@ CSS;
 										<div class="col-md-4">
 											<div class="mb-3">
 												<label for="conyuge_sexo">Género</label>
-												<div class="form-check">
-													<input class="col-sm-1 form-check-input" type="radio" id="conyuge_sexoM" name="conyuge_sexo" value="M" <?php echo $conyuge_sexoM;?> >
-													<label class="col-sm-5 form-check-label" for="conyuge_sexoM">Masculino</label>
-													<input class="col-sm-1 form-check-input" type="radio" id="conyuge_sexoF" name="conyuge_sexo" value="F" <?php echo $conyuge_sexoF;?> >
-													<label class="col-sm-4 form-check-label" for="conyuge_sexoF">Femenino</label>
+												<div class="d-flex flex-wrap gap-4">
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="conyuge_sexoM" name="conyuge_sexo" value="M" <?php echo $conyuge_sexoM;?>>
+												        <label class="form-check-label" for="conyuge_sexoM">Masculino</label>
+												    </div>
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="conyuge_sexoF" name="conyuge_sexo" value="F" <?php echo $conyuge_sexoF;?>>
+												        <label class="form-check-label" for="conyuge_sexoF">Femenino</label>
+												    </div>
 												</div> 
 											</div>
 										</div>               

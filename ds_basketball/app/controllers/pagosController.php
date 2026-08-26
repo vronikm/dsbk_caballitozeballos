@@ -131,8 +131,8 @@
 						<td>'.$rows['alumno_fechanacimiento'].'</td>
 						<td>'.$clase.$pendiente.'</a></td>
 						<td>
-							<a href="'.APP_URL.'pagosNew/'.$rows['alumno_id'].'/" class="btn float-end '.$botonpago.' btn-xs" target="_blank"><i class="fas fa-dollar-sign me-1"></i>Registrar pagos</a>
-							<a href="'.APP_URL.'pagosDescuento/'.$rows['alumno_id'].'/" class="btn float-end '.$boton.' btn-xs" style="margin-right: 5px;" target="_blank"><i class="fas fa-dollar-sign me-1"></i>Descuentos</a>
+							<a href="'.APP_URL.'pagosNew/'.$rows['alumno_id'].'/" class="btn float-end '.$botonpago.' btn-sm" target="_blank"><i class="fas fa-dollar-sign me-1"></i>Registrar pagos</a>
+							<a href="'.APP_URL.'pagosDescuento/'.$rows['alumno_id'].'/" class="btn float-end '.$boton.' btn-sm" style="margin-right: 5px;" target="_blank"><i class="fas fa-dollar-sign me-1"></i>Descuentos</a>
 						</td>
 					</tr>';	
 			}

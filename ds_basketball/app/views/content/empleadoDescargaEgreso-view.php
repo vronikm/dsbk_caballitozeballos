@@ -145,7 +145,7 @@ CSS;
 										<div class="col-md-12">
 											<div class="mb-3">
 											<label for="egreso_formaegresoid">Forma de egreso</label>
-											<select class="form-control" id="egreso_formaegresoid" name="egreso_formaegresoid" disabled>																									
+											<select class="form-select" id="egreso_formaegresoid" name="egreso_formaegresoid" disabled>																									
 												<?php echo $insDescEgreso->listarOptionDescuento($datos['egreso_formaegresoid']); ?>
 											</select>	
 											</div>
@@ -210,7 +210,7 @@ CSS;
 												<div class="col-md-3">
 													<div class="mb-3">
 														<label for="trxegreso_formaegresoid">Periodicidad de descuento</label>
-														<select class="form-control" id="trxegreso_formaegresoid" name="trxegreso_formaegresoid">																									
+														<select class="form-select" id="trxegreso_formaegresoid" name="trxegreso_formaegresoid">																									
 															<?php echo $insDescEgreso->listarPeriodicidadDescuento($trxegreso_formaegresoid); ?>
 														</select>	
 													</div>

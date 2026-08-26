@@ -44,7 +44,12 @@
             color: #fff;
         }
         .enlace-info {
+            /* El color va JUNTO al fondo, como en .enlace-url. Sin el, el
+               texto heredaba el del tema —casi blanco en oscuro— sobre este
+               verde claro fijo, y quedaba ilegible. Solo se veia tras
+               generar un enlace, que es cuando este bloque aparece. */
             background: #e8f5e9;
+            color: #14532d;
             border-left: 4px solid #4caf50;
             padding: 12px 15px;
             border-radius: 0 8px 8px 0;
@@ -109,7 +114,7 @@ CSS;
                                                     <label for="sede_id">
                                                         <i class="fas fa-map-marker-alt text-primary"></i> Sede <span class="text-danger">*</span>
                                                     </label>
-                                                    <select class="form-control" id="sede_id" name="sede_id" required>
+                                                    <select class="form-select" id="sede_id" name="sede_id" required>
                                                         <option value="">Seleccione una sede</option>
                                                         <?php foreach ($sedes as $sede): ?>
                                                             <option value="<?php echo $sede['sede_id']; ?>">
@@ -126,7 +131,7 @@ CSS;
                                                     <label for="horas_vigencia">
                                                         <i class="fas fa-clock text-primary"></i> Vigencia del enlace
                                                     </label>
-                                                    <select class="form-control" id="horas_vigencia" name="horas_vigencia">
+                                                    <select class="form-select" id="horas_vigencia" name="horas_vigencia">
                                                         <option value="24">24 horas (1 día)</option>
                                                         <option value="48">48 horas (2 días)</option>
                                                         <option value="72" selected>72 horas (3 días)</option>

@@ -124,7 +124,7 @@
 												<div class="col-md-3">
 													<div class="mb-3">
 														<label for="ingreso_sedeid">Sede</label>
-														<select class="form-control" id="ingreso_sedeid" name="ingreso_sedeid" onchange="ocultarDiv()" >																									
+														<select class="form-select" id="ingreso_sedeid" name="ingreso_sedeid" onchange="ocultarDiv()" >																									
 															<?php echo $insIngreso->listarOptionSede($ingreso_sedeid); ?>
 														</select>	
 													</div>
@@ -154,7 +154,7 @@
 												<div class="col-md-3">
 													<div class="mb-3">
 														<label for="ingreso_formaentrega">Forma de recepción</label>
-														<select class="form-control" id="ingreso_formaentrega" name="ingreso_formaentrega" onchange="ocultarDiv()" >																									
+														<select class="form-select" id="ingreso_formaentrega" name="ingreso_formaentrega" onchange="ocultarDiv()" >																									
 															<?php echo $insIngreso->listarFormaEntregaIngreso($ingreso_formaentrega); ?>
 														</select>	
 													</div>
@@ -162,7 +162,7 @@
 												<div class="col-md-3">
 													<div class="mb-3">
 														<label for="ingreso_concepto">Concepto</label>
-														<select class="form-control" id="ingreso_concepto" name="ingreso_concepto" onchange="ocultarDiv()" >																									
+														<select class="form-select" id="ingreso_concepto" name="ingreso_concepto" onchange="ocultarDiv()" >																									
 															<?php echo $insIngreso->listarTipoIngreso($ingreso_concepto); ?>
 														</select>	
 													</div>

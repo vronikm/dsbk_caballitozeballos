@@ -182,7 +182,7 @@
 									<h4 class="card-title">Torneos ingresados</h4>
 								</div>										
 								<div class="tab-content" id="custom-content-above-tabContent">	
-									<table id="example1" class="table table-bordered table-striped table-sm">
+									<table id="example1" class="table table-bordered table-striped table-sm nowrap" style="width:100%">
 										<thead>
 											<tr>
 												<th>Nombre</th>
@@ -252,6 +252,19 @@
 		document.addEventListener('DOMContentLoaded', function () {
 			new DataTable("#example1", {
 			"responsive": true, "lengthChange": false, "autoWidth": false,
+			/* Menor numero = se conserva mas tiempo. Descripcion cae primero;
+			   Nombre y Opciones son los ultimos en irse. */
+			"columnDefs": [
+				{ "responsivePriority": 1,  "targets": 0 },   /* Nombre      */
+				{ "responsivePriority": 2,  "targets": 8 },   /* Opciones    */
+				{ "responsivePriority": 3,  "targets": 7 },   /* Estado      */
+				{ "responsivePriority": 4,  "targets": 3 },   /* F. inicio   */
+				{ "responsivePriority": 5,  "targets": 1 },   /* Ciudad      */
+				{ "responsivePriority": 6,  "targets": 4 },   /* Fecha fin   */
+				{ "responsivePriority": 8,  "targets": 5 },   /* Organizador */
+				{ "responsivePriority": 9,  "targets": 2 },   /* Lugar       */
+				{ "responsivePriority": 10, "targets": 6, "orderable": false } /* Descripcion */
+			],
 			"language": {
 				"decimal": "",
 				"emptyTable": "No hay datos disponibles en la tabla",

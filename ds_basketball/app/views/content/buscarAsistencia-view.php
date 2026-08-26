@@ -134,8 +134,7 @@
 	<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
     
-	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
-	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
+	<?php require DS_HUB_PATH . "ds_core/inc/tema-init.php"; ?>
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <div class="app-wrapper ds-core">

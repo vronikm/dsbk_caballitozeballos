@@ -96,7 +96,7 @@
 							<div class="col-md-2">
 								<div class="mb-3">
 									<label for="alumno_sedeid">Sede</label>
-									<select class="form-control" id="alumno_sedeid" name="alumno_sedeid">
+									<select class="form-select" id="alumno_sedeid" name="alumno_sedeid">
 										<?php
 											if($alumno_sedeid == 0){	
 												echo "<option value='0' selected='selected'>Todas</option>";
@@ -128,10 +128,9 @@
 									<input type="text" class="form-control" id="alumno_nombre1" name="alumno_nombre1" placeholder="Primer nombre" value="<?php echo $alumno_primernombre; ?>">
 								</div>
 							</div>
-							<div class="col-md-3">
-								<div class="mb-3">
-									<label for="alumno_sedeid">.</label>
-									<?php echo ds_boton_buscar(); ?>
+							<div class="col-md-3 d-flex align-items-end">
+								<div class="mb-3 w-100">
+																		<?php echo ds_boton_buscar(); ?>
 								</div>
 							</div>
 

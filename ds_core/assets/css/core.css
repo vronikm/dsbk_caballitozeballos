@@ -18,51 +18,74 @@
     color: var(--core-texto);
 }
 
-/* ---------- Barra superior y menú lateral ---------- */
+/* ---------- Barra superior y menú lateral ----------
+   OJO CON EL NOMBRE DE LA CLASE: AdminLTE 4 renombró .nav-sidebar a
+   .sidebar-menu. Las reglas de aquí apuntaban a la vieja, así que NO SE
+   APLICABAN desde la migración —en ninguno de los dos temas—. Se vio al
+   medir el menú en claro: los enlaces salían en azul por defecto, a 2.42
+   de contraste, y el elemento activo no tenía el naranja de marca sino el
+   blanco translúcido de AdminLTE. Comprobado en el DOM: .nav-sidebar
+   devuelve 0 elementos. */
 
+/* El fondo lo pone la plantilla: el elemento lleva data-bs-theme="dark" y
+   su clase bg-body resuelve al tono oscuro. Aqui solo el filete. */
+.ds-core__navbar { border-bottom: 1px solid rgba(255, 255, 255, .06); }
+
+/* Se asigna la variable que Bootstrap ya expone en vez de pisar la
+   propiedad con !important: asi la barra se personaliza por el camino
+   previsto y nada tiene que ganar una guerra de especificidad. */
 .ds-core__navbar {
-    background: var(--ds-bg) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, .06);
+    --bs-nav-link-color: #cbd5e1;
+    --bs-nav-link-hover-color: #ffffff;
 }
 
-.ds-core__navbar .nav-link { color: #cbd5e1 !important; }
-.ds-core__navbar .nav-link:hover { color: #fff !important; }
-
-.ds-core__sidebar { background: var(--ds-surface) !important; }
+/* Igual que la barra: bg-body-secondary + data-bs-theme="dark". */
 
 .ds-core__sidebar .brand-link {
     background: var(--ds-bg);
     border-bottom: 1px solid rgba(255, 255, 255, .06);
 }
 
-.ds-core .nav-sidebar .nav-link {
+/*
+| EL COLOR DEL MENU LO PONE LA PLANTILLA, NO NOSOTROS.
+|
+| AdminLTE 4 pinta el menu con sus propias variables —--lte-sidebar-color,
+| --lte-sidebar-hover-bg, --lte-sidebar-menu-active-bg…— y esa es la forma
+| prevista de personalizarlo. Aqui habia colores escritos a mano (#cbd5e1,
+| var(--ds-surface-2)) que los pisaban, asi que el menu de DigiSports se
+| apartaba del de la plantilla sin motivo.
+|
+| Se conserva solo lo ESTRUCTURAL —el redondeo, la separacion y el ancho fijo
+| del icono, que alinean las etiquetas— y se devuelve el color a la hoja de
+| AdminLTE. Resultado: el mismo menu en los cuatro modulos.
+|
+| LO QUE SI DISTINGUE A CADA SISTEMA es el elemento activo, y sale de
+| --ds-acento, que cada modulo define. El texto va aparte en
+| --ds-acento-texto porque el naranja de Basketball pide texto oscuro
+| (#212529 sobre #ff7900 = 5.87) y los tonos oscuros de Arena, League y Core
+| piden blanco.
+*/
+.ds-core .sidebar-menu .nav-link {
     border-radius: var(--ds-radius-sm);
     margin: 2px 8px;
-    color: #cbd5e1;
 }
 
-.ds-core .nav-sidebar .nav-link:hover {
-    background: var(--ds-surface-2);
-    color: #fff;
+
+.ds-core .sidebar-menu .nav-link.active {
+    background: var(--ds-acento, var(--ds-primary)) !important;
+    color: var(--ds-acento-texto, #212529) !important;
+    box-shadow: 0 4px 14px rgb(from var(--ds-acento, var(--ds-primary)) r g b / .28);
 }
 
-.ds-core .nav-sidebar .nav-link.active {
-    background: var(--ds-primary) !important;
-    color: #fff !important;
-    box-shadow: 0 6px 18px rgba(255, 121, 0, .28);
-}
+.ds-core .sidebar-menu .nav-link i { width: 22px; text-align: center; }
 
-.ds-core .nav-sidebar .nav-link i { width: 22px; text-align: center; }
-
-/* ---------- Contenido ---------- */
-
-.ds-core .content-wrapper { background: var(--core-suave); }
-
-.ds-core .content-header h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -.02em;
-}
+/* ---------- Contenido ----------
+   Aqui habia .ds-core .content-wrapper y .ds-core .content-header h1.
+   AdminLTE 4 renombro .content-wrapper a .app-content y .content-header
+   dejo de existir, asi que las dos reglas no alcanzaban a nada desde la
+   migracion. Comprobado: cero apariciones en adminlte.min.css y cero en
+   nuestro marcado. El fondo del area de contenido lo pone ahora la
+   plantilla segun el tema. */
 
 .ds-core .card {
     border: 1px solid var(--core-borde);
@@ -405,3 +428,61 @@ td.ds-tabla-acciones .ds-hueco {
     --aviso-borde: rgba(254, 215, 170, .30);
     --aviso-texto: #fdba74;
 }
+
+/*
+|--------------------------------------------------------------------------
+| Objetivos táctiles en pantallas de dedo
+|--------------------------------------------------------------------------
+| Los botones de acción de una fila miden 31 px de alto, y el de eliminar
+| 30x31. Con ratón sobran; con el dedo no: la recomendación son 44 px, y por
+| debajo se falla el objetivo y se pulsa el de al lado —que aquí puede ser
+| «Eliminar»—.
+|
+| Se comprobó en un móvil de 390 px: DataTables Responsive esconde las
+| columnas y las devuelve al desplegar la fila, así que los botones SÍ están
+| ahí. Sólo eran demasiado pequeños.
+|
+| La regla va tras «pointer: coarse», que distingue el dedo del ratón. No es
+| lo mismo que un ancho de pantalla: una tablet grande se toca y un portátil
+| estrecho no. Así el escritorio queda exactamente igual.
+*/
+@media (pointer: coarse) {
+    td.ds-tabla-acciones .btn,
+    tr.child .btn,
+    .dtr-details .btn,
+    table tbody .btn {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Separación para que dos objetivos de 44 px no se toquen. */
+    td.ds-tabla-acciones .btn + .btn,
+    tr.child .btn + .btn { margin-left: .35rem; }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| El pie es armazón: oscuro siempre
+|--------------------------------------------------------------------------
+| El armazón de DigiSports —Hub, acceso, barra superior, menú y pie— no
+| sigue el tema: es la identidad del producto. Lo que sí cambia con la
+| elección de la persona es el área donde se cargan las vistas.
+|
+| Sin esta regla, con el tema claro el pie se aclaraba y quedaba como una
+| franja blanca entre el contenido y el borde, rompiendo la continuidad con
+| la barra y el menú, que sí se quedan oscuros.
+*/
+.app-footer {
+    background: var(--ds-bg) !important;
+    color: #94a3b8 !important;
+    border-top: 1px solid rgba(255, 255, 255, .06);
+}
+
+.app-footer a        { color: #cbd5e1; }
+.app-footer a:hover  { color: #fff; }
+.app-footer strong,
+.app-footer b        { color: #e2e8f0; }

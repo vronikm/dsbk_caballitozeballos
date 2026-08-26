@@ -125,6 +125,94 @@ for (const medida of ANCHOS) {
   await ctx.close()
 }
 
+
+/*==============  La tabla de torneos se adapta de verdad  ==============*/
+/*
+| DataTables Responsive ya estaba activo en esta vista y NO colapsaba nada.
+| El motivo: sin la clase «nowrap» las celdas parten el texto, la tabla nunca
+| desborda y la extensión no tiene motivo para esconder columnas. Se veía una
+| tabla apretada con descripciones de dos líneas, no una tabla que se adapta.
+|
+| Con nowrap y responsivePriority, las columnas se retiran en un orden
+| decidido: Descripción primero —texto largo, prescindible de un vistazo— y
+| Nombre y Opciones al final, que son lo que identifica la fila y lo que se
+| va a pulsar.
+|
+| Se comprueba el COMPORTAMIENTO en cuatro anchos, no la configuración: que
+| a menos sitio haya menos columnas, que Nombre nunca desaparezca y que la
+| página no desborde en horizontal.
+*/
+const medidas = []
+for (const [nombre, w, h] of [['escritorio', 1920, 1000], ['portátil', 1366, 800],
+                              ['tablet', 820, 1100], ['móvil', 390, 844]]) {
+  const c = await nav.newContext({ viewport: { width: w, height: h },
+                                   isMobile: w < 500, hasTouch: w < 500 })
+  await c.addCookies([{ name: 'DigiSportsBasketball', value: 'dsqaui0000000000000',
+                        domain: 'localhost', path: '/' }])
+  const pg = await c.newPage()
+  await pg.goto(BASE + 'ds_basketball/torneoList/', { waitUntil: 'networkidle', timeout: 25000 })
+  await pg.waitForTimeout(900)
+  const r = await pg.evaluate(() => {
+    const t = document.getElementById('example1')
+    if (!t) return null
+    const cols = [...t.querySelectorAll('thead th')].filter(x => x.offsetParent !== null)
+                   .map(x => x.textContent.trim())
+    const fila = t.querySelector('tbody tr')
+    const btns = fila ? [...fila.querySelectorAll('.btn')].filter(b => b.offsetParent) : []
+    return { cols, lineas: new Set(btns.map(b => Math.round(b.getBoundingClientRect().top))).size,
+             nBtns: btns.length,
+             desborda: document.documentElement.scrollWidth > document.documentElement.clientWidth + 2 }
+  })
+  medidas.push([nombre, w, r])
+  af(nombre + ' (' + w + 'px): la página no desborda a lo ancho', !!r && !r.desborda)
+  af(nombre + ': la columna Nombre sobrevive', !!r && r.cols.includes('Nombre'),
+     r ? r.cols.length + ' columnas' : '—')
+  if (r && r.nBtns > 0) {
+    af(nombre + ': los botones de acción van en una línea', r.lineas === 1,
+       r.nBtns + ' botones en ' + r.lineas)
+  }
+  await c.close()
+}
+
+/* Que a menos sitio, menos columnas. Si no decrece, Responsive no actúa. */
+const cuentas = medidas.map(([, , r]) => (r ? r.cols.length : 0))
+af('a menor ancho, menos columnas visibles',
+   cuentas.every((n, i) => i === 0 || n <= cuentas[i - 1]) && cuentas[3] < cuentas[0],
+   cuentas.join(' → '))
+
+/*==============  En el móvil se puede actuar sobre la fila  ==============*/
+/*
+| Esconder Opciones sería inaceptable si lo escondido fuese inalcanzable.
+| Responsive lo devuelve al desplegar la fila, así que se comprueba que los
+| botones estén AHÍ y que tengan tamaño de dedo: 44 px es la recomendación, y
+| por debajo se pulsa el de al lado —que aquí puede ser «Eliminar»—.
+*/
+const cm = await nav.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
+await cm.addCookies([{ name: 'DigiSportsBasketball', value: 'dsqaui0000000000000', domain: 'localhost', path: '/' }])
+const pm = await cm.newPage()
+await pm.goto(BASE + 'ds_basketball/torneoList/', { waitUntil: 'networkidle', timeout: 25000 })
+await pm.waitForTimeout(900)
+const control = await pm.$('td.dtr-control, td.dt-control')
+af('en móvil la fila se puede desplegar', !!control)
+if (control) {
+  await control.click()
+  await pm.waitForTimeout(600)
+  const d = await pm.evaluate(() => {
+    const det = document.querySelector('tr.child, .dtr-details')
+    if (!det) return null
+    const b = [...det.querySelectorAll('.btn')].filter(x => x.offsetParent)
+      .map(x => { const r = x.getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height) } })
+    return { campos: [...det.querySelectorAll('.dtr-title')].map(t => t.textContent.trim()), botones: b }
+  })
+  af('y al desplegarla aparece Opciones', !!d && d.campos.includes('Opciones'),
+     d ? d.campos.length + ' campos' : '—')
+  af('con sus botones alcanzables', !!d && d.botones.length >= 3,
+     d ? d.botones.length + ' botones' : '—')
+  af('y de tamaño para el dedo (44 px)',
+     !!d && d.botones.every(x => x.h >= 44 && x.w >= 44),
+     d ? d.botones.map(x => x.w + 'x' + x.h).join(' ') : '—')
+}
+await cm.close()
 console.log('\nfallos: ' + fallos)
 await nav.close()
 process.exit(fallos === 0 ? 0 : 1)

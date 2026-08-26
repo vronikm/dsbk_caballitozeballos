@@ -170,7 +170,7 @@ CSS;
 												<div class="col-md-3">
 													<div class="mb-3">
 													<label for="descuento_rubroid">Tipo de descuento</label>
-													<select class="form-control" id="descuento_rubroid" name="descuento_rubroid" >																									
+													<select class="form-select" id="descuento_rubroid" name="descuento_rubroid" >																									
 														<?php echo $insAlumno->listarOptionDescuento($descuento_rubroid); ?>
 													</select>	
 													</div>
@@ -195,7 +195,7 @@ CSS;
 												<div class="col-md-3">
 													<div class="mb-3">
 													<label for="descuento_estado">Estado</label>
-													<select class="form-control" id="descuento_estado" name="descuento_estado" >	
+													<select class="form-select" id="descuento_estado" name="descuento_estado" >	
 														<?php
 															if ($descuento_estado == "S"){
 																echo "<option value='S' selected>Activo</option>

@@ -156,7 +156,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                     <div class="mb-3">
                         <label for="punto_modulo">Módulo</label>
-                        <select name="punto_modulo" id="punto_modulo" class="form-control" required>
+                        <select name="punto_modulo" id="punto_modulo" class="form-select" required>
                             <option value="">Seleccione…</option>
                             <?php foreach ($modulos as $clave => $m):
                                 if ($clave === 'core') { continue; } ?>
@@ -202,7 +202,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                     <div class="mb-3 mb-0">
                         <label for="punto_estado">Estado</label>
-                        <select name="punto_estado" id="punto_estado" class="form-control">
+                        <select name="punto_estado" id="punto_estado" class="form-select">
                             <option value="I">Inactivo — reserva el número, no permite emitir</option>
                             <option value="A">Activo — el módulo ya puede facturar</option>
                         </select>

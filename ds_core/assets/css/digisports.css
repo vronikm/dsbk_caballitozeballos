@@ -57,6 +57,8 @@
 /* Esta hoja es autonoma: no hereda el reset de AdminLTE, asi que fija su
    propio box-sizing. Sin esto, .ds-container suma su padding al 100% de
    ancho y provoca scroll horizontal en movil. */
+/* El naranja vivo hace de texto tambien: el Hub es oscuro siempre. */
+:root { --ds-primary-texto: var(--ds-primary); }
 .ds-body,
 .ds-body *,
 .ds-body *::before,
@@ -434,7 +436,7 @@
 }
 
 .ds-link {
-    color: var(--ds-primary);
+    color: var(--ds-primary-texto);
     font-size: .84rem;
     font-weight: 600;
     text-decoration: none;
@@ -531,7 +533,7 @@
 }
 
 .ds-alerta:last-child { border-bottom: 0; }
-.ds-alerta:hover .ds-item__title { color: var(--ds-primary); }
+.ds-alerta:hover .ds-item__title { color: var(--ds-primary-texto); }
 
 .ds-vacio {
     padding: 26px 0;

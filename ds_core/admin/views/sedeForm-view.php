@@ -54,7 +54,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="mb-3 col-md-5">
                             <label for="sede_escuelaid">Organización <span class="text-danger">*</span></label>
-                            <select class="form-control" id="sede_escuelaid" name="sede_escuelaid" required>
+                            <select class="form-select" id="sede_escuelaid" name="sede_escuelaid" required>
                                 <option value="">Seleccione…</option>
                                 <?php foreach ($escuelas as $e): ?>
                                     <option value="<?php echo (int)$e['escuela_id']; ?>"
@@ -69,7 +69,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <!-- El campo que decide qué módulos operan sobre la sede -->
                     <div class="mb-3">
                         <label for="sede_tipoingreso">Tipo de sede <span class="text-danger">*</span></label>
-                        <select class="form-control" id="sede_tipoingreso" name="sede_tipoingreso" required>
+                        <select class="form-select" id="sede_tipoingreso" name="sede_tipoingreso" required>
                             <?php foreach ($tipos as $t): ?>
                                 <option value="<?php echo htmlspecialchars($t['catalogo_valor'], ENT_QUOTES, 'UTF-8'); ?>"
                                     <?php echo ($sede['sede_tipoingreso'] ?? 'STF') === $t['catalogo_valor'] ? 'selected' : ''; ?>>

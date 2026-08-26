@@ -86,6 +86,7 @@ corre "Arena/League/Core sin jQuery" "node qa_sin_jquery.mjs"
 corre "librerias retiradas"  "node qa_js_muerto.mjs"
 corre "movil y tablet"      "node qa_responsive.mjs"
 corre "nada sobremontado"   "node qa_sobremontado.mjs"
+corre "controles de formulario" "node qa_radios.mjs"
 corre "selector de foto"     "node qa_selector_foto.mjs"
 corre "asistente del alta"   "node qa_wizard.mjs"
 corre "contadores del menu"   "$PHP qa_contadores_menu.php"
@@ -119,6 +120,8 @@ $PHP qa2fa_usuario.php borrar > /dev/null 2>&1
 
 echo
 echo "── Base de datos ──────────────────────────────────────────"
+corre "raíces de módulo"     "$PHP qa_raices_modulos.php"
+corre "CSS y temas"          "$PHP qa_css_temas.php"
 corre "codificación unificada" "$PHP qa_utf8mb4.php"
 
 if [ "$1" = "--dinero" ]; then

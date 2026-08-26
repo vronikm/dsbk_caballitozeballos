@@ -231,9 +231,13 @@
 					boton.prop('disabled', true);
 				},
 				success: function(response) {
+					/* El color dice cual esta elegido, pero el color solo no basta:
+					   aria-pressed lo anuncia para quien no lo distinga o use lector
+					   de pantalla. Sin actualizarlo aqui, quedaria mintiendo en cuanto
+					   alguien pulsara. */
 					// Puedes mostrar un toast, cambiar color, etc.
-					$('.btn-asistencia[data-alumnoid="' + alumno_id + '"]').removeClass('btn-info').addClass('btn-dark'); // Reset buttons
-					boton.removeClass('btn-dark').addClass('btn-info'); // Highlight selected
+					$('.btn-asistencia[data-alumnoid="' + alumno_id + '"]').removeClass('btn-info').addClass('btn-dark').attr('aria-pressed','false'); // Reset buttons
+					boton.removeClass('btn-dark').addClass('btn-info').attr('aria-pressed','true'); // Highlight selected
 
 					// Si quieres mostrar un mensaje de éxito:
 					// alert("Asistencia guardada!");

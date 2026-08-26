@@ -94,7 +94,7 @@
 									<div class="col-md-2">
 										<div class="mb-3" style='font-size: 13px;'>
 										<label for="lugar_sedeid">Sede</label>
-										<select class="form-control" style='font-size: 13px; height: 30px;' id="lugar_sedeid" name="lugar_sedeid">																									
+										<select class="form-select" style='font-size: 13px; height: 30px;' id="lugar_sedeid" name="lugar_sedeid">																									
 											<?php echo $insLugar->listarOptionSedebusqueda($lugar_sedeid); ?>
 										</select>	
 										</div>
@@ -124,7 +124,7 @@
 									<div class="col-md-2" style='font-size: 13px; min-height: 15px;'>
 										<div class="mb-3">
 											<label for="estado">Estado</label>
-											<select class="form-control" style='font-size: 13px; height: 30px;' id="estado" name="estado">		
+											<select class="form-select" style='font-size: 13px; height: 30px;' id="estado" name="estado">		
 												<?php 
 													if($lugar_estado == 'A'){
 														echo '<option value="A" selected>Activo</option>

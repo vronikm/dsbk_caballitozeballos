@@ -227,21 +227,21 @@
 						<td>'.$rows['torneo_organizador'].'</td>
 						<td>'.$rows['torneo_descripcion'].'</td>
 						<td>'.$estado.'</td>
-						<td>
-							'.$this->siPuede('eliminar','torneoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/torneoAjax.php" method="POST" autocomplete="off" >
+						<td class="ds-tabla-acciones">
+							'.$this->siPuede('eliminar','torneoList','<form class="FormularioAjax d-inline-flex" action="'.APP_URL.'app/ajax/torneoAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_torneo" value="eliminar">
 								<input type="hidden" name="torneo_id" value="'.$rows['torneo_id'].'">						
-								<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 3px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn btn-danger btn-sm ms-1" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'
 							
-							'.$this->siPuede('editar','torneoList','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/torneoAjax.php" method="POST" autocomplete="off" >
+							'.$this->siPuede('editar','torneoList','<form class="FormularioAjax d-inline-flex" action="'.APP_URL.'app/ajax/torneoAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_torneo" value="actualizarestado">
 								<input type="hidden" name="torneo_id" value="'.$rows['torneo_id'].'">						
-								<button type="submit" class="btn float-end '.$boton.' btn-xs" style="margin-right: 3px;""> '.$texto.' </button>
+								<button type="submit" class="btn '.$boton.' btn-sm ms-1"> '.$texto.' </button>
 							</form>').'
 
-							'.$this->siPuede('editar','torneoList','<a href="'.APP_URL.'torneoList/'.$rows['torneo_id'].'/" class="btn float-end btn-success btn-xs" style="margin-right: 3px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
-							<a href="'.APP_URL.'equipoList/'.$rows['torneo_id'].'/" class="btn float-end btn-primary btn-xs" style="margin-right: 3px;"><i class="fas fa-users me-1"></i>Equipos</a>
+							'.$this->siPuede('editar','torneoList','<a href="'.APP_URL.'torneoList/'.$rows['torneo_id'].'/" class="btn btn-success btn-sm ms-1" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>').'
+							<a href="'.APP_URL.'equipoList/'.$rows['torneo_id'].'/" class="btn btn-primary btn-sm ms-1"><i class="fas fa-users me-1"></i>Equipos</a>
 						</td>
 					</tr>';	
 			}

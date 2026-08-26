@@ -52,7 +52,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         <form method="GET" action="<?php echo APP_URL; ?>reservaList/" class="row g-2 align-items-end">
             <div class="col-md-3 mb-2">
                 <label class="mb-1 small">Instalación</label>
-                <select name="instalacion" class="form-control form-control-sm">
+                <select name="instalacion" class="form-select form-select-sm">
                     <option value="0">Todas</option>
                     <?php foreach ($instalaciones as $i): ?>
                         <option value="<?php echo (int)$i['instalacion_id']; ?>"
@@ -65,7 +65,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
             <div class="col-md-2 mb-2">
                 <label class="mb-1 small">Estado</label>
-                <select name="estado" class="form-control form-control-sm">
+                <select name="estado" class="form-select form-select-sm">
                     <option value="">Todos</option>
                     <?php foreach ($estados as $k => $v): ?>
                         <option value="<?php echo $k; ?>" <?php echo $filtros['estado'] === $k ? 'selected' : ''; ?>><?php echo $v; ?></option>

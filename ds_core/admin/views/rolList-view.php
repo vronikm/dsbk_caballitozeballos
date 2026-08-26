@@ -130,7 +130,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
                     <div class="mb-3 mb-0">
                         <label for="rol_estado">Estado</label>
-                        <select class="form-control" name="rol_estado" id="rol_estado">
+                        <select class="form-select" name="rol_estado" id="rol_estado">
                             <option value="A">Activo</option>
                             <option value="I">Inactivo</option>
                         </select>

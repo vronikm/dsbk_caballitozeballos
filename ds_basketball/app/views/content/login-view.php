@@ -88,8 +88,7 @@ $funciones = [
     <script src="<?php echo $vendor; ?>js/sweetalert2.all.min.js"></script>
 
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/login.css">
-	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
-	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
+	<?php require DS_HUB_PATH . "ds_core/inc/tema-init.php"; ?>
 </head>
 <body class="dsl-body">
 
@@ -195,7 +194,6 @@ $funciones = [
 
             <p class="dsl-pie">
                 ¿Problemas para entrar? <strong>Contacta al administrador.</strong><br>
-                Las cuentas se crean desde el módulo Core.
             </p>
         </div>
     </section>

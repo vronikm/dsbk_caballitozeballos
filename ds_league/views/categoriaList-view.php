@@ -143,7 +143,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2">
                         <div class="mb-3 col-7">
                             <label for="categoria_torneoid">Torneo</label>
-                            <select name="categoria_torneoid" id="categoria_torneoid" class="form-control" required>
+                            <select name="categoria_torneoid" id="categoria_torneoid" class="form-select" required>
                                 <?php foreach ($torneos as $o): ?>
                                     <option value="<?php echo (int)$o['torneo_id']; ?>"
                                         <?php echo (int)$o['torneo_id'] === $torneoId ? 'selected' : ''; ?>>
@@ -154,7 +154,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                         <div class="mb-3 col-5">
                             <label for="categoria_genero">Género</label>
-                            <select name="categoria_genero" id="categoria_genero" class="form-control">
+                            <select name="categoria_genero" id="categoria_genero" class="form-select">
                                 <?php foreach ($generos as $k => $v): ?>
                                     <option value="<?php echo $k; ?>"><?php echo $h($v); ?></option>
                                 <?php endforeach; ?>

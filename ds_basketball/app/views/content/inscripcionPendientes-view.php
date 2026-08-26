@@ -74,7 +74,7 @@ CSS;
                         </h3>
                         <div class="card-tools">
                             <form method="GET" class="form-inline">
-                                <select name="sede" class="form-control form-control-sm me-2">
+                                <select name="sede" class="form-select form-select-sm me-2">
                                     <option value="">Todas las sedes</option>
                                     <?php foreach ($sedes as $sede): ?>
                                         <option value="<?php echo $sede['sede_id']; ?>"
@@ -150,11 +150,11 @@ CSS;
                                     <td><?php echo badgePendiente((int) $f['sin_foto'] === 0, 'Sí', 'Sin foto'); ?></td>
                                     <td>
                                         <a href="<?php echo APP_URL.'alumnoUpdate/'.$f['alumno_id'].'/'; ?>" target="_blank"
-                                           class="btn btn-xs btn-primary" title="Completar información">
+                                           class="btn btn-sm btn-primary" title="Completar información">
                                             <i class="fas fa-pen"></i> Completar
                                         </a>
                                         <a href="<?php echo APP_URL.'alumnoProfile/'.$f['alumno_id'].'/'; ?>" target="_blank"
-                                           class="btn btn-xs btn-info" title="Ver ficha">
+                                           class="btn btn-sm btn-info" title="Ver ficha">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>

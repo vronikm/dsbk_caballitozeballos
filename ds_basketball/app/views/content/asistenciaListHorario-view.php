@@ -70,19 +70,7 @@
 				<div class="card card-default" style='height: 140px;'>
 					<div class="card-header" style='min-height: 40px;'>
 						<h3 class="card-title">Búsqueda de horarios</h3>
-						<div class="card-tools">
-								<?php
-								if($horario_sedeid != 0){
-									echo '										
-										<form action="'.APP_URL.'asistenciaHorario/"  method="POST" autocomplete="off" target="_blank">								
-											<input type="hidden" name="horario_sedeid" value="'.$horario_sedeid.'">						
-											<button type="submit" class="btn float-end btn-ver btn-xs" >Nuevo</button>
-										</form>	
-									';
-								}
-							?>						
-						</div>	
-					</div>  
+</div>  
 
 					<form action="<?php echo APP_URL."asistenciaListHorario/" ?>" method="POST" autocomplete="off" enctype="multipart/form-data" >
 					<!-- card-body -->                
@@ -103,7 +91,7 @@
 								<div class="col-md-3">
 									<div class="mb-3">
 										<label for="horario_sedeid">Sede</label>
-										<select class="form-control" style='font-size: 13px; height: 31px;' id="horario_sedeid" name="horario_sedeid">
+										<select class="form-select" style='font-size: 13px; height: 31px;' id="horario_sedeid" name="horario_sedeid">
 											<?php
 												if($horario_sedeid == 0){	
 													echo "<option value='0' selected='selected'>Seleccionar sede</option>";
@@ -116,10 +104,9 @@
 									</div>
 								</div>
 
-								<div class="col-md-3">
-									<div class="mb-3">
-										<label for="alumno_sedeid">.</label>
-										<?php echo ds_boton_buscar(); ?>
+								<div class="col-md-3 d-flex align-items-end">
+									<div class="mb-3 w-100">
+																				<?php echo ds_boton_buscar(); ?>
 									</div>
 								</div>
 							</div>						
@@ -133,6 +120,15 @@
 					<div class="card-header" style='min-height: 40px;'>
 						<h3 class="card-title">Resultado de la búsqueda</h3>
 						<div class="card-tools">
+							<?php
+							/* El alta va junto a su tabla, no en el formulario de filtros. */
+							if ($horario_sedeid != 0) {
+								echo '<form class="d-inline-flex me-2" action="'.APP_URL.'asistenciaHorario/" method="POST" autocomplete="off" target="_blank">
+										<input type="hidden" name="horario_sedeid" value="'.$horario_sedeid.'">
+										<button type="submit" class="btn btn-primary btn-sm">Nuevo</button>
+									</form>';
+							}
+							?>
 							<button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Plegar o desplegar" aria-label="Plegar o desplegar"><i data-lte-icon="expand" class="fas fa-plus"></i><i data-lte-icon="collapse" class="fas fa-minus"></i></button>
 						</div>
 					</div>

@@ -133,7 +133,7 @@
 												<div class="col-md-2">
 													<div class="mb-3">
 														<label for="equipo_sedeid">Sede</label>
-														<select class="form-control" id="equipo_sedeid" name="equipo_sedeid">
+														<select class="form-select" id="equipo_sedeid" name="equipo_sedeid">
 															<?php
 																if($equipo_sedeid == 0){	
 																	echo "<option value='0' selected='selected'>-Seleccionar sede-</option>";
@@ -160,7 +160,7 @@
 												<div class="col-md-4">
 													<div class="mb-3">
 														<label for="equipo_profesorid">Profesor a cargo</label>
-														<select class="form-control" id="equipo_profesorid" name="equipo_profesorid">									
+														<select class="form-select" id="equipo_profesorid" name="equipo_profesorid">									
 															<?php
 																if($equipo_profesorid == 0){	
 																	echo "<option value='0' selected='selected'>Seleccionar un profesor</option>";

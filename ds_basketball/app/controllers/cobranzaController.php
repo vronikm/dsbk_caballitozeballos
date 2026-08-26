@@ -88,8 +88,8 @@
 						<td>'.$rows['ALUMNO'].'</td>
 						<td>'.$rows['TOTAL_MORA'].'</td>
 						<td>
-							'.$this->siPuede('editar','cobranzaPension','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de pensiones, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-end btn-actualizar btn-xs" style="margin-right: 5px;"><i class="fas fa-paper-plane me-1"></i>Notificar</a>').'
-                            <a href="'.APP_URL.'cobranzaDetallePension/'.$rows['repre_id'].'/" class="btn float-end btn-ver btn-xs" style="margin-right: 5px;"><i class="fas fa-list me-1"></i>Detalle</a>
+							'.$this->siPuede('editar','cobranzaPension','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de pensiones, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-end btn-actualizar btn-sm" style="margin-right: 5px;"><i class="fas fa-paper-plane me-1"></i>Notificar</a>').'
+                            <a href="'.APP_URL.'cobranzaDetallePension/'.$rows['repre_id'].'/" class="btn float-end btn-ver btn-sm" style="margin-right: 5px;"><i class="fas fa-list me-1"></i>Detalle</a>
 						</td>
 					</tr>';	
 			}
@@ -179,8 +179,8 @@
 						<td>'.$rows['ALUMNO'].'</td>
 						<td>'.$rows['TOTAL_MORA'].'</td>
 						<td>
-							'.$this->siPuede('editar','cobranzaPension','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de pensiones, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-end btn-actualizar btn-xs" style="margin-right: 5px;"><i class="fas fa-paper-plane me-1"></i>Notificar</a>').'
-                            <a href="'.APP_URL.'cobranzaDetallePension/'.$rows['repre_id'].'/" class="btn float-end btn-ver btn-xs" style="margin-right: 5px;"><i class="fas fa-list me-1"></i>Detalle</a>
+							'.$this->siPuede('editar','cobranzaPension','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de pensiones, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-end btn-actualizar btn-sm" style="margin-right: 5px;"><i class="fas fa-paper-plane me-1"></i>Notificar</a>').'
+                            <a href="'.APP_URL.'cobranzaDetallePension/'.$rows['repre_id'].'/" class="btn float-end btn-ver btn-sm" style="margin-right: 5px;"><i class="fas fa-list me-1"></i>Detalle</a>
 						</td>
 					</tr>';	
 			}
@@ -243,8 +243,8 @@
 						<td>'.$rows['ALUMNO'].'</td>
 						<td>'.$rows['TOTAL_MORA'].'</td>
 						<td>
-							'.$this->siPuede('editar','cobranzaUniforme','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de uniformes, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-end btn-actualizar btn-xs" style="margin-right: 5px;"><i class="fas fa-paper-plane me-1"></i>Notificar</a>').'
-                            <a href="'.APP_URL.'cobranzaDetalleUniforme/'.$rows['repre_id'].'/" class="btn float-end btn-ver btn-xs" style="margin-right: 5px;"><i class="fas fa-list me-1"></i>Detalle</a>
+							'.$this->siPuede('editar','cobranzaUniforme','<a href="https://wa.me/593'.$celular.'?text=Estimado representante, '.ds_nombre_organizacion(0).' le recuerda que a la presente fecha usted mantiene un saldo pendiente de uniformes, por el valor de USD $'.$rows["TOTAL_MORA"].', agradecemos su gentileza en realizar el pago correspondiente." target="_blank" class="btn float-end btn-actualizar btn-sm" style="margin-right: 5px;"><i class="fas fa-paper-plane me-1"></i>Notificar</a>').'
+                            <a href="'.APP_URL.'cobranzaDetalleUniforme/'.$rows['repre_id'].'/" class="btn float-end btn-ver btn-sm" style="margin-right: 5px;"><i class="fas fa-list me-1"></i>Detalle</a>
 						</td>
 					</tr>';	
 			}

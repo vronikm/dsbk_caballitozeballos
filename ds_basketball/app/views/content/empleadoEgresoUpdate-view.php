@@ -149,7 +149,7 @@ CSS;
 													<div class="col-md-2">
 														<div class="mb-3">
 															<label for="egreso_tipoid">Tipo de egreso</label>
-															<select class="form-control" id="egreso_tipoid" name="egreso_tipoid">																									
+															<select class="form-select" id="egreso_tipoid" name="egreso_tipoid">																									
 																<?php echo $insEgreso->listarTipoEgreso($egreso_tipoid); ?>
 															</select>	
 														</div>
@@ -163,7 +163,7 @@ CSS;
 													<div class="col-md-3">
 														<div class="mb-3">
 															<label for="egreso_formaegresoid">Periodicidad de descuento</label>
-															<select class="form-control" id="egreso_formaegresoid" name="egreso_formaegresoid">																									
+															<select class="form-select" id="egreso_formaegresoid" name="egreso_formaegresoid">																									
 																<?php echo $insEgreso->listarPeriodicidadDescuento($egreso_formaegresoid); ?>
 															</select>	
 														</div>

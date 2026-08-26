@@ -63,7 +63,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <?php endif; ?>
                     <div class="col-md-8">
                         <label for="modulo" class="mb-1">Módulo <span class="text-danger">*</span></label>
-                        <select name="modulo" id="modulo" class="form-control" onchange="this.form.submit()">
+                        <select name="modulo" id="modulo" class="form-select" onchange="this.form.submit()">
                             <?php foreach ($modulos as $clave => $nombre): ?>
                                 <option value="<?php echo $clave; ?>" <?php echo $modSel === $clave ? 'selected' : ''; ?>>
                                     <?php echo $nombre; ?>
@@ -128,7 +128,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2">
                         <div class="mb-3 col-md-6 solo-entrada">
                             <label for="menu_vista">Vista <span class="text-danger">*</span></label>
-                            <select class="form-control" id="menu_vista" name="menu_vista">
+                            <select class="form-select" id="menu_vista" name="menu_vista">
                                 <option value="">Seleccione…</option>
                                 <?php foreach ($vistas as $v): ?>
                                     <option value="<?php echo htmlspecialchars($v, ENT_QUOTES, 'UTF-8'); ?>"
@@ -153,7 +153,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2">
                         <div class="mb-3 col-md-6 solo-entrada">
                             <label for="menu_padreid">Grupo</label>
-                            <select class="form-control" id="menu_padreid" name="menu_padreid">
+                            <select class="form-select" id="menu_padreid" name="menu_padreid">
                                 <option value="0">Sin grupo (nivel superior)</option>
                                 <?php foreach ($padres as $p):
                                     if ((int)$p['menu_id'] === $id) continue; ?>
@@ -176,7 +176,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="mb-3 col-md-3">
                             <label for="menu_estado">Estado</label>
-                            <select class="form-control" id="menu_estado" name="menu_estado">
+                            <select class="form-select" id="menu_estado" name="menu_estado">
                                 <option value="A" <?php echo ($menu['menu_estado'] ?? 'A') === 'A' ? 'selected' : ''; ?>>Activo</option>
                                 <option value="I" <?php echo ($menu['menu_estado'] ?? '') === 'I' ? 'selected' : ''; ?>>Inactivo</option>
                             </select>

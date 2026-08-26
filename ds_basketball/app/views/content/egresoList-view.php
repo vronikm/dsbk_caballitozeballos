@@ -125,7 +125,7 @@
 												<div class="col-md-3">
 													<div class="mb-3">
 														<label for="egreso_sedeid">Sede</label>
-														<select class="form-control" id="egreso_sedeid" name="egreso_sedeid" onchange="ocultarDiv()" >																									
+														<select class="form-select" id="egreso_sedeid" name="egreso_sedeid" onchange="ocultarDiv()" >																									
 															<?php echo $insEgreso->listarOptionSede($egreso_sedeid); ?>
 														</select>	
 													</div>
@@ -156,7 +156,7 @@
 												<div class="col-md-3">
 													<div class="mb-3">
 														<label for="egreso_formaentrega">Forma de pago</label>
-														<select class="form-control" id="egreso_formaentrega" name="egreso_formaentrega" onchange="ocultarDiv()" >																									
+														<select class="form-select" id="egreso_formaentrega" name="egreso_formaentrega" onchange="ocultarDiv()" >																									
 															<?php echo $insEgreso->listarFormaEntregaIngreso($egreso_formaentrega); ?>
 														</select>	
 													</div>
@@ -164,7 +164,7 @@
 												<div class="col-md-3">
 													<div class="mb-3">
 														<label for="egreso_concepto">Concepto</label>
-														<select class="form-control" id="egreso_concepto" name="egreso_concepto" onchange="ocultarDiv()" >																									
+														<select class="form-select" id="egreso_concepto" name="egreso_concepto" onchange="ocultarDiv()" >																									
 															<?php echo $insEgreso->listarTipoEgreso($egreso_concepto); ?>
 														</select>	
 													</div>

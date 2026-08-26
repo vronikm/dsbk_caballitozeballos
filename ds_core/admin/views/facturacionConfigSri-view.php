@@ -64,7 +64,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2">
                         <div class="mb-3 col-md-4">
                             <label for="ambiente">Ambiente <span class="text-danger">*</span></label>
-                            <select class="form-control" id="ambiente" name="ambiente" required>
+                            <select class="form-select" id="ambiente" name="ambiente" required>
                                 <option value="1" <?php echo $sel($cfg['ambiente'], '1'); ?>>Pruebas</option>
                                 <option value="2" <?php echo $sel($cfg['ambiente'], '2'); ?>>Producción</option>
                             </select>
@@ -80,7 +80,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="mb-3 col-md-4">
                             <label for="obligado_contabilidad">Obligado a llevar contabilidad</label>
-                            <select class="form-control" id="obligado_contabilidad" name="obligado_contabilidad">
+                            <select class="form-select" id="obligado_contabilidad" name="obligado_contabilidad">
                                 <option value="NO" <?php echo $sel($cfg['obligado_contabilidad'], 'NO'); ?>>No</option>
                                 <option value="SI" <?php echo $sel($cfg['obligado_contabilidad'], 'SI'); ?>>Sí</option>
                             </select>
@@ -139,7 +139,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php /* Las tarifas admitidas las valida el módulo de facturación:
                                      se envían como entero, no como decimal. */
                                   $ivaActual = (string)(int)round((float)$cfg['iva_tarifa_default']); ?>
-                            <select class="form-control" id="iva_tarifa_default" name="iva_tarifa_default" required>
+                            <select class="form-select" id="iva_tarifa_default" name="iva_tarifa_default" required>
                                 <?php foreach (['0' => '0 %', '12' => '12 %', '14' => '14 %', '15' => '15 %'] as $v => $t): ?>
                                     <option value="<?php echo $v; ?>" <?php echo $sel($ivaActual, $v); ?>>
                                         <?php echo $t; ?>
@@ -150,7 +150,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="mb-3 col-md-6">
                             <label for="forma_pago_default">Forma de pago por defecto</label>
-                            <select class="form-control" id="forma_pago_default" name="forma_pago_default" required>
+                            <select class="form-select" id="forma_pago_default" name="forma_pago_default" required>
                                 <?php foreach ($formasPago as $codigo => $texto): ?>
                                     <option value="<?php echo $codigo; ?>"
                                         <?php echo $sel($cfg['forma_pago_default'], $codigo); ?>>

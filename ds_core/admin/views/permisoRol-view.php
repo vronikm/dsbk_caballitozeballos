@@ -45,7 +45,7 @@ require_once __DIR__ . "/inc/layout-top.php";
         <form method="GET" action="<?php echo APP_URL; ?>permisoRol/" class="row g-2 align-items-end mb-4">
             <div class="col-md-4 mb-2">
                 <label for="rol" class="mb-1">Rol</label>
-                <select name="rol" id="rol" class="form-control" onchange="this.form.submit()">
+                <select name="rol" id="rol" class="form-select" onchange="this.form.submit()">
                     <?php foreach ($roles as $r): ?>
                         <option value="<?php echo (int)$r['rol_id']; ?>" <?php echo $rolSel === (int)$r['rol_id'] ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($r['rol_nombre'], ENT_QUOTES, 'UTF-8'); ?>
@@ -57,7 +57,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
             <div class="col-md-4 mb-2">
                 <label for="modulo" class="mb-1">Módulo</label>
-                <select name="modulo" id="modulo" class="form-control" onchange="this.form.submit()">
+                <select name="modulo" id="modulo" class="form-select" onchange="this.form.submit()">
                     <?php foreach ($modulos as $clave => $nombre): ?>
                         <option value="<?php echo $clave; ?>" <?php echo $modSel === $clave ? 'selected' : ''; ?>>
                             <?php echo $nombre; ?>

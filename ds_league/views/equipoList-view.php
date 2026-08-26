@@ -182,7 +182,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2">
                         <div class="mb-3 col-5">
                             <label for="equipo_idtipo">Identificación</label>
-                            <select name="equipo_idtipo" id="equipo_idtipo" class="form-control">
+                            <select name="equipo_idtipo" id="equipo_idtipo" class="form-select">
                                 <option value="04">RUC</option>
                                 <option value="05">Cédula</option>
                                 <option value="06">Pasaporte</option>

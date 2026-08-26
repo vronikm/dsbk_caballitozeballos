@@ -91,7 +91,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
                     <div class="mb-3 mb-0">
                         <label for="fase_tipo">Formato</label>
-                        <select name="fase_tipo" id="fase_tipo" class="form-control">
+                        <select name="fase_tipo" id="fase_tipo" class="form-select">
                             <option value="S">Series al mejor de N</option>
                             <option value="E">Eliminación directa (partido único)</option>
                         </select>
@@ -126,7 +126,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 <div class="card-body">
                     <div class="mb-3">
                         <label for="fase_origen">Clasifican desde</label>
-                        <select name="fase_origen" id="fase_origen" class="form-control" required>
+                        <select name="fase_origen" id="fase_origen" class="form-select" required>
                             <?php foreach ($origenes as $o): ?>
                                 <option value="<?php echo (int)$o['fase_id']; ?>">
                                     <?php echo $h($o['fase_nombre']); ?>
@@ -149,7 +149,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                         <div class="mb-3 col-6">
                             <label for="mejor_de">Al mejor de</label>
-                            <select name="mejor_de" id="mejor_de" class="form-control">
+                            <select name="mejor_de" id="mejor_de" class="form-select">
                                 <option value="1">1 · partido único</option>
                                 <option value="3">3</option>
                                 <option value="5">5</option>

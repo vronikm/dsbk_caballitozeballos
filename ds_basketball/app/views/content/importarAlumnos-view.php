@@ -46,7 +46,7 @@
 								<div class="col-md-4">
 									<div class="mb-3">
 										<label>Sede destino</label>
-										<select class="form-control" name="alumno_sedeid" required>
+										<select class="form-select" name="alumno_sedeid" required>
 											<option value="">— Seleccione —</option>
 											<?php echo $insAlumnoImp->listarOptionSede($_SESSION['rol'], $_SESSION['usuario']); ?>
 										</select>

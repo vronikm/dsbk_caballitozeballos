@@ -1,25 +1,32 @@
 <?php
 /*
 |--------------------------------------------------------------------------
-| Control de tema: claro, oscuro o el del sistema
+| Control de tema — con el contrato de AdminLTE 4.8.5
 |--------------------------------------------------------------------------
-| Se incluye dentro de la lista de la derecha de la barra superior, junto al
-| selector de aplicaciones, de modo que aparece en los cuatro modulos sin
-| tocar cada navbar.
+| Este control ya NO lleva logica propia. Usa los atributos que el paquete de
+| AdminLTE reconoce, y es su codigo el que aplica el tema, lo guarda y marca
+| la opcion activa:
+|
+|   data-bs-theme-value="light|dark|auto"   en cada opcion. AdminLTE le pone
+|                                           .active, aria-pressed y muestra
+|                                           su .bi-check-lg.
+|   data-lte-theme-icon="light|dark|auto"   en el boton. AdminLTE deja
+|                                           visible el que corresponda y
+|                                           esconde los otros con d-none.
+|
+| POR QUE SE CAMBIO
+|
+| Antes esto se movia con un tema.js propio que guardaba en «ds-tema».
+| AdminLTE guarda en «lte-theme» y aplica el tema en DOMContentLoaded, asi
+| que habia dos mecanismos pisandose: la pagina se pintaba con el tema
+| elegido y acto seguido saltaba al de AdminLTE. Se retiro el nuestro.
 |
 | TRES OPCIONES, NO UN INTERRUPTOR DE DOS
 |
-| «Automatico» sigue la preferencia del sistema operativo, que es lo que
+| «El del sistema» sigue la preferencia del sistema operativo, que es lo que
 | espera quien tiene el movil o el portatil en oscuro por la noche. Un
 | interruptor de dos posiciones obliga a acordarse de cambiarlo dos veces al
 | dia.
-|
-| LA LOGICA NO ESTA AQUI
-|
-| Vive en ds_core/assets/js/tema.js, que se carga en la CABECERA de cada
-| vista y sin defer: el tema tiene que aplicarse antes del primer pintado o
-| la pagina parpadea de claro a oscuro. Este archivo solo pone el marcado, y
-| se comunica con el script por atributos data.
 |
 | Uso desde un modulo:
 |     require_once __DIR__ . "/../../../../ds_core/inc/tema-control.php";
@@ -29,26 +36,31 @@
 <li class="nav-item dropdown">
     <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown"
        aria-expanded="false" title="Tema de la interfaz" aria-label="Tema de la interfaz">
-        <?php /* El icono lo pone tema.js segun lo que se este viendo. */ ?>
-        <i class="fas fa-adjust" data-ds-tema-icono></i>
+        <?php /* AdminLTE deja visible el que coincide con lo elegido. */ ?>
+        <i class="fas fa-sun"     data-lte-theme-icon="light"></i>
+        <i class="fas fa-moon     d-none" data-lte-theme-icon="dark"></i>
+        <i class="fas fa-desktop  d-none" data-lte-theme-icon="auto"></i>
     </a>
 
     <div class="dropdown-menu dropdown-menu-end">
         <h6 class="dropdown-header">Tema</h6>
 
-        <a class="dropdown-item d-flex align-items-center gap-2"
-           href="#" data-ds-tema-opcion="light">
+        <button type="button" class="dropdown-item d-flex align-items-center gap-2"
+                data-bs-theme-value="light" aria-pressed="false">
             <i class="fas fa-sun fa-fw"></i> Claro
-        </a>
+            <i class="fas fa-check ms-auto d-none bi-check-lg"></i>
+        </button>
 
-        <a class="dropdown-item d-flex align-items-center gap-2"
-           href="#" data-ds-tema-opcion="dark">
+        <button type="button" class="dropdown-item d-flex align-items-center gap-2"
+                data-bs-theme-value="dark" aria-pressed="false">
             <i class="fas fa-moon fa-fw"></i> Oscuro
-        </a>
+            <i class="fas fa-check ms-auto d-none bi-check-lg"></i>
+        </button>
 
-        <a class="dropdown-item d-flex align-items-center gap-2"
-           href="#" data-ds-tema-opcion="auto">
+        <button type="button" class="dropdown-item d-flex align-items-center gap-2"
+                data-bs-theme-value="auto" aria-pressed="false">
             <i class="fas fa-desktop fa-fw"></i> El del sistema
-        </a>
+            <i class="fas fa-check ms-auto d-none bi-check-lg"></i>
+        </button>
     </div>
 </li>

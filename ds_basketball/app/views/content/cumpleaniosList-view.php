@@ -40,8 +40,7 @@
 	<!-- SweetAlert2 -->
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
 	<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/cumples.css">
-	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
-	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
+	<?php require DS_HUB_PATH . "ds_core/inc/tema-init.php"; ?>
 </head>
 
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
@@ -103,7 +102,11 @@
 				<?php if (empty($alumnos)): ?>
 					<div class="cumple-empty">
 						<i class="fas fa-birthday-cake"></i>
-						<p style="font-size:1.1rem; font-weight:600; color:var(--azul);">
+						<?php /* El color sale de un token de Bootstrap, no de --azul: ese es un
+						   azul de marca fijo y sobre el tema oscuro daba contraste 1.11,
+						   texto casi invisible. Solo se vio el dia que no cumplia años
+						   nadie y el estado vacio se dibujo por primera vez. */ ?>
+						<p style="font-size:1.1rem; font-weight:600; color:var(--bs-emphasis-color);">
 							No hay alumnos que cumplan años <?php echo $esHoy ? 'hoy' : 'en esta fecha'; ?>.
 						</p>
 						<p>Prueba seleccionando otra fecha.</p>

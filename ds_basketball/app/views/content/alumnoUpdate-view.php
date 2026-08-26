@@ -264,7 +264,7 @@ CSS;
 												<div class="col-md-4">
 													<div class="mb-3">
 														<label for="alumno_tipoidentificacion">Tipo identificación</label>
-														<select id="alumno_tipoidentificacion" class="form-control" name="alumno_tipoidentificacion">																					
+														<select id="alumno_tipoidentificacion" class="form-select" name="alumno_tipoidentificacion">																					
 															<?php echo $insAlumno->listarOptionTipoIdentificacion($datos['alumno_tipoidentificacion']); ?>
 														</select>
 													</div>          
@@ -282,7 +282,7 @@ CSS;
 												<div class="col-md-4">
 													<div class="mb-3">
 														<label for="alumno_nacionalidadid">Nacionalidad</label>
-														<select class="form-control" style="width: 100%;" id="alumno_nacionalidadid" name="alumno_nacionalidadid">
+														<select class="form-select" style="width: 100%;" id="alumno_nacionalidadid" name="alumno_nacionalidadid">
 															<?php echo $insAlumno->listarOptionNacionalidad($datos['alumno_nacionalidadid']); ?>
 														</select>
 													</div> 
@@ -330,7 +330,7 @@ CSS;
 										<div class="col-md-2">
 											<div class="mb-3">
 												<label for="alumno_sedeid">Sede</label>
-												<select class="form-control" id="alumno_sedeid" name="alumno_sedeid">									
+												<select class="form-select" id="alumno_sedeid" name="alumno_sedeid">									
 													<?php echo $insAlumno->listarSedeAlumno($datos['alumno_sedeid']); ?>
 												</select>	
 											</div>
@@ -345,22 +345,30 @@ CSS;
 											<div class="mb-3">
 												<label for="alumno_hermanos">Tiene hermanos?</label>
 												<!-- radio -->
-												<div class="form-check">
-													<input class="col-sm-1 form-check-input" type="radio" id="alumno_hermanosSi" name="alumno_hermanos" value="S" <?php echo $alumno_hermanosSi; ?> required>
-													<label class="col-sm-6 form-check-label" for="alumno_hermanosSi">Si</label>
-													<input class="col-sm-1 form-check-input" type="radio" id="alumno_hermanosNo" name="alumno_hermanos" value="N" <?php echo $alumno_hermanosNo; ?>>
-													<label class="col-sm-4 form-check-label" for="alumno_hermanosNo">No</label>
+												<div class="d-flex flex-wrap gap-4">
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="alumno_hermanosSi" name="alumno_hermanos" value="S" <?php echo $alumno_hermanosSi; ?> required>
+												        <label class="form-check-label" for="alumno_hermanosSi">Si</label>
+												    </div>
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="alumno_hermanosNo" name="alumno_hermanos" value="N" <?php echo $alumno_hermanosNo; ?>>
+												        <label class="form-check-label" for="alumno_hermanosNo">No</label>
+												    </div>
 												</div>
 											</div>
 										</div>	  
 										<div class="col-md-3">
 											<div class="mb-3">
 												<label for="alumno_genero">Sexo</label>
-												<div class="form-check">
-													<input class="col-sm-1 form-check-input" type="radio" id="alumno_generoM" name="alumno_genero" value="M" <?php echo $alumno_generoM; ?> required>
-													<label class="col-sm-5 form-check-label" for="alumno_generoM">Masculino</label>
-													<input class="col-sm-1 form-check-input" type="radio" id="alumno_generoF" name="alumno_genero" value="F" <?php echo $alumno_generoF; ?>>
-													<label class="col-sm-4 form-check-label" for="alumno_generoF">Femenino</label>
+												<div class="d-flex flex-wrap gap-4">
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="alumno_generoM" name="alumno_genero" value="M" <?php echo $alumno_generoM; ?> required>
+												        <label class="form-check-label" for="alumno_generoM">Masculino</label>
+												    </div>
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="alumno_generoF" name="alumno_genero" value="F" <?php echo $alumno_generoF; ?>>
+												        <label class="form-check-label" for="alumno_generoF">Femenino</label>
+												    </div>
 												</div> 
 											</div>
 										</div>   
@@ -428,22 +436,30 @@ CSS;
 										<div class="col-md-3">
 											<div class="mb-3">
 												<label for="Covid">Carnet vacunación Covid</label>
-												<div class="form-check">
-													<input class="col-sm-1 form-check-input" type="radio" id="infomedic_covidSi" name="infomedic_covid" value="S" <?php echo $infomedic_covidSi;?> > 
-													<label class="col-sm-6 form-check-label" for="infomedic_covidSi">Si</label>
-													<input class="col-sm-1 form-check-input" type="radio" id="infomedic_covidNo" name="infomedic_covid" value="N" <?php echo $infomedic_covidNo;?> >
-													<label class="col-sm-4 form-check-label" for="infomedic_covidNo">No</label>
+												<div class="d-flex flex-wrap gap-4">
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="infomedic_covidSi" name="infomedic_covid" value="S" <?php echo $infomedic_covidSi;?>>
+												        <label class="form-check-label" for="infomedic_covidSi">Si</label>
+												    </div>
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="infomedic_covidNo" name="infomedic_covid" value="N" <?php echo $infomedic_covidNo;?>>
+												        <label class="form-check-label" for="infomedic_covidNo">No</label>
+												    </div>
 												</div>
 											</div>
 										</div>
 										<div class="col-md-4">
 											<div class="mb-3">
 												<label for="Vacunas">Carnet vacunación habitual</label>
-												<div class="form-check">
-													<input class="col-sm-1 form-check-input" type="radio" id="infomedic_vacunasSi" name="infomedic_vacunas" value="S" <?php echo $infomedic_vacunasSi;?> > 
-													<label class="col-sm-6 form-check-label" for="infomedic_vacunasSi">Si</label>
-													<input class="col-sm-1 form-check-input" type="radio" id="infomedic_vacunasNo" name="infomedic_vacunas" value="N" <?php echo $infomedic_vacunasNo;?> >
-													<label class="col-sm-4 form-check-label" for="infomedic_vacunasNo">No</label>
+												<div class="d-flex flex-wrap gap-4">
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="infomedic_vacunasSi" name="infomedic_vacunas" value="S" <?php echo $infomedic_vacunasSi;?>>
+												        <label class="form-check-label" for="infomedic_vacunasSi">Si</label>
+												    </div>
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="infomedic_vacunasNo" name="infomedic_vacunas" value="N" <?php echo $infomedic_vacunasNo;?>>
+												        <label class="form-check-label" for="infomedic_vacunasNo">No</label>
+												    </div>
 												</div>                         
 											</div>
 										</div>  
@@ -468,7 +484,7 @@ CSS;
 										<div class="col-md-4">
 											<div class="mb-3">
 												<label for="cemer_parentesco">Parentesco</label>
-												<select class="form-control" style="width: 100%;" id="cemer_parentesco" name="cemer_parentesco" >
+												<select class="form-select" style="width: 100%;" id="cemer_parentesco" name="cemer_parentesco" >
 													<?php echo $insAlumno->listarCatalogoParentesco($cemer_parentesco); ?>
 												</select>
 											</div> 

@@ -188,12 +188,12 @@ require_once __DIR__ . "/inc/layout-top.php";
                     foreach ($tabs as $cod => $txt):
                         $activo = ($filtroEstado === $cod && !$soloVencidas); ?>
                         <a href="<?php echo $base . ($cod !== '' ? '?estado=' . $cod : ''); ?>"
-                           class="btn btn-xs btn-<?php echo $activo ? 'primary' : 'outline-secondary'; ?>">
+                           class="btn btn-sm btn-<?php echo $activo ? 'primary' : 'outline-secondary'; ?>">
                             <?php echo $txt; ?>
                         </a>
                     <?php endforeach; ?>
                     <a href="<?php echo $base; ?>?vencidas=1"
-                       class="btn btn-xs btn-<?php echo $soloVencidas ? 'danger' : 'outline-danger'; ?>">
+                       class="btn btn-sm btn-<?php echo $soloVencidas ? 'danger' : 'outline-danger'; ?>">
                         Vencidas
                     </a>
                 </div>
@@ -335,7 +335,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                                 </td>
                                                 <td class="ds-tabla-acciones">
                                                     <?php if ($puedeAnular && !$anulado): ?>
-                                                    <button type="button" class="btn btn-xs btn-eliminar js-anular-abono"
+                                                    <button type="button" class="btn btn-sm btn-eliminar js-anular-abono"
                                                             title="Anular este cobro"
                                                             data-id="<?php echo (int)$a['abono_id']; ?>">
                                                         <i class="fas fa-ban"></i>
@@ -379,7 +379,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 <div class="card-body">
                     <div class="mb-3">
                         <label for="concepto_id">Concepto</label>
-                        <select name="concepto_id" id="concepto_id" class="form-control" required>
+                        <select name="concepto_id" id="concepto_id" class="form-select" required>
                             <option value="">— Elija —</option>
                             <?php foreach ($conceptos as $c): ?>
                                 <option value="<?php echo (int)$c['concepto_id']; ?>"
@@ -400,7 +400,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                              selects que no vienen a cuento. */ ?>
                     <div class="mb-3 js-origen" data-para="INSCRIPCION" style="display:none;">
                         <label for="origen_INSCRIPCION">Equipo inscrito</label>
-                        <select id="origen_INSCRIPCION" class="form-control js-origen-campo" disabled>
+                        <select id="origen_INSCRIPCION" class="form-select js-origen-campo" disabled>
                             <option value="">— Elija —</option>
                             <?php foreach ($inscripciones as $i): ?>
                                 <option value="<?php echo (int)$i['inscripcion_id']; ?>">
@@ -413,7 +413,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                     <div class="mb-3 js-origen" data-para="EQUIPO" style="display:none;">
                         <label for="origen_EQUIPO">Equipo</label>
-                        <select id="origen_EQUIPO" class="form-control js-origen-campo" disabled>
+                        <select id="origen_EQUIPO" class="form-select js-origen-campo" disabled>
                             <option value="">— Elija —</option>
                             <?php foreach ($inscripciones as $i): ?>
                                 <option value="<?php echo (int)$i['equipo_id']; ?>">
@@ -425,7 +425,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                     <div class="mb-3 js-origen" data-para="PERSONA" style="display:none;">
                         <label for="origen_PERSONA">Persona</label>
-                        <select id="origen_PERSONA" class="form-control js-origen-campo" disabled>
+                        <select id="origen_PERSONA" class="form-select js-origen-campo" disabled>
                             <option value="">— Elija —</option>
                             <?php foreach ($personas as $p): ?>
                                 <option value="<?php echo (int)$p['persona_id']; ?>">
@@ -438,7 +438,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                     <div class="mb-3 js-origen" data-para="PARTIDO" style="display:none;">
                         <label for="origen_PARTIDO">Partido</label>
-                        <select id="origen_PARTIDO" class="form-control js-origen-campo" disabled>
+                        <select id="origen_PARTIDO" class="form-select js-origen-campo" disabled>
                             <option value="">— Elija —</option>
                             <?php foreach ($partidos as $p): ?>
                                 <option value="<?php echo (int)$p['partido_id']; ?>"
@@ -452,7 +452,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php endforeach; ?>
                         </select>
                         <label for="equipo_id" class="mt-2">Se le cobra a</label>
-                        <select name="equipo_id" id="equipo_id" class="form-control" disabled>
+                        <select name="equipo_id" id="equipo_id" class="form-select" disabled>
                             <option value="">— Elija primero el partido —</option>
                         </select>
                         <small class="form-text text-muted">
@@ -548,14 +548,14 @@ require_once __DIR__ . "/inc/layout-top.php";
                                     <span class="badge text-bg-warning">sin datos tributarios</span>
                                 <?php endif; ?>
                                 <?php if ($puedeEmitir && $puedeCobrar): ?>
-                                <button type="button" class="btn btn-xs btn-primary ms-auto js-emitir"
+                                <button type="button" class="btn btn-sm btn-primary ms-auto js-emitir"
                                         data-equipo="<?php echo (int)$eqid; ?>"
                                         data-nombre="<?php echo $h($eq['equipo_razonsocial']); ?>">
                                     <i class="fas fa-file-invoice me-1"></i>Emitir
                                 </button>
                                 <?php else: ?>
                                 <a href="<?php echo APP_URL; ?>equipoList/"
-                                   class="btn btn-xs btn-outline-secondary ms-auto">
+                                   class="btn btn-sm btn-outline-secondary ms-auto">
                                     Completar datos
                                 </a>
                                 <?php endif; ?>

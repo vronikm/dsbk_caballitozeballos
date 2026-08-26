@@ -132,7 +132,7 @@
 							<td data-order="' . (int)$rows['carnet_impreso'] . '">' . $estadoImpresion . '</td>
 							<td>
 								<a href="' . APP_URL . 'carnetFotoPDF/' . $rows['alumno_id'] . '/"
-								class="btn float-end btn-success btn-xs"
+								class="btn float-end btn-success btn-sm"
 								style="margin-right: 5px;">
 								Ver carnet
 								</a>

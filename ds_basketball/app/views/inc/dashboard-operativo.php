@@ -264,11 +264,11 @@ $h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
                             </td>
                             <td class="text-end">
                                 <a href="<?php echo APP_URL; ?>asistenciaVerHorario/<?php echo $id; ?>/"
-                                   class="btn btn-xs btn-outline-secondary" target="_blank">
+                                   class="btn btn-sm btn-outline-secondary" target="_blank">
                                     <i class="fas fa-eye"></i> Ver
                                 </a>
                                 <?php if ($puedeRegistrar): ?>
-                                    <a href="<?php echo APP_URL; ?>asistencia/" class="btn btn-xs btn-primary">
+                                    <a href="<?php echo APP_URL; ?>asistencia/" class="btn btn-sm btn-primary">
                                         <i class="fas fa-clipboard-check"></i> Registrar
                                     </a>
                                 <?php endif; ?>

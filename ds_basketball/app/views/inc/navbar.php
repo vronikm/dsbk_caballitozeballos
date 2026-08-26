@@ -1,5 +1,5 @@
 <!-- Navbar -->
-<nav class="app-header navbar navbar-expand bg-body ds-core__navbar">
+<nav class="app-header navbar navbar-expand bg-body ds-core__navbar" data-bs-theme="dark">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
         <li class="nav-item">

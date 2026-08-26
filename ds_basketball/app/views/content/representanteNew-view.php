@@ -120,7 +120,7 @@ CSS;
 										<div class="col-md-3">
 											<div class="mb-3">
 												<label for="repre_parentesco">Parentesco</label>
-												<select class="form-control" style="width: 100%;" id="repre_parentesco" name="repre_parentesco" >													
+												<select class="form-select" style="width: 100%;" id="repre_parentesco" name="repre_parentesco" >													
 													<?php echo $insRepre->listarCatalogoParentesco(); ?>
 												</select>
 											</div> 
@@ -128,11 +128,15 @@ CSS;
 										<div class="col-md-3">
 											<div class="mb-3">
 												<label for="repre_sexo">Género</label>
-												<div class="form-check">
-													<input class="col-sm-1 form-check-input" type="radio" id="repre_sexoM" value="M" name="repre_sexo" required>
-													<label class="col-sm-5 form-check-label" for="repre_sexoM" style="font-size: 14px;">Masculino</label>
-													<input class="col-sm-1 form-check-input" type="radio" id="repre_sexoF" value="F" name="repre_sexo" >
-													<label class="col-sm-4 form-check-label" for="repre_sexoF" style="font-size: 14px;">Femenino</label>
+												<div class="d-flex flex-wrap gap-4">
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="repre_sexoM" value="M" name="repre_sexo" required>
+												        <label class="form-check-label" for="repre_sexoM" style="font-size: 14px;">Masculino</label>
+												    </div>
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="repre_sexoF" value="F" name="repre_sexo">
+												        <label class="form-check-label" for="repre_sexoF" style="font-size: 14px;">Femenino</label>
+												    </div>
 												</div> 
 											</div>
 										</div>
@@ -157,11 +161,15 @@ CSS;
 										<div class="col-md-3">
 											<div class="mb-3">
 												<label for="repre_factura">Requiere factura</label>
-												<div class="form-check">
-													<input class="col-sm-1 form-check-input" type="radio" id="repre_facturaS" value="S" name="repre_factura" required>
-													<label class="col-sm-5 form-check-label" for="repre_facturaS">Si</label>
-													<input class="col-sm-1 form-check-input" type="radio" id="repre_facturaN" value="N" name="repre_factura" >
-													<label class="col-sm-4 form-check-label" for="repre_facturaN">No</label>
+												<div class="d-flex flex-wrap gap-4">
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="repre_facturaS" value="S" name="repre_factura" required>
+												        <label class="form-check-label" for="repre_facturaS">Si</label>
+												    </div>
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="repre_facturaN" value="N" name="repre_factura">
+												        <label class="form-check-label" for="repre_facturaN">No</label>
+												    </div>
 												</div> 
 											</div>
 										</div>
@@ -226,11 +234,15 @@ CSS;
 										<div class="col-md-4">
 											<div class="mb-3">
 												<label for="conyuge_sexo">Género</label>
-												<div class="form-check">
-													<input class="col-sm-1 form-check-input" type="radio" id="conyuge_sexoM" value="M" name="conyuge_sexo" >
-													<label class="col-sm-5 form-check-label" for="conyuge_sexoM">Masculino</label>
-													<input class="col-sm-1 form-check-input" type="radio" id="conyuge_sexoF" value="F" name="conyuge_sexo" >
-													<label class="col-sm-4 form-check-label" for="conyuge_sexoF">Femenino</label>
+												<div class="d-flex flex-wrap gap-4">
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="conyuge_sexoM" value="M" name="conyuge_sexo">
+												        <label class="form-check-label" for="conyuge_sexoM">Masculino</label>
+												    </div>
+												    <div class="form-check">
+												        <input class="form-check-input" type="radio" id="conyuge_sexoF" value="F" name="conyuge_sexo">
+												        <label class="form-check-label" for="conyuge_sexoF">Femenino</label>
+												    </div>
 												</div> 
 											</div>
 										</div>               

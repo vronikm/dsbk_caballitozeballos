@@ -157,7 +157,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         $autorizada = ($f['persona_publicarfoto'] ?? 'N') === 'S'; ?>
                                         <?php if (!$baja && puede_editar('plantillaPanel')): ?>
                                             <button type="button"
-                                                    class="btn btn-xs btn-<?php echo $autorizada ? 'success' : 'outline-secondary'; ?> js-consent"
+                                                    class="btn btn-sm btn-<?php echo $autorizada ? 'success' : 'outline-secondary'; ?> js-consent"
                                                     data-id="<?php echo (int)$f['persona_id']; ?>"
                                                     data-nombre="<?php echo $h($f['persona_apellidos'] . ' ' . $f['persona_nombres']); ?>"
                                                     data-auth="<?php echo $autorizada ? 'S' : 'N'; ?>"
@@ -249,7 +249,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         </div>
                         <div class="mb-3 col-5">
                             <label for="persona_genero">Género</label>
-                            <select name="persona_genero" id="persona_genero" class="form-control">
+                            <select name="persona_genero" id="persona_genero" class="form-select">
                                 <option value="M">Masculino</option>
                                 <option value="F">Femenino</option>
                                 <option value="X">Sin especificar</option>
@@ -259,7 +259,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2">
                         <div class="mb-3 col-7">
                             <label for="plantilla_rol">Rol</label>
-                            <select name="plantilla_rol" id="plantilla_rol" class="form-control">
+                            <select name="plantilla_rol" id="plantilla_rol" class="form-select">
                                 <?php foreach ($roles as $k => $v): ?>
                                     <option value="<?php echo $k; ?>"><?php echo $h($v); ?></option>
                                 <?php endforeach; ?>

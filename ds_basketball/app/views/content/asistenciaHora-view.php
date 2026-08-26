@@ -117,7 +117,7 @@
 										<div class="col-md-2">
 											<div class="mb-3" style='font-size: 13px;'>
 												<label for="estado">Estado</label>
-												<select class="form-control" style='font-size: 13px; height: 31px;' id="estado" name="estado">		
+												<select class="form-select" style='font-size: 13px; height: 31px;' id="estado" name="estado">		
 													<?php 
 														if($estado == 'A'){
 															echo '<option value="A" selected>Activo</option>

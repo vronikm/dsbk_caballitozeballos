@@ -101,7 +101,7 @@
 						<td>												
 							<input type="hidden" name="modulo_jugador" value="agregar">
 							<input type="hidden" name="equipo_id" value="'.$equipo_id.'">						
-							<button type="submit" class="btn float-end btn-actualizar btn-xs" style="margin-right: 5px;"><i class="fas fa-plus me-1"></i>Agregar</button>					
+							<button type="submit" class="btn float-end btn-actualizar btn-sm" style="margin-right: 5px;"><i class="fas fa-plus me-1"></i>Agregar</button>					
 						</td>
 						</form>').'
 					</tr>
@@ -137,7 +137,7 @@
 					  	<td>'.$rows['TIPO'].'</td>
 						<td>												
 							<input type="hidden" name="modulo_jugador" value="eliminar">												
-							<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>					
+							<button type="submit" class="btn float-end btn-danger btn-sm" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>					
 						</td>
 						</form>').'
 					</tr>

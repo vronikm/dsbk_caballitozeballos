@@ -1750,17 +1750,17 @@
 				$puedeEmitir  = puede_crear('facturasList');
 				$puedeGestion = puede_editar('facturasList');
 
-				$acciones = '<a href="'.$rideUrl.'" class="btn btn-xs btn-outline-info" target="_blank"><i class="fas fa-file-invoice"></i> RIDE</a> <a href="'.$xmlUrl.'" class="btn btn-xs btn-outline-secondary"><i class="fas fa-code"></i> XML</a>';
+				$acciones = '<a href="'.$rideUrl.'" class="btn btn-sm btn-outline-info" target="_blank"><i class="fas fa-file-invoice"></i> RIDE</a> <a href="'.$xmlUrl.'" class="btn btn-sm btn-outline-secondary"><i class="fas fa-code"></i> XML</a>';
 				if($estado !== 'AUTORIZADO'){
 					if(!$errorSecuencial && $puedeEmitir){
-						$acciones .= ' <button type="button" class="btn btn-xs btn-success btn-emitir-sri" data-id="'.$rows['id'].'"><i class="fas fa-paper-plane"></i> Emitir SRI</button>';
+						$acciones .= ' <button type="button" class="btn btn-sm btn-success btn-emitir-sri" data-id="'.$rows['id'].'"><i class="fas fa-paper-plane"></i> Emitir SRI</button>';
 					}
-					$acciones .= ' <button type="button" class="btn btn-xs btn-outline-primary btn-consultar-sri" data-id="'.$rows['id'].'"><i class="fas fa-sync-alt"></i> Consultar</button>';
+					$acciones .= ' <button type="button" class="btn btn-sm btn-outline-primary btn-consultar-sri" data-id="'.$rows['id'].'"><i class="fas fa-sync-alt"></i> Consultar</button>';
 					if(($errorSecuencial || in_array($estado, ['DEVUELTA','NO_AUTORIZADO'], true)) && $puedeGestion){
-						$acciones .= ' <button type="button" class="btn btn-xs btn-warning btn-regenerar-factura" data-id="'.$rows['id'].'"><i class="fas fa-redo"></i> Nuevo secuencial</button>';
+						$acciones .= ' <button type="button" class="btn btn-sm btn-warning btn-regenerar-factura" data-id="'.$rows['id'].'"><i class="fas fa-redo"></i> Nuevo secuencial</button>';
 					}
 				}elseif($puedeGestion && filter_var($rows['cliente_email'] ?? '', FILTER_VALIDATE_EMAIL)){
-					$acciones .= ' <button type="button" class="btn btn-xs btn-outline-success btn-enviar-factura" data-id="'.$rows['id'].'" data-email="'.htmlspecialchars($rows['cliente_email'], ENT_QUOTES, 'UTF-8').'"><i class="fas fa-envelope"></i> Enviar</button>';
+					$acciones .= ' <button type="button" class="btn btn-sm btn-outline-success btn-enviar-factura" data-id="'.$rows['id'].'" data-email="'.htmlspecialchars($rows['cliente_email'], ENT_QUOTES, 'UTF-8').'"><i class="fas fa-envelope"></i> Enviar</button>';
 				}
 				$autorizacion = !empty($rows['numero_autorizacion']) ? '<br><small class="text-success">Aut.: '.htmlspecialchars($rows['numero_autorizacion'], ENT_QUOTES, 'UTF-8').'</small>' : '';
 				$error = !empty($rows['mensaje_error']) ? '<br><small class="text-danger">'.htmlspecialchars($this->limpiarTextoFactura($rows['mensaje_error']), ENT_QUOTES, 'UTF-8').'</small>' : '';

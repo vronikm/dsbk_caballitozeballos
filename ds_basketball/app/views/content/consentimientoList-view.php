@@ -105,11 +105,11 @@
 									<td><?php echo badgeConsent($f['datos_otorgado'], $f['datos_origen'], $f['datos_fecha'], $f['datos_usuario']); ?></td>
 									<td><?php echo badgeConsent($f['imagen_otorgado'], $f['imagen_origen'], $f['imagen_fecha'], $f['imagen_usuario']); ?></td>
 									<td>
-										<button class="btn btn-xs btn-info btn-historial" data-id="<?php echo $f['alumno_id']; ?>"
+										<button class="btn btn-sm btn-info btn-historial" data-id="<?php echo $f['alumno_id']; ?>"
 												data-alumno="<?php echo htmlspecialchars($f['alumno']); ?>" title="Ver historial">
 											<i class="fas fa-history"></i>
 										</button>
-										<button class="btn btn-xs btn-primary btn-registrar" data-id="<?php echo $f['alumno_id']; ?>"
+										<button class="btn btn-sm btn-primary btn-registrar" data-id="<?php echo $f['alumno_id']; ?>"
 												data-alumno="<?php echo htmlspecialchars($f['alumno']); ?>" title="Registrar o revocar">
 											<i class="fas fa-pen"></i>
 										</button>
@@ -159,7 +159,7 @@
 
 				<div class="mb-3">
 					<label>Consentimiento</label>
-					<select class="form-control" id="reg_tipo">
+					<select class="form-select" id="reg_tipo">
 						<option value="DATOS">Tratamiento de datos personales</option>
 						<option value="IMAGEN">Uso de imagen del menor</option>
 					</select>
@@ -167,7 +167,7 @@
 
 				<div class="mb-3">
 					<label>Acción</label>
-					<select class="form-control" id="reg_otorgado">
+					<select class="form-select" id="reg_otorgado">
 						<option value="S">Otorgar</option>
 						<option value="N">Revocar</option>
 					</select>

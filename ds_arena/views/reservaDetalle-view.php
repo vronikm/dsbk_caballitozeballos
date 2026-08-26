@@ -181,7 +181,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                     <div class="mb-3">
                         <label for="pago_formaid">Forma de ingreso <span class="text-danger">*</span></label>
-                        <select class="form-control" id="pago_formaid" name="pago_formaid" required>
+                        <select class="form-select" id="pago_formaid" name="pago_formaid" required>
                             <?php foreach ($formas as $f):
                                 /* Pagar con monedero sólo si hay saldo suficiente. */
                                 $esMon = $f['forma_esmonedero'] === 'S';

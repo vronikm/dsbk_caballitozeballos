@@ -158,7 +158,7 @@ CSS;
 										<div class="col-md-12">
 											<div class="mb-3">
 											<label for="pago_formapagoid">Forma de pago</label>
-											<select class="form-control" id="pago_formapagoid" name="pago_formapagoid" disabled>																									
+											<select class="form-select" id="pago_formapagoid" name="pago_formapagoid" disabled>																									
 												<?php echo $insAlumno->listarOptionPagoid($datos['pago_formapagoid']); ?>
 											</select>	
 											</div>
@@ -231,7 +231,7 @@ CSS;
 																<div class="col-md-4">
 																	<div class="mb-3">
 																	<label for="pago_campeonatoid">Campeonato</label>
-																	<select id="pago_campeonatoid" class="form-control" name="pago_campeonatoid" disabled>																									
+																	<select id="pago_campeonatoid" class="form-select" name="pago_campeonatoid" disabled>																									
 																		'.$insAlumno->listarCampeonatos($datos['pago_campeonatoid']).'
 																	</select>	
 																	</div>
@@ -264,7 +264,7 @@ CSS;
 											<div class="col-md-4">
 												<div class="mb-3">
 												<label for="pago_formapagoid">Forma de pago</label>
-												<select class="form-control" id="pago_formapagoid" name="pago_formapagoid" >																									
+												<select class="form-select" id="pago_formapagoid" name="pago_formapagoid" >																									
 													<?php echo $insAlumno->listarOptionPagoid($datos['pago_formapagoid']); ?>
 												</select>	
 												</div>

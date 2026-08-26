@@ -318,7 +318,7 @@ CSS;
 												<div class="col-md-4">
 													<div class="mb-3">
 													<label for="pago_formapagoid">Forma de pago</label>
-													<select class="form-control" id="pago_formapagoid" name="pago_formapagoid" <?php echo $disabled; ?>>																									
+													<select class="form-select" id="pago_formapagoid" name="pago_formapagoid" <?php echo $disabled; ?>>																									
 														<?php echo $insAlumno->listarOptionPago(); ?>
 													</select>	
 													</div>
@@ -463,7 +463,7 @@ CSS;
 													<div class="col-md-4">
 														<div class="mb-3">
 														<label for="inscripcion_pago_formapagoid">Forma de pago inscripción</label>
-														<select class="form-control" id="inscripcion_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" <?php echo $disabled; ?>>																									
+														<select class="form-select" id="inscripcion_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" <?php echo $disabled; ?>>																									
 															<?php echo $insAlumno->listarOptionPago(); ?>
 														</select>	
 														</div>
@@ -588,7 +588,7 @@ CSS;
 												<div class="col-md-4">
 													<div class="mb-3">
 													<label for="torneo_pago_campeonatoid">Campeonato</label>
-													<select id="torneo_pago_campeonatoid" class="form-control" name="pago_campeonatoid" <?php echo $disabled; ?>>																									
+													<select id="torneo_pago_campeonatoid" class="form-select" name="pago_campeonatoid" <?php echo $disabled; ?>>																									
 														<?php echo $insAlumno->listarCampeonatos(); ?>
 													</select>	
 													</div>
@@ -610,7 +610,7 @@ CSS;
 												<div class="col-md-4">
 													<div class="mb-3">
 													<label for="torneo_pago_formapagoid">Forma de pago campeonato</label>
-													<select class="form-control" id="torneo_pago_formapagoid" name="pago_formapagoid">																									
+													<select class="form-select" id="torneo_pago_formapagoid" name="pago_formapagoid">																									
 														<?php echo $insAlumno->listarOptionPago(); ?>
 													</select>	
 													</div>
@@ -720,7 +720,7 @@ CSS;
 													<div class="col-md-3">
 														<div class="mb-3">
 														<label for="uniforme_pago_talla">Talla</label>
-														<select class="form-control" id="uniforme_pago_talla" name="pago_talla" required>																									
+														<select class="form-select" id="uniforme_pago_talla" name="pago_talla" required>																									
 															<?php echo $insAlumno->listarOptionTalla(""); ?>
 														</select>	
 														</div>
@@ -743,7 +743,7 @@ CSS;
 													<div class="col-md-4">
 														<div class="mb-3">
 														<label for="uniforme_pago_formapagoid">Forma de pago uniforme</label>
-														<select class="form-control" id="uniforme_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
+														<select class="form-select" id="uniforme_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
 															<?php echo $insAlumno->listarOptionPago(); ?>
 														</select>	
 														</div>
@@ -864,7 +864,7 @@ CSS;
 													<div class="col-md-4">
 														<div class="mb-3">
 														<label for="kit_pago_formapagoid">Forma de pago</label>
-														<select class="form-control" id="kit_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
+														<select class="form-select" id="kit_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
 															<?php echo $insAlumno->listarOptionPago(); ?>
 														</select>	
 														</div>
@@ -984,7 +984,7 @@ CSS;
 													<div class="col-md-4">
 														<div class="mb-3">
 														<label for="otros_pago_formapagoid">Forma de pago Otros</label>
-														<select class="form-control" id="otros_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
+														<select class="form-select" id="otros_pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
 															<?php echo $insAlumno->listarOptionPago(); ?>
 														</select>	
 														</div>

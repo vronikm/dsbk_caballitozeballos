@@ -61,9 +61,23 @@ const PANTALLAS = [
     prueba: () => document.querySelectorAll('#calendar, .fc, table').length,
     dice: 'su contenido sale', minimo: 1 },
 
+  /*
+  | Se cuentan las tarjetas O el estado vacío, no sólo las tarjetas.
+  |
+  | Esta pantalla lista los cumpleaños DEL DÍA, así que su contenido
+  | depende del calendario. El 26 de agosto no cumplía años nadie y la
+  | suite falló anunciando que la vista estaba rota — no lo estaba: se
+  | dibujó correctamente, con su mensaje de «no hay alumnos».
+  |
+  | Lo que esta comprobación quiere saber es si la vista SIGUE PINTANDO
+  | sin jQuery, no cuántos cumpleaños hay hoy. Un aserto que depende de
+  | la fecha falla solo unos días al mes y hace desconfiar del barrido
+  | entero. El estado vacío es un render válido.
+  */
   { url: 'cumpleaniosList/', nombre: 'cumpleaniosList', jquery: false,
-    prueba: () => document.querySelectorAll('.card').length,
-    dice: 'las tarjetas salen', minimo: 1 },
+    prueba: () => document.querySelectorAll('.card').length
+             + document.querySelectorAll('.cumple-empty').length,
+    dice: 'la pantalla se dibuja (tarjetas o estado vacío)', minimo: 1 },
 
   { url: 'empleadoEntrada/', nombre: 'empleadoEntrada', jquery: false,
     prueba: () => document.querySelectorAll('form.FormularioAjax input, form.FormularioAjax select').length,

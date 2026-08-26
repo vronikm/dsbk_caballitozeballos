@@ -1189,7 +1189,7 @@
 						<td>'.$rows['alumno_apellidopaterno'].' '.$rows['alumno_apellidomaterno'].'</td>
 						<td>'.$rows['alumno_fechanacimiento'].'</td>
 						<td>
-							<a href="'.APP_URL.'buscarAsistencia/'.$rows['alumno_id'].'/" target="_blank" class="btn float-start btn-ver btn-xs">Ver</a>
+							<a href="'.APP_URL.'buscarAsistencia/'.$rows['alumno_id'].'/" target="_blank" class="btn float-start btn-ver btn-sm">Ver</a>
 						</td>
 					</tr>';	
 			}
@@ -1220,7 +1220,7 @@
 								<input type="hidden" name="empleado_id" value="'.$rows['empleado_id'].'">
 								<input type="hidden" name="fecha_inicio" value="'.$fecha_inicio.'">		
 								<input type="hidden" name="fecha_fin" value="'.$fecha_fin.'">					
-								<button type="submit" class="btn float-end btn-ver btn-xs" style="margin-right: 5px;" ><i class="fas fa-list me-1"></i>Detalle ver</button>
+								<button type="submit" class="btn float-end btn-ver btn-sm" style="margin-right: 5px;" ><i class="fas fa-list me-1"></i>Detalle ver</button>
 							</form>						
 						</td>
 					</tr>';	

@@ -76,7 +76,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                     <?php $pub = ($o['torneo_publico'] ?? 'N') === 'S'; ?>
                                     <?php if (puede_eliminar('torneoList')): ?>
                                         <button type="button" data-id="<?php echo (int)$o['torneo_id']; ?>"
-                                                class="btn btn-xs btn-<?php echo $pub ? 'success' : 'outline-secondary'; ?> js-publicar"
+                                                class="btn btn-sm btn-<?php echo $pub ? 'success' : 'outline-secondary'; ?> js-publicar"
                                                 data-nombre="<?php echo $h($o['torneo_nombre']); ?>"
                                                 data-pub="<?php echo $pub ? 'S' : 'N'; ?>">
                                             <i class="fas fa-<?php echo $pub ? 'globe' : 'eye-slash'; ?> me-1"></i>
@@ -138,7 +138,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
                     <div class="mb-3">
                         <label for="torneo_temporadaid">Temporada</label>
-                        <select name="torneo_temporadaid" id="torneo_temporadaid" class="form-control" required>
+                        <select name="torneo_temporadaid" id="torneo_temporadaid" class="form-select" required>
                             <?php foreach ($temporadas as $t): ?>
                                 <option value="<?php echo (int)$t['temporada_id']; ?>"
                                     <?php echo (int)$t['temporada_id'] === $temporadaId ? 'selected' : ''; ?>>
@@ -149,7 +149,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
                     <div class="mb-3 mb-0">
                         <label for="torneo_deporte">Deporte</label>
-                        <select name="torneo_deporte" id="torneo_deporte" class="form-control">
+                        <select name="torneo_deporte" id="torneo_deporte" class="form-select">
                             <option value="baloncesto">Baloncesto</option>
                         </select>
                         <small class="form-text text-muted">

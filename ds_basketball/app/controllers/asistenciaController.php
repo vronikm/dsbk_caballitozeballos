@@ -91,9 +91,9 @@
 							'.$this->siPuede('eliminar','asistenciaHora','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_asistencia" value="eliminar">
 								<input type="hidden" name="hora_id" value="'.$rows['hora_id'].'">						
-								<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn float-end btn-danger btn-sm" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'	
-							<a href="'.APP_URL.'asistenciaHora/'.$rows['hora_id'].'/" class="btn float-end btn-actualizar btn-xs" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>							
+							<a href="'.APP_URL.'asistenciaHora/'.$rows['hora_id'].'/" class="btn float-end btn-actualizar btn-sm" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>							
 						</td>
 					</tr>';	
 			}
@@ -263,10 +263,10 @@
 							'.$this->siPuede('eliminar','asistenciaLugar','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_asistencia" value="eliminar_lugar">
 								<input type="hidden" name="lugar_id" value="'.$rows['lugar_id'].'">						
-								<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn float-end btn-danger btn-sm" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'							
 
-							<a href="'.APP_URL.'asistenciaLugar/'.$rows['lugar_id'].'/" class="btn float-end btn-success btn-xs" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>
+							<a href="'.APP_URL.'asistenciaLugar/'.$rows['lugar_id'].'/" class="btn float-end btn-success btn-sm" style="margin-right: 5px;"  title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>
 							
 						</td>
 					</tr>';	
@@ -370,7 +370,7 @@
 					<td>".$column2."</td>
 					<td>".$column3."</td>
 					<td>".$column4."</td>                  
-					<td><button type='button' class='btn btn-danger btn-xs btn-icon icon-left btn_remove float-end'>Eliminar<i class='entypo-trash'></i></button></td></tr>";	
+					<td><button type='button' class='btn btn-danger btn-sm btn-icon icon-left btn_remove float-end'>Eliminar<i class='entypo-trash'></i></button></td></tr>";	
 			}
 			return $option;
 		}
@@ -700,18 +700,18 @@
 						<td>'.$estado.'</td>
 						<td>'.$rows['ALUMNOS'].'</td>
 						<td>							
-							<a href="'.APP_URL.'asistenciaHorarioJugador/'.$rows['horario_id'].'/'.$horario_sedeid.'/" target="_blank" class="btn float-end btn-warning btn-xs" style="margin-right: 5px;"><i class="fas fa-link me-1"></i>Asignar alumnos</a>
-							<a href="'.APP_URL.'asistenciaHorarioLista/'.$rows['horario_id'].'/" target="_blank" class="btn float-end btn-ver btn-xs" style="margin-right: 5px;"><i class="fas fa-list me-1"></i>Ver lista</a>
+							<a href="'.APP_URL.'asistenciaHorarioJugador/'.$rows['horario_id'].'/'.$horario_sedeid.'/" target="_blank" class="btn float-end btn-warning btn-sm" style="margin-right: 5px;"><i class="fas fa-link me-1"></i>Asignar alumnos</a>
+							<a href="'.APP_URL.'asistenciaHorarioLista/'.$rows['horario_id'].'/" target="_blank" class="btn float-end btn-ver btn-sm" style="margin-right: 5px;"><i class="fas fa-list me-1"></i>Ver lista</a>
 						</td>
 						<td>
 							'.$this->siPuede('eliminar','asistenciaListHorario','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" >
 								<input type="hidden" name="modulo_asistencia" value="eliminar_horario">
 								<input type="hidden" name="horario_id" value="'.$rows['horario_id'].'">						
-								<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn float-end btn-danger btn-sm" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>
 							</form>').'	
 
-							<a href="'.APP_URL.'asistenciaHorario/'.$rows['horario_id'].'/" target="_blank" class="btn float-end btn-actualizar btn-xs" style="margin-right: 5px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>
-							<a href="'.APP_URL.'asistenciaVerHorario/'.$rows['horario_id'].'/" target="_blank" class="btn float-end btn-ver btn-xs" style="margin-right: 5px;" title="Ver" aria-label="Ver"><i class="fas fa-eye"></i></a>
+							<a href="'.APP_URL.'asistenciaHorario/'.$rows['horario_id'].'/" target="_blank" class="btn float-end btn-actualizar btn-sm" style="margin-right: 5px;" title="Editar" aria-label="Editar"><i class="fas fa-pen"></i></a>
+							<a href="'.APP_URL.'asistenciaVerHorario/'.$rows['horario_id'].'/" target="_blank" class="btn float-end btn-ver btn-sm" style="margin-right: 5px;" title="Ver" aria-label="Ver"><i class="fas fa-eye"></i></a>
 						</td>
 					</tr>';	
 			}
@@ -778,7 +778,7 @@
 						<td>'.$rows['horario_detalle'].'</td>						
 						<td>'.$rows['ALUMNOS'].'</td>						
 						<td>
-							<a href="'.APP_URL.'asistenciaAlumno/'.$rows['horario_id'].'/" target="_blank" class="btn float-end btn-warning btn-xs"><i class="fas fa-list me-1"></i>Listado de alumnos</a>
+							<a href="'.APP_URL.'asistenciaAlumno/'.$rows['horario_id'].'/" target="_blank" class="btn float-end btn-warning btn-sm"><i class="fas fa-list me-1"></i>Listado de alumnos</a>
 						</td>
 					</tr>';	
 			}
@@ -1188,7 +1188,7 @@
 						<td>												
 							<input type="hidden" name="modulo_asistencia" value="asignar_alumno">	
 							<input type="hidden" name="horario_id" value="'.$horario_id.'">					
-							<button type="submit" class="btn float-end btn-actualizar btn-xs" style="margin-right: 5px;"><i class="fas fa-plus me-1"></i>Agregar</button>					
+							<button type="submit" class="btn float-end btn-actualizar btn-sm" style="margin-right: 5px;"><i class="fas fa-plus me-1"></i>Agregar</button>					
 						</td>
 						</form>').'
 					</tr>
@@ -1297,7 +1297,7 @@
 						<td>'.$rows['CATEGORIA'].'</td>
 						<td>												
 							<input type="hidden" name="modulo_asistencia" value="eliminar_alumnolista">												
-							<button type="submit" class="btn float-end btn-danger btn-xs" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>					
+							<button type="submit" class="btn float-end btn-danger btn-sm" style="margin-right: 5px;" title="Eliminar" aria-label="Eliminar"><i class="fas fa-trash"></i></button>					
 						</td>
 						</form>').'
 					</tr>
@@ -1396,34 +1396,34 @@
 						<td>'.$rows['CATEGORIA'].'</td>
 						<td><input type="hidden" name="asignahorario_alumnoid" value="'.$rows['asignahorario_alumnoid'].'">'.$rows['APELLIDOS'].' '.$rows['NOMBRES'].'</td>
 											
-						<td style="width: 220px;">							
+						<td style="width: 220px;">
 							<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" data-recargar-directo>
 								<input type="hidden" name="modulo_asistencia" value="asistencia">
 								<input type="hidden" name="estado" value="J">
 								<input type="hidden" name="fecha" value="'.$fecha_formateada.'">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">						
-								<button type="submit" class="btn float-end '.$btn_j.' btn-xs" style="margin-right: 5px;">Justificado</button>
+								<button type="submit" class="btn float-end '.$btn_j.' btn-sm" style="margin-right: 5px;">Justificado</button>
 							</form>').'
 							'.$this->siPuede('crear','asistencia','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" data-recargar-directo>
 								<input type="hidden" name="modulo_asistencia" value="asistencia">
 								<input type="hidden" name="estado" value="F">
 								<input type="hidden" name="fecha" value="'.$fecha_formateada.'">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">						
-								<button type="submit" class="btn float-end '.$btn_f.' btn-xs" style="margin-right: 5px;">Falta</button>
+								<button type="submit" class="btn float-end '.$btn_f.' btn-sm" style="margin-right: 5px;">Falta</button>
 							</form>').'
 							'.$this->siPuede('crear','asistencia','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" data-recargar-directo>
 								<input type="hidden" name="modulo_asistencia" value="asistencia">	
 								<input type="hidden" name="estado" value="A">
 								<input type="hidden" name="fecha" value="'.$fecha_formateada.'">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">						
-								<button type="submit" class="btn float-end '.$btn_a.' btn-xs" style="margin-right: 5px;">Atraso</button>
+								<button type="submit" class="btn float-end '.$btn_a.' btn-sm" style="margin-right: 5px;">Atraso</button>
 							</form>').'
 							'.$this->siPuede('crear','asistencia','<form class="FormularioAjax" action="'.APP_URL.'app/ajax/asistenciaAjax.php" method="POST" autocomplete="off" data-recargar-directo>
 								<input type="hidden" name="modulo_asistencia" value="asistencia">	
 								<input type="hidden" name="estado" value="P">
 								<input type="hidden" name="fecha" value="'.$fecha_formateada.'">
 								<input type="hidden" name="alumno_id" value="'.$rows['alumno_id'].'">						
-								<button type="submit" class="btn float-end '.$btn_p.' btn-xs" style="margin-right: 5px;">Presente</button>
+								<button type="submit" class="btn float-end '.$btn_p.' btn-sm" style="margin-right: 5px;">Presente</button>
 							</form>').'
 						</td>						
 					</tr>
@@ -1519,11 +1519,13 @@
 							<tr>
 								<td>'.$rows['CATEGORIA'].'</td>
 								<td>'.$rows['APELLIDOS'].' '.$rows['NOMBRES'].'</td>
-								<td style="width: 220px;">
-									<button type="button" class="btn '.$btn_p.' btn-xs btn-asistencia" data-estado="P" data-alumnoid="'.$rows['alumno_id'].'" data-fecha="'.$fecha_formateada.'">Presente</button>
-									<button type="button" class="btn '.$btn_a.' btn-xs btn-asistencia" data-estado="A" data-alumnoid="'.$rows['alumno_id'].'" data-fecha="'.$fecha_formateada.'">Atraso</button>
-									<button type="button" class="btn '.$btn_f.' btn-xs btn-asistencia" data-estado="F" data-alumnoid="'.$rows['alumno_id'].'" data-fecha="'.$fecha_formateada.'">Falta</button>
-									<button type="button" class="btn '.$btn_j.' btn-xs btn-asistencia" data-estado="J" data-alumnoid="'.$rows['alumno_id'].'" data-fecha="'.$fecha_formateada.'">Justificado</button>								
+								<td style="width: 1px; white-space: nowrap;">
+					<div class="btn-group btn-group-sm" role="group" aria-label="Estado de asistencia">
+									<button type="button" class="btn '.$btn_p.' btn-asistencia" aria-pressed="'.($btn_p === 'btn-info' ? 'true' : 'false').'" data-estado="P" data-alumnoid="'.$rows['alumno_id'].'" data-fecha="'.$fecha_formateada.'">Presente</button>
+									<button type="button" class="btn '.$btn_a.' btn-asistencia" aria-pressed="'.($btn_a === 'btn-info' ? 'true' : 'false').'" data-estado="A" data-alumnoid="'.$rows['alumno_id'].'" data-fecha="'.$fecha_formateada.'">Atraso</button>
+									<button type="button" class="btn '.$btn_f.' btn-asistencia" aria-pressed="'.($btn_f === 'btn-info' ? 'true' : 'false').'" data-estado="F" data-alumnoid="'.$rows['alumno_id'].'" data-fecha="'.$fecha_formateada.'">Falta</button>
+									<button type="button" class="btn '.$btn_j.' btn-asistencia" aria-pressed="'.($btn_j === 'btn-info' ? 'true' : 'false').'" data-estado="J" data-alumnoid="'.$rows['alumno_id'].'" data-fecha="'.$fecha_formateada.'">Justificado</button>								
+								</div>								
 								</td>
 							</tr>';
 

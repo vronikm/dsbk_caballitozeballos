@@ -60,7 +60,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="mb-3 col-md-2">
                             <label for="cliente_estado">Estado</label>
-                            <select class="form-control" id="cliente_estado" name="cliente_estado">
+                            <select class="form-select" id="cliente_estado" name="cliente_estado">
                                 <option value="A" <?php echo ($cli['cliente_estado'] ?? 'A') === 'A' ? 'selected' : ''; ?>>Activo</option>
                                 <option value="I" <?php echo ($cli['cliente_estado'] ?? '') === 'I' ? 'selected' : ''; ?>>Inactivo</option>
                             </select>

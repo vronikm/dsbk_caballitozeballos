@@ -73,7 +73,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2">
                         <div class="mb-3 col-md-6">
                             <label for="reserva_clienteid">Cliente <span class="text-danger">*</span></label>
-                            <select class="form-control" id="reserva_clienteid" name="reserva_clienteid" required>
+                            <select class="form-select" id="reserva_clienteid" name="reserva_clienteid" required>
                                 <option value="">Seleccione…</option>
                                 <?php foreach ($clientes as $c): ?>
                                     <option value="<?php echo (int)$c['cliente_id']; ?>"
@@ -86,7 +86,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="mb-3 col-md-6">
                             <label for="reserva_instalacionid">Instalación <span class="text-danger">*</span></label>
-                            <select class="form-control" id="reserva_instalacionid" name="reserva_instalacionid" required>
+                            <select class="form-select" id="reserva_instalacionid" name="reserva_instalacionid" required>
                                 <option value="">Seleccione…</option>
                                 <?php foreach ($instalaciones as $i): ?>
                                     <option value="<?php echo (int)$i['instalacion_id']; ?>"

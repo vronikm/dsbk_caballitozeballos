@@ -131,7 +131,7 @@
 											<div class="col-md-2">
 												<div class="mb-3">
 													<label for="empleado_sedeid">Sede</label>
-													<select class="form-control" id="empleado_sedeid" name="empleado_sedeid">									
+													<select class="form-select" id="empleado_sedeid" name="empleado_sedeid">									
 														<?php echo $insempleado->listarOptionSede($empleado_sedeid); ?>
 													</select>	
 												</div>
@@ -187,7 +187,7 @@
 											<div class="col-md-3">
 												<div class="mb-3">
 													<label for="empleado_tipopersonalid">Tipo empleado</label>
-													<select class="form-control" id="empleado_tipopersonalid" name="empleado_tipopersonalid" onchange="toggleEspecialidad()">									
+													<select class="form-select" id="empleado_tipopersonalid" name="empleado_tipopersonalid" onchange="toggleEspecialidad()">									
 														<?php echo $insempleado->listarTipoPersonal($empleado_tipopersonalid); ?>
 													</select>	
 												</div>
@@ -195,7 +195,7 @@
 											<div class="col-md-4">
 												<div class="mb-3">
 													<label for="empleado_especialidadid">Especialidad</label>
-													<select class="form-control" id="empleado_especialidadid" name="empleado_especialidadid" disabled>									
+													<select class="form-select" id="empleado_especialidadid" name="empleado_especialidadid" disabled>									
 														<?php echo $insempleado->OptionEspecialidad($empleado_especialidadid); ?>
 													</select>	
 												</div>
@@ -209,11 +209,15 @@
 											<div class="col-md-3">
 												<div class="mb-3">
 													<label for="empleado_genero">Género</label>
-													<div class="form-check">
-														<input class="col-sm-1 form-check-input" type="radio" id="empleado_generoM" name="empleado_genero" value="M" <?php echo $empleado_sexoM; ?> required>
-														<label class="col-sm-5 form-check-label" for="empleado_generoM">Masculino</label>
-														<input class="col-sm-1 form-check-input" type="radio" id="empleado_generoF" name="empleado_genero" value="F" <?php echo $empleado_sexoF; ?> >
-														<label class="col-sm-4 form-check-label" for="empleado_generoF">Femenino</label>
+													<div class="d-flex flex-wrap gap-4">
+													    <div class="form-check">
+													        <input class="form-check-input" type="radio" id="empleado_generoM" name="empleado_genero" value="M" <?php echo $empleado_sexoM; ?> required>
+													        <label class="form-check-label" for="empleado_generoM">Masculino</label>
+													    </div>
+													    <div class="form-check">
+													        <input class="form-check-input" type="radio" id="empleado_generoF" name="empleado_genero" value="F" <?php echo $empleado_sexoF; ?>>
+													        <label class="form-check-label" for="empleado_generoF">Femenino</label>
+													    </div>
 													</div> 
 												</div>
 											</div>									

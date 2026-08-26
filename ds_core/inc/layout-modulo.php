@@ -86,9 +86,12 @@ $moduloInicio = $moduloInicio ?? (defined('APP_URL') ? APP_URL . 'panel/' : DS_H
         | que hace falta para leerlos. Cada modulo pasa aqui un tono mas
         | oscuro de su misma familia, y el contraste se mide, no se estima.
         */
-        .app-sidebar .nav-link.active {
-            background: <?php echo $moduloAcento; ?> !important;
-            color: #fff !important;
+        /* El acento va por variable, que es donde core.css lo busca. Asi
+           el color del menu lo sigue poniendo la plantilla y lo unico que
+           cambia por sistema es el elemento activo. */
+        .ds-core {
+            --ds-acento: <?php echo $moduloAcento; ?>;
+            --ds-acento-texto: #fff;
         }
         .btn-primary {
             --bs-btn-bg: <?php echo $moduloAcento; ?>;
@@ -106,13 +109,21 @@ $moduloInicio = $moduloInicio ?? (defined('APP_URL') ? APP_URL . 'panel/' : DS_H
         .app-header .nav-link,
         .app-header .ds-launcher .nav-link { color: var(--bs-body-color); }
     </style>
-	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
-	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
+	<?php require DS_HUB_PATH . "ds_core/inc/tema-init.php"; ?>
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
-<div class="app-wrapper">
+<?php /* ds-core NO es decorativa: acota las 44 reglas de core.css que
+             dan a DigiSports su aspecto —tarjetas, tablas, interruptores,
+             menu y los KPI del panel—. Sin ella, Arena, League y Core se
+             quedaban con el AdminLTE de fabrica; los KPI del panel de
+             Arena salian como texto suelto porque .ds-core .ds-kpi nunca
+             encontraba su ancestro. Basketball si la llevaba. */ ?>
+<div class="app-wrapper ds-core">
 
-    <nav class="app-header navbar navbar-expand bg-body">
+    <?php /* ds-core__navbar mantiene la barra en oscuro con el tema claro,
+             igual que en Basketball. El armazon no sigue la eleccion: es
+             la identidad de DigiSports. */ ?>
+    <nav class="app-header navbar navbar-expand bg-body ds-core__navbar" data-bs-theme="dark">
         <div class="container-fluid">
 
             <ul class="navbar-nav">

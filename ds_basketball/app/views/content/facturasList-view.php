@@ -111,7 +111,7 @@
 							<div class="col-md-2">
 								<div class="mb-3 input-group-sm">
 									<label for="alumno_sedeid">Sede</label>
-									<select class="form-control" id="alumno_sedeid" name="alumno_sedeid">		
+									<select class="form-select" id="alumno_sedeid" name="alumno_sedeid">		
 										<?php
 											if($rolid == 1 || $rolid == 2){
 												if($alumno_sedeid == 0){	

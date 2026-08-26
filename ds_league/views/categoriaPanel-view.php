@@ -93,14 +93,14 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         <?php echo $h($i['estado_nombre']); ?>
                                     </span>
                                     <a href="<?php echo APP_URL; ?>plantillaPanel/<?php echo (int)$i['inscripcion_id']; ?>/"
-                                       class="btn btn-xs btn-ver ms-1" title="Ver plantilla">
+                                       class="btn btn-sm btn-ver ms-1" title="Ver plantilla">
                                         <i class="fas fa-id-card"></i>
                                     </a>
                                     <?php if ($movs && puede_editar('categoriaPanel')): ?>
                                     <div class="mt-1">
                                         <?php foreach ($movs as $m): ?>
                                             <button type="button"
-                                                    class="btn btn-xs btn-outline-secondary js-mover"
+                                                    class="btn btn-sm btn-outline-secondary js-mover"
                                                     data-id="<?php echo (int)$i['inscripcion_id']; ?>"
                                                     data-hacia="<?php echo $h($m['hacia']); ?>"
                                                     data-motivo="<?php echo $h($m['exige_motivo']); ?>"
@@ -125,7 +125,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <input type="hidden" name="modulo_league" value="inscribirEquipo">
                     <input type="hidden" name="inscripcion_categoriaid" value="<?php echo $categoriaId; ?>">
                     <div class="input-group input-group-sm">
-                        <select name="inscripcion_equipoid" class="form-control" required>
+                        <select name="inscripcion_equipoid" class="form-select" required>
                             <option value="">Inscribir equipo…</option>
                             <?php foreach ($disponibles as $q): ?>
                                 <option value="<?php echo (int)$q['equipo_id']; ?>">
@@ -305,7 +305,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php endif; ?>
 
                             <?php if (!$cerrado && $canchas && puede_editar('categoriaPanel')): ?>
-                                <button type="button" class="btn btn-xs btn-outline-secondary js-programar"
+                                <button type="button" class="btn btn-sm btn-outline-secondary js-programar"
                                         data-id="<?php echo (int)$p['partido_id']; ?>"
                                         data-rotulo="<?php echo $h($p['local'] . ' vs ' . $p['visitante']); ?>"
                                         data-fecha="<?php echo $h((string)$p['partido_fecha']); ?>"
@@ -321,7 +321,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                 <?php echo $h($p['estado_nombre']); ?>
                             </span>
                             <a href="<?php echo APP_URL; ?>actaPartido/<?php echo (int)$p['partido_id']; ?>/"
-                               class="btn btn-xs btn-ver ms-1" title="Acta del partido">
+                               class="btn btn-sm btn-ver ms-1" title="Acta del partido">
                                 <i class="fas fa-clipboard-list"></i>
                             </a>
                         </td>

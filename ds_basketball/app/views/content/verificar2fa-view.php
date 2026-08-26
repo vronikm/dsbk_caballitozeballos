@@ -61,8 +61,7 @@ $h      = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
             color: inherit; font: inherit; text-decoration: underline;
         }
     </style>
-	<?php /* El tema, antes del primer pintado: sin defer a proposito. */ ?>
-	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/tema.js"></script>
+	<?php require DS_HUB_PATH . "ds_core/inc/tema-init.php"; ?>
 </head>
 <body>
 

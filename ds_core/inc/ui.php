@@ -171,7 +171,9 @@ if (!function_exists('ds_icono')) {
      */
     function ds_boton_buscar(string $texto = 'Buscar'): string
     {
-        return '<button type="submit" class="form-control btn btn-primary">'
+        /* w-100 da el ancho; form-control daba ademas el alto de una caja de
+               texto, que no es el de un boton. */
+            return '<button type="submit" class="btn btn-primary w-100">'
              . '<i class="' . ds_icono('ver') . ' me-1"></i> '
              . htmlspecialchars($texto, ENT_QUOTES, 'UTF-8') . '</button>';
     }

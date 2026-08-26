@@ -93,7 +93,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <div class="input-group">
                                                                 <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                             
-                                <select class="form-control" id="usuario_empleadoid" name="usuario_empleadoid">
+                                <select class="form-select" id="usuario_empleadoid" name="usuario_empleadoid">
                                     <option value="0">Sin vincular</option>
                                     <?php foreach ($empleados as $e): ?>
                                         <option value="<?php echo (int)$e['empleado_id']; ?>"
@@ -126,7 +126,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                rol», sin que se hubiera tocado el campo. */
                             $puedeOtorgarSuper = es_superadministrador();
                             ?>
-                            <select class="form-control" id="usuario_rolid" name="usuario_rolid" required>
+                            <select class="form-select" id="usuario_rolid" name="usuario_rolid" required>
                                 <?php if ($esAlta): ?>
                                     <option value="">Seleccione…</option>
                                 <?php endif; ?>
@@ -180,7 +180,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                     <div class="row g-2">
                         <div class="mb-3 col-md-6 mb-0">
                             <label for="usuario_estado">Estado</label>
-                            <select class="form-control" id="usuario_estado" name="usuario_estado">
+                            <select class="form-select" id="usuario_estado" name="usuario_estado">
                                 <option value="A" <?php echo ($usuario['usuario_estado'] ?? 'A') === 'A' ? 'selected' : ''; ?>>Activo</option>
                                 <option value="I" <?php echo ($usuario['usuario_estado'] ?? '') === 'I' ? 'selected' : ''; ?>>Inactivo</option>
                             </select>
@@ -189,7 +189,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
                         <div class="mb-3 col-md-6 mb-0">
                             <label for="usuario_tienebloqueo">Bloqueado</label>
-                            <select class="form-control" id="usuario_tienebloqueo" name="usuario_tienebloqueo">
+                            <select class="form-select" id="usuario_tienebloqueo" name="usuario_tienebloqueo">
                                 <option value="N" <?php echo ($usuario['usuario_tienebloqueo'] ?? 'N') === 'N' ? 'selected' : ''; ?>>No</option>
                                 <option value="S" <?php echo ($usuario['usuario_tienebloqueo'] ?? '') === 'S' ? 'selected' : ''; ?>>Sí</option>
                             </select>

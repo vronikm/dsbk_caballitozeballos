@@ -428,7 +428,7 @@
 						<p><strong>Usuario:</strong> <?php echo $h($_SESSION['usuario'] ?? 'Sistema'); ?></p>
 						<div class="mb-3 mb-2">
 							<label class="font-weight-bold mb-1" for="factura_forma_pago">Forma de Pago:</label>
-							<select class="form-control form-control-sm" id="factura_forma_pago" name="forma_pago">
+							<select class="form-select form-select-sm" id="factura_forma_pago" name="forma_pago">
 								<?php foreach(($sriConfig['formas_pago'] ?? []) as $codigo => $nombre){ ?>
 									<option value="<?php echo $h($codigo); ?>" <?php echo ((string)$codigo === $sriFormaPago) ? 'selected' : ''; ?>><?php echo $h($codigo.' - '.$nombre); ?></option>
 								<?php } ?>

@@ -100,10 +100,9 @@
 										<input type="text" class="form-control" id="repre_nombre1" name="repre_nombre1" placeholder="Primer nombre" value="<?php echo $repre_primernombre; ?>">
 									</div>
 								</div>								
-								<div class="col-md-2">
-									<div class="mb-3">
-										<label for="repre_buscar">.</label>
-										<?php echo ds_boton_buscar(); ?>
+								<div class="col-md-2 d-flex align-items-end">
+									<div class="mb-3 w-100">
+																				<?php echo ds_boton_buscar(); ?>
 									</div>
 								</div>	
 							</div>					

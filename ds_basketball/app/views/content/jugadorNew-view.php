@@ -139,7 +139,7 @@
 										<div class="col-md-2">
 											<div class="mb-3">
 												<label for="alumno_sedeid">Sede</label>
-												<select class="form-control" style='font-size: 13px; height: 31px;' id="alumno_sedeid" name="alumno_sedeid">
+												<select class="form-select" style='font-size: 13px; height: 31px;' id="alumno_sedeid" name="alumno_sedeid">
 													<?php
 														if($alumno_sedeid == 0){	
 															echo "<option value='0' selected='selected'>Todas</option>";
@@ -152,10 +152,9 @@
 											</div>
 										</div>
 
-										<div class="col-md-2">
-											<div class="mb-3">
-												<label for="alumno_sedeid">.</label>
-												<?php echo ds_boton_buscar(); ?>
+										<div class="col-md-2 d-flex align-items-end">
+											<div class="mb-3 w-100">
+																								<?php echo ds_boton_buscar(); ?>
 											</div>
 										</div>
 									</div>					

@@ -9,7 +9,22 @@
     if(isset($_GET['views'])){
         $url=explode("/", $_GET['views']);
     }else{
-        $url=["login"];
+        $url=[""];
+    }
+
+    # La raiz del modulo es el panel, como en Core, Arena y League. Antes
+    # resolvia a «login» y mostraba la pantalla de acceso AUN CON SESION
+    # ABIERTA; era el unico de los cuatro que lo hacia.
+    #
+    # Se arregla aqui y no en el enlace del lanzador porque el problema no
+    # es del lanzador: afecta igual a un marcador del navegador o a una URL
+    # escrita a mano.
+    #
+    # A quien no tenga sesion lo sigue mandando al login el guardian de mas
+    # abajo, el mismo que protege el resto de vistas. Aqui solo se decide a
+    # donde apunta la raiz, no quien puede entrar.
+    if(!isset($url[0]) || $url[0]===""){
+        $url[0]="dashboard";
     }
 
     use app\controllers\viewsController;

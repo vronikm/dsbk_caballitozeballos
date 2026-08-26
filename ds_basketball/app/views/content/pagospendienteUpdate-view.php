@@ -198,7 +198,7 @@ CSS;
 											<div class="col-md-4">
 												<div class="mb-3">
 												<label for="pago_formapagoid">Forma de pago</label>
-												<select class="form-control" id="pago_formapagoid" name="pago_formapagoid" >																									
+												<select class="form-select" id="pago_formapagoid" name="pago_formapagoid" >																									
 													<?php echo $insAlumno->listarOptionPagoid($datos['transaccion_formapagoid']); ?>
 												</select>	
 												</div>

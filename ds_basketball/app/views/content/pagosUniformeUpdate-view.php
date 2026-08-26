@@ -182,7 +182,7 @@ CSS;
 													<div class="col-md-3">
 														<div class="mb-3">
 														<label for="pago_talla">Talla</label>
-														<select class="form-control" id="pago_talla" name="pago_talla" required>																									
+														<select class="form-select" id="pago_talla" name="pago_talla" required>																									
 															<?php echo $insAlumno->listarOptionTalla($datos['pago_talla']); ?>
 														</select>	
 														</div>
@@ -205,7 +205,7 @@ CSS;
 													<div class="col-md-4">
 														<div class="mb-3">
 														<label for="pago_formapagoid">Forma de pago</label>
-														<select class="form-control" id="pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
+														<select class="form-select" id="pago_formapagoid" name="pago_formapagoid" onchange="ocultarDiv()" >																									
 															<?php echo $insAlumno->listarOptionPagoid($datos['pago_formapagoid']); ?>
 														</select>	
 														</div>

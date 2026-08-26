@@ -129,7 +129,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                              corta justo donde está la información. */ ?>
                     <div class="mb-3">
                         <label for="concepto_ambito">Se aplica a</label>
-                        <select name="concepto_ambito" id="concepto_ambito" class="form-control">
+                        <select name="concepto_ambito" id="concepto_ambito" class="form-select">
                             <?php foreach ($ambitos as $cod => $txt): ?>
                                 <option value="<?php echo $cod; ?>"><?php echo $h($txt); ?></option>
                             <?php endforeach; ?>
