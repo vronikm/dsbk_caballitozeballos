@@ -77,9 +77,9 @@ $funciones = [
     <?php /* Sin core.css: esta pantalla no usa AdminLTE ni el estándar de
              acciones, tiene su propio diseño, y es la página más pública del
              sistema. Cada KB cuenta aquí. */ ?>
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/fuentes.css'); ?>">
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/fontawesome6/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/digisports.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/digisports.css'); ?>">
 
     <?php /* SweetAlert2 va ANTES que login.css: su tema es claro y choca con
              la pantalla, asi que login.css lo reviste al final. Al reves
@@ -87,7 +87,7 @@ $funciones = [
     <link rel="stylesheet" href="<?php echo $vendor; ?>css/sweetalert2.min.css">
     <script src="<?php echo $vendor; ?>js/sweetalert2.all.min.js"></script>
 
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/login.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/login.css'); ?>">
 	<?php require DS_HUB_PATH . "ds_core/inc/tema-init.php"; ?>
 </head>
 <body class="dsl-body">
@@ -112,7 +112,7 @@ $funciones = [
             <h1 class="dsl-hero__titulo">Bienvenido</h1>
             <div class="dsl-hero__regla"></div>
             <p class="dsl-hero__texto">
-                Inicia sesión para gestionar la escuela desde
+                Inicia sesión para gestionar tu club desde
                 <b>un solo lugar</b>.
             </p>
         </div>

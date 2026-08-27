@@ -73,7 +73,7 @@ $swalEnCabecera = in_array('swal', $extras, true);
     <link rel="icon" type="image/png" href="<?php echo APP_URL; ?>app/views/dist/img/Logos/logo_bsc.png">
 
     <?php /* Tipografias e iconos. */ ?>
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/fuentes.css'); ?>">
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/fontawesome6/css/all.min.css">
 
 <?php foreach ($extras as $extra): ?>
@@ -86,7 +86,7 @@ $swalEnCabecera = in_array('swal', $extras, true);
              reglas de core.css pierden por orden de aparicion. */ ?>
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/overlayscrollbars/css/overlayscrollbars.min.css">
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/css/adminlte.min.css">
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/core.css'); ?>">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/dist/css/sweetalert2.min.css">
 <?php if ($swalEnCabecera): ?>
     <script src="<?php echo APP_URL; ?>app/views/dist/js/sweetalert2.all.min.js"></script>

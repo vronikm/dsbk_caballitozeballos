@@ -68,13 +68,13 @@ $moduloInicio = $moduloInicio ?? (defined('APP_URL') ? APP_URL . 'panel/' : DS_H
     <title><?php echo APP_NAME; ?> | <?php echo $tituloVista; ?></title>
 
     <link rel="icon" type="image/png" href="<?php echo DS_HUB_URL; ?>ds_core/assets/img/logo_ds.png">
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/fuentes.css'); ?>">
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/fontawesome6/css/all.min.css">
     <link rel="stylesheet" href="<?php echo DS_OVERLAYSCROLL_URL; ?>css/overlayscrollbars.min.css">
     <link rel="stylesheet" href="<?php echo DS_ADMINLTE4_URL; ?>css/adminlte.min.css">
     <link rel="stylesheet" href="<?php echo DS_VENDOR_URL; ?>css/sweetalert2.min.css">
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/digisports.css">
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/core.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/digisports.css'); ?>">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/core.css'); ?>">
 
     <style>
         /*

@@ -41,11 +41,11 @@ $h      = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
     <title><?php echo APP_NAME; ?> | Verificación</title>
 
     <link rel="icon" type="image/png" href="<?php echo DS_HUB_URL; ?>ds_core/assets/img/logo_ds.png">
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/fuentes.css'); ?>">
     <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/fontawesome6/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/digisports.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/digisports.css'); ?>">
     <link rel="stylesheet" href="<?php echo $vendor; ?>css/sweetalert2.min.css">
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/login.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/login.css'); ?>">
 
     <style>
         /* El campo del código se lee de un vistazo: dígitos grandes,

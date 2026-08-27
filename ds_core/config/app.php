@@ -19,6 +19,11 @@
    la clave de la base viaja como argumento de new PDO. */
 require_once __DIR__ . "/../inc/errores.php";
 
+/*----------  Version de los recursos  ----------*/
+/* ds_recurso() anade la fecha del archivo a las hojas propias, para que
+   un cambio de CSS llegue al navegador sin recarga forzada. */
+require_once __DIR__ . "/../inc/recursos.php";
+
 /*----------  Raiz del ecosistema  ----------*/
 const DS_HUB_URL  = "http://localhost/barcelona/";
 const DS_HUB_NAME = "DigiSports";

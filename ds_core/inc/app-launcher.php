@@ -23,7 +23,7 @@ $moduloActual = defined('APP_URL') ? APP_URL : '';
 ?>
 
 <!-- Design system del ecosistema: aporta los tokens y el panel. -->
-<link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/digisports.css">
+<link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/digisports.css'); ?>">
 
 <li class="nav-item ds-launcher">
     <a class="nav-link" href="#" id="dsLauncherBtn" role="button"

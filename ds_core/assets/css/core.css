@@ -41,10 +41,14 @@
 
 /* Igual que la barra: bg-body-secondary + data-bs-theme="dark". */
 
-.ds-core__sidebar .brand-link {
-    background: var(--ds-bg);
-    border-bottom: 1px solid rgba(255, 255, 255, .06);
-}
+/* El rótulo de la marca NO lleva fondo propio: hereda el del menú.
+   Antes se pintaba con var(--ds-bg) —#080d18—, mucho más oscuro que el
+   menú (#343a40), y se veía como una caja negra alrededor del texto. La
+   plantilla no pinta nada ahí: .sidebar-brand y .brand-link sólo hacen
+   maquetación. Se conserva el filete de separación con el menú. */
+/* El rotulo no lleva NADA propio: ni fondo ni filete. Hereda del menu,
+   igual que en Arena, League y Core, cuyo aside no tiene esta clase y
+   por eso nunca los tuvieron. La plantilla tampoco pinta ahi. */
 
 /*
 | EL COLOR DEL MENU LO PONE LA PLANTILLA, NO NOSOTROS.

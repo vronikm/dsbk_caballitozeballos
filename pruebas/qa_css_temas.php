@@ -121,5 +121,41 @@ $af('ninguna regla fija un fondo claro sin fijar el texto',
 /* La prueba tiene que poder fallar: si no lee reglas, no comprueba nada. */
 $af('la sonda está leyendo CSS de verdad', $reglas > 200, "$reglas reglas");
 
+/*==============  Las hojas propias llevan versión  ==============*/
+/*
+| Los enlaces eran «core.css» a secas y Apache no envía Cache-Control, así que
+| el navegador servía su copia guardada sin preguntar.
+|
+| Pasó de verdad: se corrigió el fondo del rótulo de la marca, el servidor
+| entregaba la hoja nueva —comprobado pidiéndosela— y quien lo reportó seguía
+| viendo el fallo. Dos veces. Un cambio de CSS que no llega no se distingue de
+| un cambio que no se hizo.
+|
+| Con ?v=<fecha del archivo> la dirección cambia en cuanto el archivo cambia.
+| Las librerías de terceros quedan fuera: cambian con una actualización, no
+| con una edición, y su versión ya está en la ruta.
+*/
+$paginas = [
+    'Basketball' => 'ds_basketball/dashboard/',
+    'Hub'        => '',
+    'Acceso'     => 'ds_basketball/login/',
+    'League'     => 'ds_league/',
+];
+$sinVersion = [];
+foreach ($paginas as $nombre => $ruta) {
+    $ch = curl_init('http://localhost/barcelona/' . $ruta);
+    curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true,
+                            CURLOPT_MAXREDIRS => 4, CURLOPT_TIMEOUT => 20,
+                            CURLOPT_COOKIE => 'DigiSportsBasketball=dsqaui0000000000000']);
+    $html = (string) curl_exec($ch);
+    curl_close($ch);
+    /* Hojas nuestras enlazadas SIN el parámetro de versión. */
+    if (preg_match_all('~href="[^"]*ds_core/assets/css/([a-z]+\.css)"~', $html, $m)) {
+        foreach ($m[1] as $h) { $sinVersion[] = "$nombre:$h"; }
+    }
+}
+$af('las hojas propias se enlazan con versión', count($sinVersion) === 0,
+    $sinVersion ? implode(' · ', array_slice($sinVersion, 0, 5)) : count($paginas) . ' páginas');
+
 printf("\nfallos: %d\n", $fallos);
 exit($fallos === 0 ? 0 : 1);

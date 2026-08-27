@@ -53,10 +53,10 @@ $h = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
     <title><?php echo DS_HUB_NAME; ?> | Mi seguridad</title>
 
     <link rel="icon" type="image/png" href="<?php echo DS_HUB_URL; ?>ds_core/assets/img/logo_ds.png">
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/fuentes.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/fuentes.css'); ?>">
     <link rel="stylesheet" href="<?php echo $vendorCss; ?>">
     <link rel="stylesheet" href="<?php echo $vendorSw; ?>">
-    <link rel="stylesheet" href="<?php echo DS_HUB_URL; ?>ds_core/assets/css/digisports.css">
+    <link rel="stylesheet" href="<?php echo ds_recurso('ds_core/assets/css/digisports.css'); ?>">
 
     <style>
         .sg-caja { background: var(--ds-surface, #1c2333); border: 1px solid var(--ds-border, #2a3348);

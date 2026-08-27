@@ -59,6 +59,17 @@ corre() {
     return 0
 }
 
+# La sesión que usan las suites caduca sola: PHP recoge el archivo tras
+# ~24 minutos sin actividad. Cuando eso pasaba a mitad de trabajo, el
+# barrido entero fallaba con «37 vistas, 37 con problema» y «HTTP 200 sin
+# app-main» — que se lee como armazón roto y en realidad era el login.
+# Se renueva aquí para que el arnés no dependa de cuándo se creó.
+# Argumentos: <sid> <usuario> <usuarioid> <rol> [nombre] [empleadoid].
+# AdminBCC no tiene ficha de empleado, de ahí el 0 final: ver el aviso
+# dentro de sesion_qa.php sobre usuario_id vs usuarioid.
+$PHP sesion_qa.php dsqaui0000000000000 AdminBCC 1 1 "QA" 0 > /dev/null 2>&1 \n  || { echo "  no se pudo preparar la sesión de pruebas"; exit 1; }
+echo
+
 echo "── Se envían los formularios ──────────────────────────────"
 corre "CRUD completo"        "node qa_crud_basket.mjs"
 corre "limpiar el form justo" "node qa_limpiar.mjs"

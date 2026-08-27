@@ -98,7 +98,24 @@ for (const pant of PANTALLAS) {
   const oyCon = m => { if (m.type() === 'error') errores.push(m.text().slice(0, 90)) }
   p.on('pageerror', oyErr); p.on('console', oyCon)
 
-  const r = await p.goto(BASE + pant.url, { waitUntil: 'networkidle' })
+  /*
+  | «networkidle» espera a que la red lleve 500 ms en calma, y con la
+  | maquina cargada eso puede no llegar en 30 s: la suite fallaba con un
+  | TimeoutError en pagospendienteRecibo mientras la pagina respondia en
+  | 75 ms. No era un fallo de la vista, era la espera.
+  |
+  | Se espera a que el documento este listo —que es lo que hace falta para
+  | mirar el DOM— y se da mas margen. Si aun asi no llega, se anota y se
+  | sigue: una vista lenta no debe tumbar el barrido entero.
+  */
+  let r
+  try {
+    r = await p.goto(BASE + pant.url, { waitUntil: 'domcontentloaded', timeout: 45000 })
+    await p.waitForTimeout(400)
+  } catch (e) {
+    af(pant.nombre + ': la pagina carga', false, String(e.message).slice(0, 60))
+    continue
+  }
   await p.waitForTimeout(1200)
 
   /* Que no haya redirigido: si la pantalla no es la que se pidió, lo
