@@ -866,9 +866,9 @@
 								FROM sujeto_alumno 
 								INNER JOIN alumno_pago ON alumno_id = pago_alumnoid
 								LEFT JOIN general_tabla_catalogo on pago_rubroid = catalogo_valor
-								INNER JOIN general_sede on alumno_sedeid = sede_id
+								INNER JOIN general_sede on pago_sedeid = sede_id
 								WHERE pago_estado <> 'E'
-									AND alumno_sedeid =:q1
+									AND pago_sedeid =:q1
 									and pago_fecharegistro between :q2 and :q3
 								GROUP BY sede_nombre, catalogo_descripcion
 							
@@ -880,11 +880,11 @@
 								INNER JOIN alumno_pago ON alumno_id = pago_alumnoid
 								INNER JOIN alumno_pago_transaccion ON pago_id = transaccion_pagoid
 								LEFT JOIN general_tabla_catalogo on pago_rubroid = catalogo_valor
-								INNER JOIN general_sede on alumno_sedeid = sede_id
+								INNER JOIN general_sede on pago_sedeid = sede_id
 								WHERE transaccion_estado <> 'E'
-									AND alumno_sedeid =:q4
+									AND pago_sedeid =:q4
 									and transaccion_fecharegistro between :q5 and :q6
-									AND alumno_sedeid =1
+									AND pago_sedeid =1
 								GROUP BY sede_nombre, catalogo_descripcion
 							
 							UNION ALL
@@ -999,7 +999,7 @@
 								FROM sujeto_alumno 
 								INNER JOIN alumno_pago ON alumno_id = pago_alumnoid
 								LEFT JOIN general_tabla_catalogo on pago_rubroid = catalogo_valor
-								INNER JOIN general_sede on alumno_sedeid = sede_id
+								INNER JOIN general_sede on pago_sedeid = sede_id
 								WHERE pago_estado <> 'E'
 									and pago_fecharegistro between :q1 and :q2
 								GROUP BY sede_nombre, catalogo_descripcion
@@ -1012,10 +1012,10 @@
 								INNER JOIN alumno_pago ON alumno_id = pago_alumnoid
 								INNER JOIN alumno_pago_transaccion ON pago_id = transaccion_pagoid
 								LEFT JOIN general_tabla_catalogo on pago_rubroid = catalogo_valor
-								INNER JOIN general_sede on alumno_sedeid = sede_id
+								INNER JOIN general_sede on pago_sedeid = sede_id
 								WHERE transaccion_estado <> 'E'
 									and transaccion_fecharegistro between :q3 and :q4
-									AND alumno_sedeid =1
+									AND pago_sedeid =1
 								GROUP BY sede_nombre, catalogo_descripcion
 							
 							UNION ALL

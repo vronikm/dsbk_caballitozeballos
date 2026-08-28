@@ -282,7 +282,8 @@ class coreController
                     COALESCE(p.permiso_ver, 'N')                 AS ver,
                     COALESCE(p.permiso_crear, 'N')               AS crear,
                     COALESCE(p.permiso_editar, 'N')              AS editar,
-                    COALESCE(p.permiso_eliminar, 'N')            AS eliminar
+                    COALESCE(p.permiso_eliminar, 'N')            AS eliminar,
+                    COALESCE(p.permiso_exportar, 'N')            AS exportar
                FROM seguridad_menu m
                LEFT JOIN seguridad_menu pa ON pa.menu_id = m.menu_padreid
                LEFT JOIN seguridad_permiso p
@@ -333,6 +334,9 @@ class coreController
             $crear    = !empty($a['crear'])    ? 'S' : 'N';
             $editar   = !empty($a['editar'])   ? 'S' : 'N';
             $eliminar = !empty($a['eliminar']) ? 'S' : 'N';
+            /* Exportar: la accion por la que la informacion SALE del
+               sistema. Ver ds_core/database/045. */
+            $exportar = !empty($a['exportar']) ? 'S' : 'N';
 
             /* Sin lectura no hay nada que hacer en la pantalla: se retira
                la fila completa en lugar de dejar acciones huerfanas. */
@@ -356,19 +360,20 @@ class coreController
                     "UPDATE seguridad_permiso
                         SET permiso_ver = :v, permiso_crear = :c,
                             permiso_editar = :e, permiso_eliminar = :d,
+                            permiso_exportar = :x,
                             permiso_estado = 'A'
                       WHERE permiso_rolid = :r AND permiso_menuid = :m",
                     [':v' => $ver, ':c' => $crear, ':e' => $editar, ':d' => $eliminar,
-                     ':r' => $rolid, ':m' => $menuid]
+                     ':x' => $exportar, ':r' => $rolid, ':m' => $menuid]
                 );
             } else {
                 $this->escribir(
                     "INSERT INTO seguridad_permiso
                         (permiso_rolid, permiso_menuid, permiso_ver, permiso_crear,
-                         permiso_editar, permiso_eliminar, permiso_estado)
-                     VALUES (:r, :m, :v, :c, :e, :d, 'A')",
+                         permiso_editar, permiso_eliminar, permiso_exportar, permiso_estado)
+                     VALUES (:r, :m, :v, :c, :e, :d, :x, 'A')",
                     [':r' => $rolid, ':m' => $menuid, ':v' => $ver, ':c' => $crear,
-                     ':e' => $editar, ':d' => $eliminar]
+                     ':e' => $editar, ':d' => $eliminar, ':x' => $exportar]
                 );
             }
 

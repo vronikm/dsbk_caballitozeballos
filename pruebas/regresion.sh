@@ -134,6 +134,12 @@ echo "── Base de datos ─────────────────�
 corre "raíces de módulo"     "$PHP qa_raices_modulos.php"
 corre "CSS y temas"          "$PHP qa_css_temas.php"
 corre "codificación unificada" "$PHP qa_utf8mb4.php"
+corre "sede histórica del pago" "$PHP qa_sede_historica.php"
+corre "permiso de exportar"    "$PHP qa_permiso_exportar.php"
+corre "Insights solo lee"     "$PHP qa_insights_solo_lectura.php"
+corre "asistencia por día"    "$PHP qa_asistencia_dia.php"
+corre "módulo Insights"      "$PHP qa_insights_modulo.php"
+corre "tablero de Insights"  "node qa_insights_tablero.mjs"
 
 if [ "$1" = "--dinero" ]; then
     echo

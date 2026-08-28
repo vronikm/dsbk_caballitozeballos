@@ -1,0 +1,14 @@
+# =====================================================================
+# DigiSports Insights
+# =====================================================================
+RewriteEngine On
+Options All -Indexes
+
+# Codigo de servidor: se incluye desde index.php, nunca se solicita por URL.
+# cli/ va en la lista porque el capturador de cartera es una herramienta de
+# linea de comandos: servirlo por HTTP lo dejaria ejecutable por cualquiera.
+RewriteRule ^(cli/|config/|controllers/|views/) - [F,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-zA-Z0-9/_-]+)$ index.php?views=$1 [QSA,L]

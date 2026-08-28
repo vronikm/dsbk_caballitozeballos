@@ -73,6 +73,31 @@ class mainModel
         return !preg_match("/^$filtro$/", $cadena);
     }
 
+    /**
+     * Sede en la que se registra un pago.
+     *
+     * La sede del pago se CONGELA al crearlo y no sigue despues los
+     * traslados del alumno: un pago es un hecho ocurrido en un sitio, igual
+     * que ocurrio en una fecha. Sin esto, mover un alumno de sede reescribia
+     * retroactivamente los ingresos de las dos sedes y un cierre de mes ya
+     * impreso dejaba de cuadrar. Ver ds_core/database/044.
+     *
+     * En el momento de cobrar, la sede actual del alumno ES la sede correcta;
+     * lo que no vale es volver a preguntarla meses despues.
+     *
+     * Devuelve 0 si el alumno no existe. La columna es NOT NULL con clave
+     * foranea, asi que un 0 hace fallar la insercion en vez de guardar un
+     * pago sin sede: es deliberado.
+     */
+    protected function sedeDelAlumno($alumnoId): int
+    {
+        $sql = $this->conectar()->prepare(
+            "SELECT alumno_sedeid FROM sujeto_alumno WHERE alumno_id = :alumno"
+        );
+        $sql->execute([":alumno" => (int) $alumnoId]);
+
+        return (int) $sql->fetchColumn();
+    }
     protected function guardarDatos($tabla, $datos)
     {
         $campos   = implode(',', array_column($datos, 'campo_nombre'));

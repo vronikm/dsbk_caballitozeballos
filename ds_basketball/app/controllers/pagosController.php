@@ -553,6 +553,14 @@
 					"campo_nombre"=>"pago_alumnoid",
 					"campo_marcador"=>":Alumnoid",
 					"campo_valor"=>$pago_alumnoid
+				],
+				[
+					/* Sede CONGELADA en el momento de cobrar. No se deriva despues
+					   del alumno: si se traslada, sus pagos anteriores seguirian
+					   contando en la sede donde se cobraron. Ver database/044. */
+					"campo_nombre"=>"pago_sedeid",
+					"campo_marcador"=>":Sedeid",
+					"campo_valor"=>$this->sedeDelAlumno($pago_alumnoid)
 				],				
 				[
 					"campo_nombre"=>"pago_valor",
@@ -819,6 +827,14 @@
 					"campo_nombre"=>"pago_alumnoid",
 					"campo_marcador"=>":Alumnoid",
 					"campo_valor"=>$pago_alumnoid
+				],
+				[
+					/* Sede CONGELADA en el momento de cobrar. No se deriva despues
+					   del alumno: si se traslada, sus pagos anteriores seguirian
+					   contando en la sede donde se cobraron. Ver database/044. */
+					"campo_nombre"=>"pago_sedeid",
+					"campo_marcador"=>":Sedeid",
+					"campo_valor"=>$this->sedeDelAlumno($pago_alumnoid)
 				],				
 				[
 					"campo_nombre"=>"pago_valor",
@@ -1089,6 +1105,14 @@
 					"campo_nombre"=>"pago_alumnoid",
 					"campo_marcador"=>":Alumnoid",
 					"campo_valor"=>$pago_alumnoid
+				],
+				[
+					/* Sede CONGELADA en el momento de cobrar. No se deriva despues
+					   del alumno: si se traslada, sus pagos anteriores seguirian
+					   contando en la sede donde se cobraron. Ver database/044. */
+					"campo_nombre"=>"pago_sedeid",
+					"campo_marcador"=>":Sedeid",
+					"campo_valor"=>$this->sedeDelAlumno($pago_alumnoid)
 				],				
 				[
 					"campo_nombre"=>"pago_valor",

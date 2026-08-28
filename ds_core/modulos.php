@@ -75,9 +75,13 @@ if (!function_exists('ds_modulos')) {
                 'icono'   => 'fas fa-chart-line',
                 'acento'  => 'var(--ds-insights)',
                 'url'     => DS_INSIGHTS_URL,
-                'activo'  => false,
-                'accesos' => [],
-            ],
+                'activo'  => true,
+                'accesos' => [
+                    ['texto' => 'Panel',      'icono' => 'fas fa-chart-line',  'ruta' => 'dashboard/'],
+                    ['texto' => 'Financiero', 'icono' => 'fas fa-dollar-sign', 'ruta' => 'financiero/'],
+                    ['texto' => 'Reportes',   'icono' => 'fas fa-file-alt',    'ruta' => 'reporteList/'],
+                ],
+                ],
         ];
     }
 }

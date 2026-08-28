@@ -128,6 +128,12 @@ require_once __DIR__ . "/inc/layout-top.php";
                                         <a href="#" data-marcar-columna="eliminar" class="d-block small font-weight-normal">alternar</a>
                                     <?php endif; ?>
                                 </th>
+                                <th class="accion">
+                                    Exportar
+                                    <?php if ($puedeEdit): ?>
+                                        <a href="#" data-marcar-columna="exportar" class="d-block small font-weight-normal">alternar</a>
+                                    <?php endif; ?>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -138,7 +144,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             if ($grupo !== $grupoPrevio):
                                 $grupoPrevio = $grupo;
                         ?>
-                            <tr class="grupo"><td colspan="5"><?php echo htmlspecialchars($grupo, ENT_QUOTES, 'UTF-8'); ?></td></tr>
+                            <tr class="grupo"><td colspan="6"><?php echo htmlspecialchars($grupo, ENT_QUOTES, 'UTF-8'); ?></td></tr>
                         <?php endif; ?>
 
                             <tr data-menu="<?php echo (int)$m['menu_id']; ?>">
@@ -154,6 +160,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                                     'crear'    => $m['crear'],
                                     'editar'   => $m['editar'],
                                     'eliminar' => $m['eliminar'],
+                                    'exportar' => $m['exportar'],
                                 ];
                                 foreach ($acciones as $accion => $valor):
                                 ?>

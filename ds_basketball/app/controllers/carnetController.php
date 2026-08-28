@@ -901,16 +901,18 @@
 
 						// Insertar pago por reimpresión
 						$sqlPago = "INSERT INTO alumno_pago
-									(pago_rubroid, pago_formapagoid, pago_alumnoid, pago_valor,
+									(pago_rubroid, pago_formapagoid, pago_alumnoid, pago_sedeid, pago_valor,
 										pago_saldo, pago_concepto, pago_fecha, pago_fecharegistro,
 										pago_periodo, pago_recibo, pago_estado)
 									VALUES
-									('ROT', 'FEF', :alumno_id, :valor_reimpresion, 0.00,
+									('ROT', 'FEF', :alumno_id, :sede_id, :valor_reimpresion, 0.00,
 										'Por reimpresión de carnet extraviado',
 										:fecha, :fecha, :periodo, :recibo, 'C')";
 
 						$this->ejecutarConsulta($sqlPago, [
 							':alumno_id' => $alumno_id,
+							/* Sede CONGELADA al cobrar; no sigue traslados. Ver database/044. */
+							':sede_id'   => $this->sedeDelAlumno($alumno_id),
 							':valor_reimpresion' => $valor_reimpresion_pago,
 							':fecha' => $fecha_actual,
 							':periodo' => $name_mesactual . '/' . $anio_actual,

@@ -424,7 +424,8 @@ if (!function_exists('usuario_autenticado')) {
             $sql = $con->prepare(
                 "SELECT m.menu_vista,
                         p.permiso_ver, p.permiso_crear,
-                        p.permiso_editar, p.permiso_eliminar
+                        p.permiso_editar, p.permiso_eliminar,
+                        p.permiso_exportar
                    FROM seguridad_permiso p
                    JOIN seguridad_menu    m ON m.menu_id = p.permiso_menuid
                   WHERE p.permiso_rolid  = :rol
@@ -440,6 +441,10 @@ if (!function_exists('usuario_autenticado')) {
                     'crear'    => $f['permiso_crear']    === 'S',
                     'editar'   => $f['permiso_editar']   === 'S',
                     'eliminar' => $f['permiso_eliminar'] === 'S',
+                    /* Exportar es la accion por la que la informacion SALE del
+                       sistema: verla en pantalla y llevarsela en un Excel son dos
+                       decisiones distintas. Ver ds_core/database/045. */
+                    'exportar' => $f['permiso_exportar'] === 'S',
                 ];
             }
 
@@ -532,6 +537,7 @@ if (!function_exists('usuario_autenticado')) {
     function puede_crear(string $vista, string $modulo = ''): bool    { return puede('crear', $vista, $modulo); }
     function puede_editar(string $vista, string $modulo = ''): bool   { return puede('editar', $vista, $modulo); }
     function puede_eliminar(string $vista, string $modulo = ''): bool { return puede('eliminar', $vista, $modulo); }
+    function puede_exportar(string $vista, string $modulo = ''): bool { return puede('exportar', $vista, $modulo); }
 
     /*----------  Accion que exige cada operacion AJAX  ----------*/
 
