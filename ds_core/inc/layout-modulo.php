@@ -112,12 +112,12 @@ $moduloInicio = $moduloInicio ?? (defined('APP_URL') ? APP_URL . 'panel/' : DS_H
 	<?php require DS_HUB_PATH . "ds_core/inc/tema-init.php"; ?>
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
-<?php /* ds-core NO es decorativa: acota las 44 reglas de core.css que
-             dan a DigiSports su aspecto —tarjetas, tablas, interruptores,
-             menu y los KPI del panel—. Sin ella, Arena, League y Core se
-             quedaban con el AdminLTE de fabrica; los KPI del panel de
-             Arena salian como texto suelto porque .ds-core .ds-kpi nunca
-             encontraba su ancestro. Basketball si la llevaba. */ ?>
+<?php /* ds-core NO es decorativa: acota las reglas de core.css que dan a
+               DigiSports su aspecto —tarjetas, tablas, interruptores y menu—.
+               Sin ella, Arena, League y Core se quedaban con el AdminLTE de
+               fabrica. Basketball si la llevaba, y por eso solo fallaban los
+               otros tres. (El componente propio .ds-kpi que hubo aqui ya no
+               existe: los cuatro modulos usan .info-box de la plantilla.) */ ?>
 <div class="app-wrapper ds-core">
 
     <?php /* ds-core__navbar mantiene la barra en oscuro con el tema claro,

@@ -75,7 +75,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                         <div class="col-md-6 col-xl-4 mb-3">
                             <label class="d-flex align-items-center w-100 mb-0 p-3"
                                    style="gap:12px;border:1px solid var(--core-borde);border-radius:var(--ds-radius-md);
-                                          background:#fff;cursor:<?php echo $puedeEdit ? 'pointer' : 'default'; ?>;">
+                                          background:var(--bs-body-bg);cursor:<?php echo $puedeEdit ? 'pointer' : 'default'; ?>;">
                                 <span class="switch">
                                     <input type="checkbox" name="modulos[]" value="<?php echo $clave; ?>"
                                            <?php echo $activo ? 'checked' : ''; ?>

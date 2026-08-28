@@ -78,7 +78,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 <?php foreach ($dias as $num => $nombre): ?>
                     <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div style="border:1px solid var(--core-borde);border-radius:var(--ds-radius-md);
-                                    background:#fff;height:100%;">
+                                    background:var(--bs-body-bg);height:100%;">
                             <div style="padding:10px 14px;border-bottom:1px solid var(--core-borde);
                                         font-weight:700;font-size:.85rem;">
                                 <?php echo $nombre; ?>

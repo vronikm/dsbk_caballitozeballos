@@ -17,15 +17,15 @@ require_once __DIR__ . "/inc/layout-top.php";
 
 <div class="row">
     <?php foreach ($resumen as $r): ?>
-        <div class="col-lg-3 col-6 mb-3">
-            <div class="ds-kpi">
-                <span class="ds-kpi__icono bg-<?php echo $r['color']; ?> text-white">
-                    <i class="<?php echo $r['icono']; ?>"></i>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-<?php echo $r['color']; ?> shadow-sm">
+                    <i class="<?php echo $r['icono']; ?>" aria-hidden="true"></i>
                 </span>
-                <span>
-                    <span class="ds-kpi__valor"><?php echo (int)$r['valor']; ?></span>
-                    <span class="ds-kpi__label"><?php echo $r['etiqueta']; ?></span>
-                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text"><?php echo htmlspecialchars($r['etiqueta'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="info-box-number"><?php echo (int)$r['valor']; ?></span>
+                </div>
             </div>
         </div>
     <?php endforeach; ?>

@@ -23,11 +23,18 @@ require_once __DIR__ . "/inc/layout-top.php";
         <h3 class="card-title mb-0"><?php echo count($clientes); ?> cliente<?php echo count($clientes) === 1 ? '' : 's'; ?></h3>
 
         <div class="d-flex align-items-center" style="gap:12px;">
-            <form method="GET" action="<?php echo APP_URL; ?>clienteList/" class="d-flex flex-wrap align-items-center gap-2">
-                <input type="text" name="q" class="form-control form-control-sm me-2"
-                       placeholder="Nombre o identificación"
-                       value="<?php echo htmlspecialchars($busqueda, ENT_QUOTES, 'UTF-8'); ?>">
-                <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="fas fa-search"></i></button>
+            <form method="GET" action="<?php echo APP_URL; ?>clienteList/">
+                <?php /* input-group mantiene campo y botón unidos y en una línea:
+                         con form-control suelto el campo toma ancho completo y
+                         empujaba el botón a la fila de abajo. */ ?>
+                <div class="input-group input-group-sm" style="width:16rem;">
+                    <input type="text" name="q" class="form-control"
+                           placeholder="Nombre o identificación"
+                           aria-label="Buscar por nombre o identificación"
+                           value="<?php echo htmlspecialchars($busqueda, ENT_QUOTES, 'UTF-8'); ?>">
+                    <button type="submit" class="btn btn-outline-secondary"
+                            title="Buscar" aria-label="Buscar"><i class="fas fa-search"></i></button>
+                </div>
             </form>
 
             <?php if ($puedeCrear): ?>

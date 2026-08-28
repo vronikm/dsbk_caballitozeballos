@@ -37,11 +37,12 @@ require_once __DIR__ . "/inc/layout-top.php";
     <div class="col-lg-4 mb-3">
         <div class="card h-100">
             <div class="card-body text-center">
-                <span class="ds-kpi__icono bg-success text-white mx-auto mb-3" style="width:56px;height:56px;font-size:1.4rem;">
-                    <i class="fas fa-wallet"></i>
+                <span class="d-inline-flex align-items-center justify-content-center rounded bg-success text-white mx-auto mb-3"
+                      style="width:56px;height:56px;font-size:1.4rem;">
+                    <i class="fas fa-wallet" aria-hidden="true"></i>
                 </span>
-                <div class="ds-kpi__valor" style="font-size:2rem;">$<?php echo number_format($saldo, 2); ?></div>
-                <div class="ds-kpi__label">Saldo disponible</div>
+                <div class="text-muted text-uppercase fw-semibold" style="font-size:.8rem;letter-spacing:.04em;">Saldo disponible</div>
+                <div class="fw-bold" style="font-size:2rem;line-height:1.15;">$<?php echo number_format($saldo, 2); ?></div>
 
                 <hr>
 

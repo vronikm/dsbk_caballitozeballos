@@ -121,12 +121,12 @@ require_once __DIR__ . "/inc/layout-top.php";
                     </div>
 
                     <!-- Previsualización del importe -->
-                    <div class="ds-kpi mb-3" id="cajaImporte" style="display:none;">
-                        <span class="ds-kpi__icono bg-info text-white"><i class="fas fa-calculator"></i></span>
-                        <span>
-                            <span class="ds-kpi__valor" id="importeTotal">$0.00</span>
-                            <span class="ds-kpi__label" id="importeDetalle"></span>
-                        </span>
+                    <div class="info-box mb-3" id="cajaImporte" style="display:none;">
+                        <span class="info-box-icon bg-info shadow-sm"><i class="fas fa-calculator" aria-hidden="true"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" id="importeDetalle"></span>
+                            <span class="info-box-number" id="importeTotal">$0.00</span>
+                        </div>
                     </div>
 
                     <div class="mb-3 mb-0">

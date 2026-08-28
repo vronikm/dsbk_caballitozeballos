@@ -222,8 +222,8 @@ require_once __DIR__ . "/inc/layout-top.php";
             <?php /* Fondo claro explicito: --ds-surface-2 es de la paleta OSCURA
                      del ecosistema y aqui la pagina la pinta AdminLTE en claro,
                      asi que el token dejaba texto oscuro sobre fondo oscuro. */ ?>
-            <div class="card-body py-2" style="background:#f1f3f7;border-top:1px solid #e3e6ec;
-                                                border-bottom:1px solid #e3e6ec;">
+            <div class="card-body py-2" style="background:var(--bs-tertiary-bg);border-top:1px solid var(--bs-border-color);
+                                                border-bottom:1px solid var(--bs-border-color);">
                 <div class="d-flex align-items-center justify-content-center"
                      style="gap:1.2rem;font-size:1.05rem;">
                     <span<?php echo $cerrada && (int)$s['serie_ganadorid'] === (int)$s['serie_localid']

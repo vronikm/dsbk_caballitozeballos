@@ -20,22 +20,22 @@ require_once __DIR__ . "/inc/layout-top.php";
 ?>
 
 <div class="row">
-    <div class="col-lg-4 col-6 mb-3">
-        <div class="ds-kpi">
-            <span class="ds-kpi__icono bg-success text-white"><i class="fas fa-wallet"></i></span>
-            <span>
-                <span class="ds-kpi__valor">$<?php echo number_format($totalSaldo, 2); ?></span>
-                <span class="ds-kpi__label">Saldo total a favor de clientes</span>
-            </span>
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="info-box">
+            <span class="info-box-icon bg-success shadow-sm"><i class="fas fa-wallet" aria-hidden="true"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Saldo total a favor de clientes</span>
+                <span class="info-box-number">$<?php echo number_format($totalSaldo, 2); ?></span>
+            </div>
         </div>
     </div>
-    <div class="col-lg-4 col-6 mb-3">
-        <div class="ds-kpi">
-            <span class="ds-kpi__icono bg-info text-white"><i class="fas fa-user-friends"></i></span>
-            <span>
-                <span class="ds-kpi__valor"><?php echo $conSaldo; ?></span>
-                <span class="ds-kpi__label">Clientes con saldo</span>
-            </span>
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="info-box">
+            <span class="info-box-icon bg-info shadow-sm"><i class="fas fa-user-friends" aria-hidden="true"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Clientes con saldo</span>
+                <span class="info-box-number"><?php echo (int)$conSaldo; ?></span>
+            </div>
         </div>
     </div>
 </div>

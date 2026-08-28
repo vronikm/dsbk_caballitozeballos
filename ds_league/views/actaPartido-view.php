@@ -73,7 +73,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
 <!-- ==================== Marcador ==================== -->
 <div class="card mb-3">
-    <div class="card-body py-3" style="background:#f1f3f7;border-bottom:1px solid #e3e6ec;">
+    <div class="card-body py-3" style="background:var(--bs-tertiary-bg);border-bottom:1px solid var(--bs-border-color);">
         <div class="d-flex align-items-center justify-content-center flex-wrap" style="gap:1.5rem;">
             <span style="font-size:1.1rem;"><?php echo $h($partido['local']); ?></span>
             <strong style="font-size:1.7rem;font-variant-numeric:tabular-nums;">
@@ -175,7 +175,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             </th>
                         <?php endforeach; ?>
                         <?php foreach ($derivadas as $c => $t): ?>
-                            <th class="text-center" style="width:3.4rem;background:#eef1f6;"
+                            <th class="text-center" style="width:3.4rem;background:var(--bs-tertiary-bg);"
                                 title="<?php echo $h($t['tipo_nombre']); ?> · se calcula">
                                 <?php echo $h($t['tipo_abrev']); ?>
                             </th>
@@ -221,7 +221,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                             <?php endforeach; ?>
 
                             <?php foreach ($derivadas as $c => $t): ?>
-                                <td class="text-center" style="background:#f6f8fb;font-weight:600;">
+                                <td class="text-center" style="background:var(--bs-secondary-bg);font-weight:600;">
                                     <?php echo (int)round($calc[$c]); ?>
                                 </td>
                             <?php endforeach; ?>
@@ -239,7 +239,7 @@ require_once __DIR__ . "/inc/layout-top.php";
                 </tbody>
                 <?php if (isset($totales[$e['nombre']])): ?>
                 <tfoot>
-                    <tr style="background:#eef1f6;font-weight:600;">
+                    <tr style="background:var(--bs-tertiary-bg);font-weight:600;">
                         <td colspan="2">Totales</td>
                         <?php foreach ($captura as $t): ?>
                             <td class="text-center">

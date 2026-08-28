@@ -106,38 +106,12 @@
 
 .ds-core .card-title { font-weight: 700; font-size: 1rem; }
 
-/* ---------- Tarjetas de indicador ---------- */
-
-.ds-core .ds-kpi {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 18px;
-    background: var(--bs-body-bg);
-    border: 1px solid var(--core-borde);
-    border-radius: var(--ds-radius-md);
-    height: 100%;
-}
-
-.ds-core .ds-kpi__icono {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: var(--ds-radius-sm);
-    font-size: 1.2rem;
-    flex: 0 0 auto;
-}
-
-.ds-core .ds-kpi__valor {
-    font-size: 1.6rem;
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -.02em;
-}
-
-.ds-core .ds-kpi__label { font-size: .8rem; color: var(--core-tenue); }
+/* ---------- Tarjetas de indicador ----------
+   Retiradas: los cuatro módulos usan ahora .info-box, el componente de
+   AdminLTE, que pone la etiqueta ENCIMA del valor. Antes había tres
+   implementaciones distintas de la misma tarjeta —info-box en Basketball,
+   .ds-kpi propio en Arena y Core, y card con estilos en línea en League—.
+   La comprobación que lo impide está en pruebas/qa_css_temas.php.           */
 
 /* ---------- Tablas ---------- */
 
@@ -490,3 +464,44 @@ td.ds-tabla-acciones .ds-hueco {
 .app-footer a:hover  { color: #fff; }
 .app-footer strong,
 .app-footer b        { color: #e2e8f0; }
+
+/*
+|--------------------------------------------------------------------------
+| El clearfix de la cabecera estorba cuando la cabecera es flex
+|--------------------------------------------------------------------------
+| AdminLTE trae «.card-header::after { display:block; clear:both; content:"" }»,
+| un clearfix pensado para maquetación con flotantes. En un contenedor flex ese
+| pseudoelemento cuenta como UN ELEMENTO MÁS.
+|
+| Consecuencia medida en ds_arena/instalacionList: la cabecera va de 271 a 1479
+| y con «justify-content: space-between» el reparto era
+|
+|     título · grupo de controles · fantasma
+|
+| así que el fantasma se quedaba el borde derecho y los selects y el botón
+| «Nueva instalación» acababan en el medio, a 318 px del borde.
+|
+| Se desactiva SÓLO donde la cabecera se declara flex: ahí no hay flotantes que
+| limpiar, y el reparto vuelve a ser el que el marcado pide. Las cabeceras que
+| no son flex conservan el clearfix de la plantilla.
+*/
+.card-header.d-flex::after,
+.card-header.d-flex::before {
+    display: none;
+}
+
+/*
+| .callout: AdminLTE lo fija en --bs-gray-100 (#f8f9fa) y deja el texto en
+| `inherit`. La escala de grises de Bootstrap NO cambia con el tema —sólo los
+| tokens semánticos—, así que en oscuro queda texto claro sobre fondo claro.
+| Afecta a 13 vistas (League entero, 2 de Basketball, 1 de Core).
+|
+| Se corrige por las variables que la propia plantilla expone, no con reglas
+| que compitan en especificidad. El borde izquierdo lo sigue fijando cada
+| vista con su color de módulo.
+*/
+.callout {
+    --lte-callout-bg:     var(--bs-tertiary-bg);
+    --lte-callout-color:  var(--bs-body-color);
+    --lte-callout-border: var(--bs-border-color);
+}

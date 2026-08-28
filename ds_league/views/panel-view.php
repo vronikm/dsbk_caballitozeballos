@@ -47,25 +47,15 @@ require_once __DIR__ . "/inc/layout-top.php";
 <!-- ==================== Diagnóstico de la instalación ==================== -->
 <div class="row">
     <?php foreach ($diagnostico as $clave => $d): ?>
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card h-100">
-                <div class="card-body d-flex align-items-start">
-                    <span class="me-3" style="font-size:1.6rem;line-height:1;
-                          color: var(--ds-<?php echo $d['ok'] ? 'success' : 'warning'; ?>);">
-                        <i class="fas fa-<?php echo $d['ok'] ? 'check-circle' : 'exclamation-circle'; ?>"></i>
-                    </span>
-                    <div style="min-width:0;">
-                        <div class="text-muted"
-                             style="font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;">
-                            <?php echo htmlspecialchars($d['etiqueta'], ENT_QUOTES, 'UTF-8'); ?>
-                        </div>
-                        <div style="font-size:1.35rem;font-weight:700;line-height:1.25;">
-                            <?php echo htmlspecialchars((string)$d['valor'], ENT_QUOTES, 'UTF-8'); ?>
-                        </div>
-                        <div class="text-muted" style="font-size:.85rem;">
-                            <?php echo htmlspecialchars($d['detalle'], ENT_QUOTES, 'UTF-8'); ?>
-                        </div>
-                    </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="info-box">
+                <span class="info-box-icon bg-<?php echo $d['ok'] ? 'success' : 'warning'; ?> shadow-sm">
+                    <i class="fas fa-<?php echo $d['ok'] ? 'check-circle' : 'exclamation-circle'; ?>" aria-hidden="true"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text"><?php echo htmlspecialchars($d['etiqueta'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="info-box-number"><?php echo htmlspecialchars((string)$d['valor'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="info-box-text"><?php echo htmlspecialchars($d['detalle'], ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
             </div>
         </div>
