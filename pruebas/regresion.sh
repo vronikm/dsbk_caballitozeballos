@@ -140,6 +140,9 @@ corre "Insights solo lee"     "$PHP qa_insights_solo_lectura.php"
 corre "asistencia por día"    "$PHP qa_asistencia_dia.php"
 corre "módulo Insights"      "$PHP qa_insights_modulo.php"
 corre "tablero de Insights"  "node qa_insights_tablero.mjs"
+corre "exportación"         "$PHP qa_insights_exportar.php"
+corre "vistas de Insights"  "node qa_insights_vistas.mjs"
+corre "ámbito de sede"      "$PHP qa_insights_ambito_sede.php"
 
 if [ "$1" = "--dinero" ]; then
     echo

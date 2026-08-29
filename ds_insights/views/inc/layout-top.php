@@ -9,6 +9,8 @@
 
 use insights\controllers\insightsController;
 
+require_once __DIR__ . '/formato.php';
+
 if (!isset($insInsights)) {
     $insInsights = new insightsController();
 }

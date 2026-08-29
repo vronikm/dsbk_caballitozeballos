@@ -27,9 +27,20 @@ return [
     'financiero',
     'cartera',
 
+    /* Becas y descuentos: cuánto cuesta el beneficio, a cuántos alcanza y
+       cómo asisten. Va suelta porque es dinero que se concede, y quien
+       puede ver los ingresos no necesariamente debe ver a quién se le
+       perdona la cuota. */
+    'becas',
+
     /* Catálogo de reportes y el detalle al que llega el drill-down. */
     'reporteList',
     'transacciones',
+
+    /* Entrega de archivos. Es una vista y no un endpoint suelto para que
+       herede los cuatro controles del front controller; encima comprueba
+       la accion «exportar», que es propia. */
+    'exportar',
 
     /* Configuración de indicadores y umbrales del centro de atención. */
     'configuracion',

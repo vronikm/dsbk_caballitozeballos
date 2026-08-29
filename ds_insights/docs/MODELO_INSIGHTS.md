@@ -412,7 +412,8 @@ Cada uno comprobable por el arnés, no por opinión:
 4. La ocupación calculada coincide con horas reservadas / horas de apertura
    verificadas a mano sobre una instalación.
 5. Un usuario con ámbito de una sede no ve datos de otra, ni en pantalla ni en
-   el JSON ni en la exportación.
+   el JSON ni en la exportación. — *incumplido hasta la Fase 13; ver 12 bis y
+   `qa_insights_ambito_sede.php`*
 6. Ningún panel sin datos muestra un cero sin explicación.
 7. Ninguna consulta de Insights escribe en tablas de otros módulos.
 8. Los ingresos por sede no cambian al trasladar un alumno (ya cubierto por
@@ -420,6 +421,80 @@ Cada uno comprobable por el arnés, no por opinión:
 
 ---
 
+## 12 bis. El ámbito de sede, y cómo se nos escapó
+
+El criterio 5 de la lista anterior —«un usuario con ámbito de una sede no ve
+datos de otra»— **no se cumplía**. La Fase 13 lo encontró.
+
+`sedesDelUsuario()` estaba escrito, con un comentario que explicaba por qué era
+imprescindible («un coordinador que sólo ve su sede en Basketball no puede
+verlas todas porque el informe sea consolidado»), y **no lo llamaba nadie**. No
+era un descuido teórico: hay seis usuarios limitados en la base ahora mismo, y
+los siete controladores de Basketball respetan el ámbito desde hace años. Sólo
+Insights lo ignoraba.
+
+Un método que existe se parece mucho a un método que funciona. Ahí se escondió.
+
+### Cómo se aplica
+
+Tres ayudantes, según por dónde llegue cada tabla a su sede:
+
+| ayudante | para | resuelve con |
+|---|---|---|
+| `sede($col)` | la tabla tiene columna de sede | `col IN (...)` |
+| `sedeReserva($col)` | `dsa_pago`, que la hereda de la reserva | subconsulta a `dsa_reserva` |
+| `sedeAlumno($col)` | `insights_v_asistencia_dia` y `facturas_electronicas` | subconsulta a `sujeto_alumno` |
+
+Los tres devuelven **cadena vacía** cuando el usuario no está limitado, que es
+por qué el camino sin restricción quedó byte a byte idéntico tras acotar los
+treinta métodos —se comprobó comparando el HTML completo de las siete vistas
+antes y después—.
+
+Las subconsultas no son un JOIN a propósito: varias de estas consultas son
+agregados, y un JOIN de más cambiaría los conteos multiplicando filas. Es el
+mismo error de *fan-out* que ya infló las marcas de asistencia 4,4 veces en
+`alumnosPorEntrenador`.
+
+### Por qué los ids van en línea y no como parámetros
+
+La regla del proyecto es no concatenar **nunca** información recibida del
+usuario. Estos ids no vienen del usuario: se leen de `seguridad_usuario_sede`
+con la clave de la sesión y pasan por `array_map('intval', ...)`. No queda
+ninguna cadena del exterior en el resultado.
+
+Se hizo así porque el mismo fragmento se inserta en subconsultas que ya traen
+sus propios marcadores, y arrastrar nombres únicos por cada una multiplicaría
+las oportunidades de equivocarse justo en el código que protege el acceso.
+
+### Lo que evita que vuelva a pasar
+
+`qa_insights_ambito_sede.php` tiene dos mitades, y hacen falta las dos:
+
+- **estática** — cada método cuya SQL toca una tabla con sede tiene que llamar
+  a un ayudante. Es la que caza el próximo método que se escriba sin acotar.
+  Encontró cinco que se habían quedado fuera en la primera pasada, entre ellos
+  `ingresosPorSede`, que es precisamente la tabla por sede.
+- **en ejecución** — un usuario limitado pide las mismas pantallas y
+  exportaciones y no puede aparecer un dato ajeno. Antes comprueba que el
+  superadministrador **sí** los ve, para no celebrar una pantalla vacía.
+
+Se sometieron a un defecto provocado: con `sede()` devolviendo cadena vacía
+—el defecto original exacto— las cuatro comprobaciones de ejecución se ponen
+rojas y nombran lo que se filtró.
+
+### Lo que queda por decidir: League
+
+League **no tiene sede** por la decisión R5: sus torneos pueden organizarse
+fuera de las canchas del club. Por eso sus consultas quedaron **sin acotar**, y
+un usuario limitado a dos sedes ve las cifras de la liga entera.
+
+Se consideró ocultárselas —un coordinador de dos sedes viendo la recaudación
+completa de los torneos es discutible— pero eso sería **inventar una política**,
+no cumplir el criterio 5: los datos de League no son «de otra sede», son de
+ninguna. Queda como pregunta abierta para la escuela. Si se decide ocultarlas,
+el cambio es un ayudante más y un `AND 1 = 0`; no hay que rehacer nada.
+
+---
 ## 13. Decisiones tomadas
 
 Resueltas el 2026-08-28. Cada una cambia el diseño, no sólo el papeleo.

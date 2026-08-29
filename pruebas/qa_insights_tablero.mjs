@@ -125,6 +125,54 @@ af('sin comparable, las tres tarjetas dicen lo mismo',
 af('sin comparable, ninguna inventa un porcentaje',
    !comparables.some(v => /[0-9]+(\.[0-9]+)?\s*(%|pts)/.test(v)), comparables.join(' | '))
 
+/*==============  Los graficos sobreviven al cambio de tema  ==============*/
+/*
+| Un grafico se dibuja UNA VEZ con los colores que habia en ese momento. El
+| resto de la interfaz reacciona sola porque su color vive en CSS; este no.
+| Cambiar a claro dejaba la tinta del tema oscuro y nada fallaba: solo no se
+| leia.
+|
+| Y una version del ayudante que actualizaba campo por campo se dejaba
+| plotOptions, donde vive el color del total en el centro del donut: bajaba a
+| 2,56 mientras el resto quedaba bien. Por eso se mide el MINIMO de todos los
+| textos del grafico, no una muestra.
+*/
+const contrasteGrafico = () => page.evaluate(() => {
+  const lum = c => { const p = (c.match(/[\d.]+/g) || []).map(Number)
+    const [r, g, b] = p.slice(0, 3).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4) })
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b }
+  const opaco = el => { for (let n = el; n; n = n.parentElement) {
+      const b = getComputedStyle(n).backgroundColor
+      if (b && !/rgba\(.*,\s*0\)/.test(b) && b !== 'transparent') return b }
+    return getComputedStyle(document.body).backgroundColor }
+  const k = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) }
+  const textos = [...document.querySelectorAll(
+    '.apexcharts-datalabel-label,.apexcharts-datalabel-value,.apexcharts-legend-text,' +
+    '.apexcharts-xaxis text,.apexcharts-yaxis text')]
+  const ks = textos.map(e => {
+    const cs = getComputedStyle(e)
+    const c = (cs.fill && cs.fill !== 'none' && e.namespaceURI && e.namespaceURI.includes('svg')) ? cs.fill : cs.color
+    return k(c, opaco(e)) })
+  return { n: ks.length, minimo: ks.length ? +Math.min(...ks).toFixed(2) : null }
+})
+
+await page.goto(BASE + '?desde=2026-01-01&hasta=2026-08-31', { waitUntil: 'load', timeout: 45000 })
+await page.evaluate(() => document.documentElement.setAttribute('data-bs-theme', 'dark'))
+await page.waitForTimeout(1000)
+const enOscuro = await contrasteGrafico()
+
+await page.evaluate(() => document.documentElement.setAttribute('data-bs-theme', 'light'))
+await page.waitForTimeout(900)
+const trasCambiar = await contrasteGrafico()
+
+af('los textos del gráfico se leen en oscuro',
+   enOscuro.minimo !== null && enOscuro.minimo >= 4.5,
+   enOscuro.n + ' textos · mínimo ' + enOscuro.minimo)
+
+af('y siguen leyéndose tras cambiar a claro',
+   trasCambiar.minimo !== null && trasCambiar.minimo >= 4.5,
+   trasCambiar.n + ' textos · mínimo ' + trasCambiar.minimo)
+
 /*==============  Nada roto por el camino  ==============*/
 const reales = problemas.filter(p => !/favicon|analytics/i.test(p))
 af('sin errores de consola ni recursos caídos', reales.length === 0,

@@ -60,21 +60,6 @@ $varOcupacion = $ocuAnt['reservadas'] > 0 ? $ocu['pct'] - $ocuAnt['pct'] : null;
 $tituloVista = 'Panel';
 $vistaActual = 'dashboard';
 
-/** Pinta la variación de una tarjeta, o un guion si no se puede calcular. */
-function ds_variacion(?float $v, string $sufijo = '%'): string
-{
-    if ($v === null) {
-        return '<span class="text-muted small" title="Sin periodo anterior comparable">—</span>';
-    }
-    $sube  = $v >= 0;
-    $color = $sube ? 'text-success' : 'text-danger';
-    $flecha = $sube ? 'up' : 'down';
-    return sprintf(
-        '<span class="%s small"><i class="fas fa-arrow-%s"></i> %s%s%s</span>',
-        $color, $flecha, $sube ? '+' : '', number_format($v, 1), $sufijo
-    );
-}
-
 require_once __DIR__ . "/inc/layout-top.php";
 ?>
 
@@ -261,6 +246,7 @@ require_once __DIR__ . "/inc/layout-top.php";
 
 <?php if (count($serie) > 0): ?>
 <script src="<?php echo DS_INSIGHTS_GRAFICOS_JS; ?>"></script>
+<script src="<?php echo ds_recurso('ds_insights/assets/js/graficos.js'); ?>"></script>
 <script>
 /*
 | El gráfico se pinta desde el aplicativo: ApexCharts está autoalojada en
@@ -279,23 +265,14 @@ require_once __DIR__ . "/inc/layout-top.php";
         'lg'  => round((float) $f['league'], 2),
     ], $serie), JSON_UNESCAPED_UNICODE); ?>;
 
-    var oscuro = document.documentElement.getAttribute('data-bs-theme') === 'dark'
-        || (!document.documentElement.getAttribute('data-bs-theme')
-            && window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-    var tinta  = oscuro ? '#94a3b8' : '#475569';
-    var rejilla = oscuro ? '#1f2c42' : '#e2e8f0';
-
     var meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
     var etiquetas = datos.map(function (d) {
         var p = d.mes.split('-');
         return meses[parseInt(p[1], 10) - 1] + ' ' + p[0].slice(2);
     });
 
-    new ApexCharts(document.getElementById('grafico-evolucion'), {
-        chart: { type: 'area', height: 300, stacked: true, toolbar: { show: false },
-                 fontFamily: 'inherit', background: 'transparent' },
-        theme: { mode: oscuro ? 'dark' : 'light' },
+    dsGrafico('grafico-evolucion', {
+        chart: { type: 'area', height: 300, stacked: true, toolbar: { show: false } },
         colors: ['#3b82f6', '#22d3ee', '#a78bfa'],
         dataLabels: { enabled: false },
         stroke: { curve: 'smooth', width: 2 },
@@ -304,15 +281,12 @@ require_once __DIR__ . "/inc/layout-top.php";
             { name: 'Arena',      data: datos.map(function (d) { return d.ar; }) },
             { name: 'League',     data: datos.map(function (d) { return d.lg; }) }
         ],
-        xaxis: { categories: etiquetas, labels: { style: { colors: tinta } },
-                 axisBorder: { color: rejilla }, axisTicks: { color: rejilla } },
-        yaxis: { labels: { style: { colors: tinta },
+        xaxis: { categories: etiquetas },
+        yaxis: { labels: {
                  formatter: function (v) { return '$' + Math.round(v).toLocaleString('es-EC'); } } },
-        grid: { borderColor: rejilla, strokeDashArray: 3 },
-        legend: { labels: { colors: tinta } },
-        tooltip: { theme: oscuro ? 'dark' : 'light',
-                   y: { formatter: function (v) { return '$' + v.toFixed(2); } } }
-    }).render();
+        grid: { strokeDashArray: 3 },
+        tooltip: { y: { formatter: function (v) { return '$' + v.toFixed(2); } } }
+    });
 })();
 </script>
 <?php endif; ?>
