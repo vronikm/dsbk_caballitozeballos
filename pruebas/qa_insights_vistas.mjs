@@ -66,6 +66,16 @@ const VISTAS = [
   { v: 'arena',       graficos: 0 },   /* su visual es el mapa de calor, que es HTML */
   { v: 'league',      graficos: 0 },   /* League es tablas: no lleva grafico */
   { v: 'reporteList', graficos: 0 },
+  { v: 'transacciones', graficos: 0 },
+  { v: 'configuracion', graficos: 0 },
+  /*
+  | Cartera es el caso raro: su grafico solo existe cuando hay DOS o mas
+  | fotografias mensuales de la deuda, y hoy hay una. Un numero fijo aqui
+  | se romperia solo el mes que viene, asi que se comprueba la REGLA: o
+  | esta el grafico, o esta el texto que explica por que no. Nunca las dos
+  | ni ninguna.
+  */
+  { v: 'cartera',     graficos: null },
 ]
 
 /* Lo que PHP imprime cuando algo va mal. Se busca en el TEXTO VISIBLE, no en
@@ -128,7 +138,13 @@ for (const { v, graficos } of VISTAS) {
   af(v.padEnd(12) + ' sin errores de consola ni peticiones caidas',
      problemas.length === 0, problemas.slice(0, 2).join(' · '))
 
-  {
+  if (graficos === null) {
+    /* O grafico, o explicacion. Las dos cosas o ninguna es un defecto. */
+    const explica = d.texto.includes('fotografías mensuales')
+    af(v.padEnd(12) + ' o dibuja su grafico o explica por que no',
+       (d.pintados === 1) !== explica,
+       d.pintados + ' graficos · explicacion: ' + explica)
+  } else {
     af(v.padEnd(12) + ' sus ' + graficos + ' grafico(s) DIBUJARON',
        d.lienzos === graficos && d.pintados === graficos, d.pintados + ' pintados de ' + d.lienzos + ' lienzos')
   }

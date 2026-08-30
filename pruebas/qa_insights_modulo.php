@@ -85,6 +85,20 @@ $af('toda vista declarada está registrada en el menú',
 $af('todo menú apunta a una vista declarada',
     $sinDeclarar === [], $sinDeclarar ? implode(', ', $sinDeclarar) : count($menu) . ' entradas');
 
+/*
+| Y que el ARCHIVO exista. Este era el eslabon que faltaba: la cadena es
+| menu -> enrutador -> archivo, y solo se comprobaban los dos primeros.
+| Tres entradas del menu —Cartera, Transacciones e Indicadores— estaban
+| declaradas en los dos sitios y sin vista escrita. El front controller
+| responde 404 y a continuacion pinta el tablero, asi que al pulsar en el
+| menu se abria el Panel sin decir nada: el 404 no se ve en ninguna parte.
+*/
+$sinArchivo = array_values(array_filter($vistas, static fn(string $v): bool =>
+    !is_file(__DIR__ . '/../ds_insights/views/' . $v . '-view.php')));
+
+$af('toda vista declarada tiene su archivo',
+    $sinArchivo === [], $sinArchivo ? implode(', ', $sinArchivo) : count($vistas) . ' archivos');
+
 /*==============  3. El código de servidor no se sirve por URL  ==============*/
 foreach (['config/app.php', 'config/conexion.php', 'controllers/insightsController.php',
           'views/dashboard-view.php', 'cli/capturar_cartera.php'] as $ruta) {

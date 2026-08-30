@@ -361,5 +361,6 @@ CSS;
 	</script>
 
 	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/js/foto.js"></script>
-  </body>
+  	<script src="<?php echo ds_recurso('ds_core/assets/js/visor.js'); ?>"></script>
+</body>
 </html>

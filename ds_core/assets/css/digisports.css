@@ -672,15 +672,39 @@
    ninguna pantalla de aqui usa esa estructura. El resultado eran bloques
    pegados, sin una linea de aire: se leian como uno solo.
 
-   Se limita a las tarjetas que cuelgan DIRECTAMENTE del contenedor de la
-   pagina, que son las que se apilan una debajo de otra. Las que van dentro
-   de una columna quedan fuera a proposito: ahi el espaciado ya lo pone la
-   rejilla, y anadir margen las descuadraria.
-
    Las vistas pueden escribir mb-4 a mano —es lo que hace la propia
    plantilla en su ejemplo— y entonces manda la clase. Esto es la red para
    las que no lo hagan. */
 .app-content .container-fluid > .card { margin-bottom: 1.5rem; }
+
+/* Y lo mismo para las tarjetas que van en rejilla.
+   -------------------------------------------------------------------------
+   La primera version de la regla de arriba solo cubria la tarjeta suelta, y
+   dejaba fuera las que van en columna con este razonamiento: «ahi el
+   espaciado ya lo pone la rejilla».
+
+   NO LO PONE. En Bootstrap 5 el hueco vertical de la rejilla es
+   --bs-gutter-y, y vale CERO salvo que se pida. La rejilla separa en
+   horizontal y nada mas. Basketball no lo noto porque no usa ni una fila de
+   primer nivel: apila tarjetas sueltas y le bastaba la regla anterior.
+   Insights, Arena y League si las usan, y ahi TODOS los bloques quedaban a
+   0 px, uno encima de otro.
+
+   El margen va en la COLUMNA y no en la fila, porque asi resuelve los dos
+   casos con una sola regla:
+
+       entre filas          la ultima linea de columnas deja su aire debajo
+       al partirse en movil las columnas apiladas quedan separadas igual
+
+   No se usa --bs-gutter-y para esto: anade padding a las columnas Y un
+   margen superior NEGATIVO a la fila, y ese negativo se comeria justo la
+   separacion que se acaba de poner.
+
+   La .info-box trae 1rem propio de AdminLTE. Se anula dentro de estas
+   columnas para que todo el modulo respire el mismo 1.5rem y no haya una
+   fila con 40 px y las demas con 24. */
+.app-content .container-fluid > .row > [class*="col-"] { margin-bottom: 1.5rem; }
+.app-content .container-fluid > .row > [class*="col-"] > .info-box { margin-bottom: 0; }
 
 /* Las utilidades de color de TEXTO, legibles en los dos temas.
    -------------------------------------------------------------------------

@@ -1094,7 +1094,7 @@ CSS;
 	<script src="<?php echo APP_URL; ?>app/views/dist/js/ajax.js" ></script>	
 	<!-- fileinput -->
 
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/ekko-lightbox/ekko-lightbox.min.js"></script>
+	<script src="<?php echo ds_recurso('ds_core/assets/js/visor.js'); ?>"></script>
 		
 	<script>
 		$(document).ready(function () {
@@ -1124,12 +1124,7 @@ CSS;
 
 	<script>	
 		$(function () {
-			$(document).on('click', '[data-bs-toggle="lightbox"]', function(event) {
-			event.preventDefault();
-			$(this).ekkoLightbox({
-				alwaysShowClose: true
-			});
-			});
+			
 
 			$('.btn[data-filter]').on('click', function() {
 			$('.btn[data-filter]').removeClass('active');

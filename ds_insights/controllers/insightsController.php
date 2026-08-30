@@ -108,11 +108,39 @@ class insightsController
     | multiplicaria las oportunidades de equivocarse justo en el codigo que
     | protege el acceso.
     */
-    protected function sede(string $columna): string
+    /*
+    | Resuelve el ambito una sola vez por peticion y lo devuelve.
+    |
+    | Existe para que ningun sitio lea $this->ambito directamente: hacerlo
+    | funciona solo si otro metodo lo resolvio antes, y esa dependencia
+    | invisible ya produjo un filtro que se saltaba en carteraEvolucion().
+    */
+    protected function ambitoSedes(): array
     {
         if ($this->ambito === null) {
             $this->ambito = $this->sedesDelUsuario();
         }
+        return $this->ambito;
+    }
+
+    /*
+    | El snapshot de cartera guarda la sede en snapshot_sedeid, y NULL cuando
+    | el dato no tiene sede: es el caso de League (decision R5). Esas filas se
+    | conservan para el usuario limitado, por coherencia con el resto del
+    | modulo, donde League tampoco se acota.
+    */
+    protected function sedeSnapshot(string $columna): string
+    {
+        $ambito = $this->ambitoSedes();
+        if ($ambito === []) {
+            return '';
+        }
+        return ' AND (' . $columna . ' IS NULL OR ' . $columna
+             . ' IN (' . implode(',', $ambito) . '))';
+    }
+    protected function sede(string $columna): string
+    {
+        $this->ambitoSedes();
         if ($this->ambito === []) {
             return '';
         }
@@ -127,9 +155,7 @@ class insightsController
     */
     protected function sedeReserva(string $columna): string
     {
-        if ($this->ambito === null) {
-            $this->ambito = $this->sedesDelUsuario();
-        }
+        $this->ambitoSedes();
         if ($this->ambito === []) {
             return '';
         }
@@ -143,9 +169,7 @@ class insightsController
     */
     protected function sedeAlumno(string $columna): string
     {
-        if ($this->ambito === null) {
-            $this->ambito = $this->sedesDelUsuario();
-        }
+        $this->ambitoSedes();
         if ($this->ambito === []) {
             return '';
         }
@@ -601,7 +625,7 @@ class insightsController
                                    AND d.descuento_estado = 'S'
                                    AND c.catalogo_descripcion LIKE 'Beca%')"
             . $this->sede('a.alumno_sedeid'));
-        if ($sinPagar > 0) {
+        if ($this->superaUmbral('alumnos_sin_pago', $sinPagar)) {
             $avisos[] = ['tono' => 'danger', 'icono' => 'fa-user-clock',
                 'texto' => "$sinPagar alumno(s) activo(s) sin ningún pago de pensión registrado"];
         }
@@ -609,7 +633,7 @@ class insightsController
         $carteraArena = (float) $this->escalar(
             "SELECT IFNULL(SUM(reserva_saldo),0) FROM dsa_reserva WHERE reserva_estado <> 'X'"
             . $this->sede('reserva_sedeid'));
-        if ($carteraArena > 0) {
+        if ($this->superaUmbral('cartera_arena', $carteraArena)) {
             $avisos[] = ['tono' => 'warning', 'icono' => 'fa-warehouse',
                 'texto' => 'Arena tiene $' . number_format($carteraArena, 2) . ' por cobrar en reservas'];
         }
@@ -617,7 +641,7 @@ class insightsController
         $vencidas = (int) $this->escalar(
             "SELECT COUNT(*) FROM alumno_pago WHERE pago_estado = 'P' AND pago_saldo > 0"
             . $this->sede('pago_sedeid'));
-        if ($vencidas > 0) {
+        if ($this->superaUmbral('pagos_pendientes', $vencidas)) {
             $avisos[] = ['tono' => 'warning', 'icono' => 'fa-file-invoice-dollar',
                 'texto' => "$vencidas pago(s) de Basketball con saldo pendiente"];
         }
@@ -638,7 +662,7 @@ class insightsController
                 AND a.alumno_estado = 'A'
                 AND c.catalogo_descripcion LIKE 'Beca 100%'"
             . $this->sede('a.alumno_sedeid'));
-        if ((int) ($beca[0]['n'] ?? 0) > 0) {
+        if ($this->superaUmbral('becas_completas', (float) ($beca[0]['n'] ?? 0))) {
             $avisos[] = ['tono' => 'info', 'icono' => 'fa-graduation-cap',
                 'texto' => (int) $beca[0]['n'] . ' beca(s) del 100 % suponen $'
                     . number_format((float) $beca[0]['v'], 2)
@@ -650,7 +674,7 @@ class insightsController
                JOIN dsl_estado e ON e.estado_id = p.partido_estadoid
               WHERE e.estado_codigo = 'FINALIZADO'
                 AND (p.partido_puntoslocal IS NULL OR p.partido_puntosvisitante IS NULL)");
-        if ($sinResultado > 0) {
+        if ($this->superaUmbral('partidos_sin_resultado', $sinResultado)) {
             $avisos[] = ['tono' => 'warning', 'icono' => 'fa-trophy',
                 'texto' => "$sinResultado partido(s) finalizado(s) sin resultado registrado"];
         }
@@ -659,7 +683,7 @@ class insightsController
             "SELECT COUNT(*) FROM dsl_obligacion
               WHERE obligacion_estado NOT IN ('PAGADA','ANULADA')
                 AND obligacion_vence < CURDATE()");
-        if ($obligVencidas > 0) {
+        if ($this->superaUmbral('obligaciones_vencidas', $obligVencidas)) {
             $avisos[] = ['tono' => 'warning', 'icono' => 'fa-clock',
                 'texto' => "$obligVencidas obligación(es) de League vencida(s) sin pagar"];
         }
@@ -1867,6 +1891,480 @@ class insightsController
         return $a;
     }
 
+
+    /*==================================================================
+    | Cartera — lo que se debe
+    |==================================================================
+    | El tablero ya dice CUANTO se debe. Esta seccion dice de QUE, de QUIEN
+    | y DESDE CUANDO, que es lo que permite hacer algo al respecto.
+    |
+    |
+    | LA ANTIGUEDAD NO SE MIDE IGUAL EN LOS TRES MODULOS, Y NO ES UN DESCUIDO
+    |
+    | Cada uno guarda una fecha distinta y solo uno tiene vencimiento real:
+    |
+    |     League       obligacion_vence. Es una fecha de vencimiento de
+    |                  verdad: antes de ella no se debe nada.
+    |
+    |     Arena        reserva_fecha, el dia de la reserva. Una reserva
+    |                  FUTURA con saldo no es mora: es una reserva que
+    |                  todavia no se ha usado. Se separa como «aun no
+    |                  vencida» en vez de meterla en el tramo mas reciente,
+    |                  que es lo que haria un DATEDIFF a secas y abultaria
+    |                  la deuda joven con dinero que ni siquiera es exigible.
+    |
+    |     Basketball   pago_fecha, la fecha del pago. NO hay vencimiento en
+    |                  la tabla, asi que la antiguedad se cuenta desde ahi.
+    |                  Es una aproximacion y la pantalla lo rotula: decir
+    |                  «90 dias de mora» cuando lo que se sabe es «registrado
+    |                  hace 90 dias» seria afirmar mas de lo que el dato
+    |                  aguanta.
+    |
+    | Homogeneizarlo exigiria una fecha de vencimiento en alumno_pago, que es
+    | un cambio del modulo Basketball y no de este. Queda anotado.
+    */
+
+    /** Los tramos de antiguedad, en un solo sitio para que los tres coincidan. */
+    protected function tramosCartera(): array
+    {
+        return [
+            ['clave' => 'porVencer', 'nombre' => 'Aún no vencida', 'desde' => null, 'hasta' => null],
+            ['clave' => 'd30',       'nombre' => 'Hasta 30 días',  'desde' => 0,    'hasta' => 30],
+            ['clave' => 'd60',       'nombre' => '31 a 60 días',   'desde' => 31,   'hasta' => 60],
+            ['clave' => 'd90',       'nombre' => '61 a 90 días',   'desde' => 61,   'hasta' => 90],
+            ['clave' => 'mas',       'nombre' => 'Más de 90 días', 'desde' => 91,   'hasta' => null],
+        ];
+    }
+
+    /*
+    | Deuda viva por sede y modulo.
+    |
+    | League no aparece por sede sino en su propia fila: sus torneos pueden
+    | organizarse fuera de las canchas del club y no se le puede atribuir una
+    | sede sin inventarla (decision R5). Repartirlo a prorrateo daria una
+    | tabla mas bonita y una cifra falsa.
+    */
+    public function carteraPorSede(): array
+    {
+        $filas = $this->filas(
+            "SELECT s.sede_id, s.sede_nombre nombre,
+                    IFNULL(bk.v, 0) basketball, IFNULL(bk.n, 0) bkn,
+                    IFNULL(ar.v, 0) arena,      IFNULL(ar.n, 0) arn
+               FROM general_sede s
+               LEFT JOIN (SELECT pago_sedeid sede, SUM(pago_saldo) v, COUNT(*) n
+                            FROM alumno_pago
+                           WHERE pago_estado = 'P' AND pago_saldo > 0
+                           GROUP BY pago_sedeid) bk ON bk.sede = s.sede_id
+               LEFT JOIN (SELECT reserva_sedeid sede, SUM(reserva_saldo) v, COUNT(*) n
+                            FROM dsa_reserva
+                           WHERE reserva_estado <> 'X' AND reserva_saldo > 0
+                           GROUP BY reserva_sedeid) ar ON ar.sede = s.sede_id
+              WHERE 1 = 1"
+            . $this->sede('s.sede_id') . "
+              ORDER BY (IFNULL(bk.v,0) + IFNULL(ar.v,0)) DESC, s.sede_nombre");
+
+        $r = [];
+        foreach ($filas as $f) {
+            $total = (float) $f['basketball'] + (float) $f['arena'];
+            if ($total <= 0) { continue; }
+            $r[] = [
+                'nombre'     => $f['nombre'],
+                'basketball' => (float) $f['basketball'], 'bkn' => (int) $f['bkn'],
+                'arena'      => (float) $f['arena'],      'arn' => (int) $f['arn'],
+                'total'      => $total,
+            ];
+        }
+        return $r;
+    }
+
+    /*
+    | Antiguedad de la deuda, por modulo.
+    |
+    | Se calcula en SQL con CASE y no en PHP recorriendo filas: son 1.700
+    | reservas con saldo y traerlas al servidor para clasificarlas seria mover
+    | datos para hacer una suma que la base hace sola.
+    */
+    public function carteraAntiguedad(): array
+    {
+        $tramo = static function (string $fecha): string {
+            return "CASE WHEN $fecha > CURDATE()                    THEN 'porVencer'
+                         WHEN DATEDIFF(CURDATE(), $fecha) <= 30     THEN 'd30'
+                         WHEN DATEDIFF(CURDATE(), $fecha) <= 60     THEN 'd60'
+                         WHEN DATEDIFF(CURDATE(), $fecha) <= 90     THEN 'd90'
+                         ELSE 'mas' END";
+        };
+
+        $vacio = [];
+        foreach ($this->tramosCartera() as $t) { $vacio[$t['clave']] = ['v' => 0.0, 'n' => 0]; }
+
+        $r = ['basketball' => $vacio, 'arena' => $vacio, 'league' => $vacio];
+
+        foreach ($this->filas(
+            "SELECT " . $tramo('pago_fecha') . " tramo, SUM(pago_saldo) v, COUNT(*) n
+               FROM alumno_pago
+              WHERE pago_estado = 'P' AND pago_saldo > 0"
+            . $this->sede('pago_sedeid') . "
+              GROUP BY tramo") as $f) {
+            $r['basketball'][$f['tramo']] = ['v' => (float) $f['v'], 'n' => (int) $f['n']];
+        }
+
+        foreach ($this->filas(
+            "SELECT " . $tramo('reserva_fecha') . " tramo, SUM(reserva_saldo) v, COUNT(*) n
+               FROM dsa_reserva
+              WHERE reserva_estado <> 'X' AND reserva_saldo > 0"
+            . $this->sede('reserva_sedeid') . "
+              GROUP BY tramo") as $f) {
+            $r['arena'][$f['tramo']] = ['v' => (float) $f['v'], 'n' => (int) $f['n']];
+        }
+
+        /* League usa su vencimiento real, que es lo que deberian tener los
+           otros dos. El saldo se calcula: obligacion menos lo abonado. */
+        foreach ($this->filas(
+            "SELECT " . $tramo('o.obligacion_vence') . " tramo,
+                    SUM(o.obligacion_valor - o.obligacion_descuento + o.obligacion_recargo
+                        - IFNULL((SELECT SUM(a.abono_valor) FROM dsl_abono a
+                                   WHERE a.abono_obligacionid = o.obligacion_id
+                                     AND a.abono_anulado = 'N'), 0)) v,
+                    COUNT(*) n
+               FROM dsl_obligacion o
+              WHERE o.obligacion_estado NOT IN ('PAGADA','ANULADA')
+              GROUP BY tramo") as $f) {
+            $r['league'][$f['tramo']] = ['v' => (float) $f['v'], 'n' => (int) $f['n']];
+        }
+
+        return $r;
+    }
+
+    /*
+    | Evolucion mensual, leida del snapshot y NO recalculada.
+    |
+    | Es la razon de ser de insights_cartera_snapshot (decision R10): la deuda
+    | de marzo no se puede reconstruir hoy, porque los saldos de entonces ya
+    | se cobraron y la tabla solo guarda el estado actual. Preguntarle a la
+    | base «cuanto se debia en marzo» devolveria lo que se debe HOY de marzo,
+    | que es una cifra distinta y sistematicamente menor.
+    */
+    public function carteraEvolucion(int $meses = 8): array
+    {
+        $filas = $this->filas(
+            "SELECT snapshot_periodo periodo, snapshot_modulo modulo,
+                    SUM(snapshot_valor) v, SUM(snapshot_deudores) d
+               FROM insights_cartera_snapshot
+              WHERE snapshot_tipo = 'REGISTRADA'"
+            . $this->sedeSnapshot('snapshot_sedeid') . "
+              GROUP BY snapshot_periodo, snapshot_modulo
+              ORDER BY snapshot_periodo DESC
+              LIMIT " . (int) ($meses * 3));
+
+        $r = [];
+        foreach (array_reverse($filas) as $f) {
+            $p = $f['periodo'];
+            if (!isset($r[$p])) {
+                $r[$p] = ['periodo' => $p, 'basketball' => 0.0, 'arena' => 0.0,
+                          'league' => 0.0, 'deudores' => 0, 'total' => 0.0];
+            }
+            $r[$p][$f['modulo']] = (float) $f['v'];
+            $r[$p]['deudores']  += (int) $f['d'];
+            $r[$p]['total']     += (float) $f['v'];
+        }
+        return array_values($r);
+    }
+
+    /*
+    | La deuda de quien ya no esta.
+    |
+    | Decision R12: cuenta en un KPI aparte y no en la cartera general. Un
+    | alumno retirado con saldo no es cobrable de la misma manera que uno
+    | activo, y sumarlos da una cifra que nadie puede gestionar. Separarlos
+    | permite decidir sobre cada una: perseguir la primera, provisionar la
+    | segunda.
+    */
+    public function carteraRetirados(): array
+    {
+        $r = $this->filas(
+            "SELECT IFNULL(SUM(p.pago_saldo), 0) v,
+                    COUNT(DISTINCT p.pago_alumnoid) alumnos
+               FROM alumno_pago p
+               JOIN sujeto_alumno a ON a.alumno_id = p.pago_alumnoid
+              WHERE p.pago_estado = 'P' AND p.pago_saldo > 0
+                AND a.alumno_estado <> 'A'"
+            . $this->sede('p.pago_sedeid'));
+
+        return ['valor' => (float) ($r[0]['v'] ?? 0), 'alumnos' => (int) ($r[0]['alumnos'] ?? 0)];
+    }
+
+    /*
+    | Quien debe, de mayor a menor.
+    |
+    | AQUI APARECEN DATOS PERSONALES, y por eso esta acotado de tres maneras:
+    |
+    |   · solo alumnos ACTIVOS con saldo: la lista sirve para gestionar cobro,
+    |     no para tener un fichero de morosos historicos;
+    |   · un limite duro, porque una tabla de 300 nombres no se gestiona y
+    |     ademas volcarla al navegador va contra el §51;
+    |   · el ambito de sede del usuario, como todo lo demas.
+    |
+    | Se devuelve tambien la fecha del saldo mas antiguo: sin ella la lista
+    | ordena por importe y esconde al que debe poco desde hace mucho, que
+    | suele ser el caso que hay que atender primero.
+    */
+    public function carteraDeudores(int $limite = 25): array
+    {
+        $limite = max(1, min(100, $limite));
+
+        return $this->filas(
+            "SELECT a.alumno_id,
+                    /* El nombre corto basta para gestionar el cobro. No se trae
+                       identificacion ni nombre completo: minimizacion de datos. */
+                    IFNULL(NULLIF(a.alumno_nombrecorto, ''),
+                           CONCAT(a.alumno_primernombre, ' ', a.alumno_apellidopaterno)) nombre,
+                    s.sede_nombre sede,
+                    SUM(p.pago_saldo) saldo,
+                    COUNT(*) cuotas,
+                    MIN(p.pago_fecha) masAntiguo,
+                    DATEDIFF(CURDATE(), MIN(p.pago_fecha)) dias
+               FROM alumno_pago p
+               JOIN sujeto_alumno a ON a.alumno_id = p.pago_alumnoid
+               JOIN general_sede  s ON s.sede_id   = p.pago_sedeid
+              WHERE p.pago_estado = 'P' AND p.pago_saldo > 0
+                AND a.alumno_estado = 'A'"
+            . $this->sede('p.pago_sedeid') . "
+              GROUP BY a.alumno_id, nombre, s.sede_nombre
+              ORDER BY saldo DESC
+              LIMIT $limite");
+    }
+
+
+    /*==================================================================
+    | Transacciones — el último salto del drill-down
+    |==================================================================
+    | Aqui el dato deja de ser agregado y pasa a ser un pago concreto de una
+    | persona concreta. Por eso «transacciones» es una entrada de menu propia
+    | con su propio permiso de lectura: quien puede ver que la sede recaudo
+    | $11.000 no tiene por que poder ver quien pago cada cuota (§7).
+    |
+    |
+    | LA PAGINACION ES DEL SERVIDOR, NO DEL NAVEGADOR
+    |
+    | Son 5.499 transacciones. Volcarlas todas y dejar que DataTables pagine
+    | en el navegador es justo lo que prohibe el §51, y ademas no escala: cada
+    | mes que pasa la pagina tarda mas en cargar aunque el usuario solo mire
+    | las veinte primeras filas.
+    |
+    | Se piden LIMIT filas y se cuenta aparte. Dos consultas en vez de una,
+    | pero la segunda es un COUNT que la base resuelve sin traer nada.
+    |
+    |
+    | SOLO SE CONSULTAN LOS MODULOS QUE SE PIDEN
+    |
+    | Con el filtro de modulo puesto, la UNION se arma con una sola rama en
+    | vez de tres. No es una optimizacion prematura: filtrar por modulo es lo
+    | primero que hace cualquiera que busca un pago, y unir 4.841 filas de
+    | Arena para acabar descartandolas seria trabajo tirado.
+    |
+    |
+    | LOS NOMBRES SE MUESTRAN, Y SE MUESTRAN AL MINIMO
+    |
+    | Del alumno va el nombre corto; ni identificacion, ni telefono, ni
+    | direccion. Ver quien pago es el proposito de la pantalla —sin eso no
+    | sirve para conciliar nada—, pero eso no obliga a arrastrar el resto de
+    | la ficha.
+    */
+
+    /** Los modulos que esta pantalla sabe listar, con su etiqueta. */
+    public function modulosTransaccion(): array
+    {
+        return ['basketball' => 'Basketball', 'arena' => 'Arena', 'league' => 'League'];
+    }
+
+    /*
+    | Devuelve una pagina de transacciones y cuantas hay en total.
+    |
+    | $filtros: desde, hasta, modulo ('' = los tres)
+    */
+    public function transaccionesDetalle(array $filtros, int $pagina = 1, int $porPagina = 50): array
+    {
+        $porPagina = max(10, min(200, $porPagina));
+        $pagina    = max(1, $pagina);
+
+        $modulo = (string) ($filtros['modulo'] ?? '');
+        if (!isset($this->modulosTransaccion()[$modulo])) { $modulo = ''; }
+
+        $params = [':d' => $filtros['desde'], ':h' => $filtros['hasta']];
+        $ramas  = [];
+
+        if ($modulo === '' || $modulo === 'basketball') {
+            $ramas[] = "SELECT 'basketball' modulo, p.pago_id id, p.pago_fecha fecha,
+                               s.sede_nombre sede,
+                               IFNULL(c.catalogo_descripcion, p.pago_rubroid) concepto,
+                               IFNULL(NULLIF(a.alumno_nombrecorto, ''),
+                                      CONCAT(a.alumno_primernombre, ' ', a.alumno_apellidopaterno)) quien,
+                               p.pago_valor valor, p.pago_recibo referencia
+                          FROM alumno_pago p
+                          JOIN sujeto_alumno a ON a.alumno_id = p.pago_alumnoid
+                          LEFT JOIN general_sede s ON s.sede_id = p.pago_sedeid
+                          LEFT JOIN general_tabla_catalogo c
+                                 ON c.catalogo_valor = p.pago_rubroid AND c.catalogo_tablaid = 5
+                         WHERE p.pago_estado = 'C' AND p.pago_fecha BETWEEN :d AND :h"
+                     . $this->sede('p.pago_sedeid');
+        }
+
+        if ($modulo === '' || $modulo === 'arena') {
+            $ramas[] = "SELECT 'arena' modulo, p.pago_id id, p.pago_fecha fecha,
+                               s.sede_nombre sede,
+                               i.instalacion_nombre concepto,
+                               cl.cliente_nombre quien,
+                               p.pago_valor valor, p.pago_referencia referencia
+                          FROM dsa_pago p
+                          JOIN dsa_reserva r      ON r.reserva_id = p.pago_reservaid
+                          LEFT JOIN dsa_instalacion i ON i.instalacion_id = r.reserva_instalacionid
+                          LEFT JOIN general_sede  s  ON s.sede_id = r.reserva_sedeid
+                          LEFT JOIN dsa_cliente   cl ON cl.cliente_id = r.reserva_clienteid
+                         WHERE p.pago_estado = 'A' AND p.pago_fecha BETWEEN :d AND :h"
+                     . $this->sede('r.reserva_sedeid');
+        }
+
+        if ($modulo === '' || $modulo === 'league') {
+            /* League no tiene sede (R5): la columna va nula y la pantalla lo
+               rotula como «fuera de sede» en vez de dejar un hueco. */
+            $ramas[] = "SELECT 'league' modulo, ab.abono_id id, ab.abono_fecha fecha,
+                               NULL sede,
+                               co.concepto_nombre concepto,
+                               eq.equipo_nombre quien,
+                               ab.abono_valor valor, ab.abono_referencia referencia
+                          FROM dsl_abono ab
+                          JOIN dsl_obligacion o ON o.obligacion_id = ab.abono_obligacionid
+                          LEFT JOIN dsl_concepto co ON co.concepto_id = o.obligacion_conceptoid
+                          LEFT JOIN dsl_equipo   eq ON eq.equipo_id   = o.obligacion_equipoid
+                         WHERE ab.abono_anulado = 'N' AND ab.abono_fecha BETWEEN :d AND :h";
+        }
+
+        if ($ramas === []) {
+            return ['filas' => [], 'total' => 0, 'pagina' => 1, 'paginas' => 1, 'suma' => 0.0];
+        }
+
+        $union = implode("\n UNION ALL\n", $ramas);
+
+        /* El total y la suma, de una sola pasada sobre la union. */
+        $resumen = $this->filas(
+            "SELECT COUNT(*) n, IFNULL(SUM(valor), 0) v FROM ($union) t", $params);
+
+        $total   = (int)   ($resumen[0]['n'] ?? 0);
+        $suma    = (float) ($resumen[0]['v'] ?? 0);
+        $paginas = max(1, (int) ceil($total / $porPagina));
+        $pagina  = min($pagina, $paginas);
+        $desplaz = ($pagina - 1) * $porPagina;
+
+        /* LIMIT y OFFSET son enteros ya acotados arriba, no texto del usuario:
+           van en linea porque MySQL no admite marcadores ahi con emulacion
+           desactivada. */
+        $filas = $this->filas(
+            "SELECT * FROM ($union) t
+              ORDER BY t.fecha DESC, t.id DESC
+              LIMIT $porPagina OFFSET $desplaz", $params);
+
+        return ['filas' => $filas, 'total' => $total, 'suma' => $suma,
+                'pagina' => $pagina, 'paginas' => $paginas, 'porPagina' => $porPagina];
+    }
+
+
+    /*==================================================================
+    | Umbrales del centro de atención
+    |==================================================================
+    | «Requiere tu atencion» avisaba con la condicion mas simple que existe:
+    | mayor que cero. Con 266 alumnos eso significa que avisa siempre, y un
+    | panel que avisa siempre no avisa de nada: se aprende a no mirarlo.
+    |
+    | Cual es el numero que merece atencion lo sabe la escuela, no el codigo.
+    | Por eso vive en insights_umbral (migracion 054) y no en una constante.
+    |
+    | El umbral apaga el AVISO, nunca el calculo: las pantallas siguen
+    | mostrando la cifra entera. Solo cambia cuando el panel levanta la mano.
+    */
+
+    /** Los umbrales, leidos una sola vez por peticion. */
+    private ?array $umbralesCache = null;
+
+    public function umbrales(): array
+    {
+        if ($this->umbralesCache === null) {
+            $this->umbralesCache = [];
+            foreach ($this->filas(
+                "SELECT umbral_id, umbral_codigo, umbral_nombre, umbral_ayuda,
+                        umbral_unidad, umbral_valor, umbral_estado, umbral_orden,
+                        umbral_modificado
+                   FROM insights_umbral
+                  ORDER BY umbral_orden, umbral_id") as $u) {
+                $this->umbralesCache[$u['umbral_codigo']] = $u;
+            }
+        }
+        return $this->umbralesCache;
+    }
+
+    /*
+    | ¿La medida merece aviso?
+    |
+    | Si el codigo no existe en la tabla se avisa igual —comportamiento de
+    | antes—. Un umbral que se borra por error no puede tener el efecto de
+    | silenciar un aviso en silencio: eso seria justo el fallo que no se
+    | descubre nunca.
+    */
+    protected function superaUmbral(string $codigo, float $medida): bool
+    {
+        $u = $this->umbrales()[$codigo] ?? null;
+
+        if ($u === null)                  { return $medida > 0; }
+        if ($u['umbral_estado'] !== 'A')  { return false; }
+
+        return $medida >= (float) $u['umbral_valor'];
+    }
+
+    /*
+    | Guarda los umbrales que cambian, y solo esos.
+    |
+    | Escribe en insights_umbral, que es tabla del propio modulo: el candado
+    | de InsightsConexion la admite justamente para esto. No se toca ni una
+    | fila de otro modulo.
+    |
+    | Devuelve cuantos cambiaron de verdad. Reescribir los seis en cada envio
+    | ensuciaria la marca de «modificado por» de los que nadie toco, y esa
+    | marca es lo que permite entender despues por que un aviso dejo de salir.
+    */
+    public function guardarUmbrales(array $enviados): int
+    {
+        $actuales = $this->umbrales();
+        $cambios  = 0;
+
+        foreach ($enviados as $codigo => $datos) {
+            if (!isset($actuales[$codigo])) { continue; }
+
+            $valor  = round(max(0, (float) ($datos['valor'] ?? 0)), 2);
+            $estado = ($datos['estado'] ?? 'A') === 'A' ? 'A' : 'I';
+
+            $mismo = abs($valor - (float) $actuales[$codigo]['umbral_valor']) < 0.005
+                  && $estado === $actuales[$codigo]['umbral_estado'];
+            if ($mismo) { continue; }
+
+            $q = $this->conexion()->prepare(
+                "UPDATE insights_umbral
+                    SET umbral_valor = :v, umbral_estado = :e,
+                        umbral_usuarioid = :u, umbral_modificado = NOW()
+                  WHERE umbral_codigo = :c");
+            $q->execute([
+                ':v' => $valor, ':e' => $estado,
+                ':u' => usuario_actual_id(), ':c' => $codigo,
+            ]);
+            $cambios++;
+        }
+
+        if ($cambios > 0) {
+            $this->umbralesCache = null;
+            $this->auditar('EDITAR_UMBRALES', 'configuracion', ['filas' => $cambios]);
+        }
+
+        return $cambios;
+    }
+
     /*==============  Catalogo de reportes  ==============*/
     /*
     | El catalogo vive en codigo y no en una tabla, a proposito: cada entrada
@@ -1902,6 +2400,35 @@ class insightsController
                 'icono'    => 'fas fa-dollar-sign',
                 'vista'    => 'financiero',
                 'url'      => APP_URL . 'financiero/',
+                'externo'  => false,
+            ],
+            'cartera' => [
+                'titulo'   => 'Cartera',
+                'resumen'  => 'Lo que se debe: por módulo, por sede y por antigüedad, con la evolución mensual y quiénes deben. Separa la deuda de alumnos retirados.',
+                'categoria'=> 'Financiero',
+                'icono'    => 'fas fa-hand-holding-usd',
+                'vista'    => 'cartera',
+                'url'      => APP_URL . 'cartera/',
+                'externo'  => false,
+            ],
+
+            'transacciones' => [
+                'titulo'   => 'Transacciones',
+                'resumen'  => 'El detalle pago a pago de los tres módulos, con filtros de periodo y módulo. Muestra personas identificadas, así que exige su propio permiso.',
+                'categoria'=> 'Financiero',
+                'icono'    => 'fas fa-list-ul',
+                'vista'    => 'transacciones',
+                'url'      => APP_URL . 'transacciones/',
+                'externo'  => false,
+            ],
+
+            'indicadores' => [
+                'titulo'   => 'Indicadores',
+                'resumen'  => 'Desde qué número el panel levanta la mano. Cambiar un umbral silencia o despierta un aviso; nunca oculta una cifra.',
+                'categoria'=> 'Gerencial',
+                'icono'    => 'fas fa-sliders-h',
+                'vista'    => 'configuracion',
+                'url'      => APP_URL . 'configuracion/',
                 'externo'  => false,
             ],
             'becas' => [
@@ -2116,6 +2643,27 @@ class insightsController
     public function datosExportables(string $reporte, array $p): ?array
     {
         switch ($reporte) {
+            /*
+            | La cartera NO se filtra por periodo aunque el boton mande las
+            | fechas: es un saldo vivo. Se ignoran a proposito, y la cabecera
+            | del archivo sigue diciendo el periodo porque asi el lector sabe
+            | CUANDO se saco la foto, que es la fecha que importa aqui.
+            */
+            case 'cartera':
+                $filas = [];
+                foreach ($this->carteraPorSede() as $s) {
+                    $filas[] = [$s['nombre'], $s['basketball'], $s['bkn'],
+                                 $s['arena'], $s['arn'], $s['total']];
+                }
+                return [
+                    'titulo'    => 'Cartera por sede',
+                    'vista'     => 'cartera',
+                    'cabeceras' => ['Sede', 'Basketball', 'Documentos BK',
+                                     'Arena', 'Documentos AR', 'Total'],
+                    'tipos'     => ['texto', 'dinero', 'entero', 'dinero', 'entero', 'dinero'],
+                    'filas'     => $filas,
+                ];
+
             case 'financiero':
                 $filas = [];
                 foreach ($this->ingresosPorSede($p) as $s) {
@@ -2222,6 +2770,7 @@ class insightsController
             'conceptos'     => 'Ingresos por concepto',
             'becas'         => 'Becas y descuentos',
             'retencion'     => 'Retención por cohorte',
+            'cartera'       => 'Cartera por sede',
             'instalaciones' => 'Ocupación por instalación',
             'torneos'       => 'Torneos',
         ];

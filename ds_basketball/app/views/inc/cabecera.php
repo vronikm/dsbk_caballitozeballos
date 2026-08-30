@@ -49,7 +49,10 @@ $hojasExtra = [
         DS_HUB_URL . 'ds_core/assets/vendor/datatables2/css/buttons.bootstrap5.min.css',
     ],
     'dropzone'   => [APP_URL . 'app/views/dist/plugins/dropzone/min/dropzone.min.css'],
-    'lightbox'   => [APP_URL . 'app/views/dist/plugins/ekko-lightbox/ekko-lightbox.css'],
+    /* El visor ya no necesita hoja propia: usa el modal de Bootstrap y sus
+       clases. La entrada se queda para no tocar el $extras de las siete
+       vistas que la piden, pero no carga nada. */
+    'lightbox'   => [],
     'select2'    => [
         APP_URL . 'app/views/dist/plugins/select2/css/select2.min.css',
         APP_URL . 'app/views/dist/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css',

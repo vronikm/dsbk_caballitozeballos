@@ -286,7 +286,7 @@ CSS;
 	<!-- BS-Stepper -->
 
 	<!-- Ekko Lightbox -->
-	<script src="<?php echo APP_URL; ?>app/views/dist/plugins/ekko-lightbox/ekko-lightbox.min.js"></script>
+	<script src="<?php echo ds_recurso('ds_core/assets/js/visor.js'); ?>"></script>
 	
 	<!-- AdminLTE App -->
 	<script src="<?php echo DS_HUB_URL; ?>ds_core/assets/vendor/adminlte4/js/adminlte.min.js"></script>
@@ -300,12 +300,7 @@ CSS;
 	<!-- Page specific script -->
 	<script>
 	$(function () {
-		$(document).on('click', '[data-bs-toggle="lightbox"]', function(event) {
-		event.preventDefault();
-		$(this).ekkoLightbox({
-			alwaysShowClose: true
-		});
-		});
+		
 
 		$('.btn[data-filter]').on('click', function() {
 		$('.btn[data-filter]').removeClass('active');

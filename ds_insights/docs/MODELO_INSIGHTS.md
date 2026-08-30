@@ -495,6 +495,94 @@ ninguna. Queda como pregunta abierta para la escuela. Si se decide ocultarlas,
 el cambio es un ayudante más y un `AND 1 = 0`; no hay que rehacer nada.
 
 ---
+## 12 ter. Las tres pantallas que faltaban
+
+La migración 048 registró once entradas de menú. Se escribieron ocho. Las
+otras tres —**Cartera**, **Transacciones** e **Indicadores**— quedaron
+declaradas en el menú y en el enrutador, y sin archivo de vista.
+
+### Por qué no se notó
+
+`ds_insights/index.php` responde 404 cuando el archivo no existe **y a
+continuación pinta el tablero**. El código de estado es correcto y nadie lo
+ve: el navegador muestra el Panel, y quien pulsa «Cartera» concluye que el
+enlace no hace nada. Lo encontró el usuario, no el arnés.
+
+El arnés comprobaba **menú ↔ enrutador** en los dos sentidos, y las tres
+estaban bien declaradas en ambos. La cadena real es menú → enrutador →
+**archivo**, y el tercer eslabón no se miraba. Ya se comprueba.
+
+### Cartera
+
+Saldo vivo, sin filtro de periodo: la deuda no es un flujo. La evolución
+mensual se lee del snapshot y **no se recalcula** (decisión R10): preguntarle
+hoy a la base cuánto se debía en marzo devuelve lo que se debe *hoy* de marzo,
+que es sistemáticamente menor.
+
+La antigüedad no se mide igual en los tres módulos, y la pantalla lo rotula:
+
+| módulo | se cuenta desde | es un vencimiento real |
+|---|---|---|
+| League | `obligacion_vence` | **sí** |
+| Arena | `reserva_fecha` | no |
+| Basketball | `pago_fecha` | no — la tabla no guarda vencimiento |
+
+Las reservas **futuras** con saldo van a su propia columna, «aún no vencida».
+Un `DATEDIFF` a secas las metería en el tramo más reciente y abultaría la
+deuda joven con dinero que todavía no es exigible: son $17.670,80 de $26.954,47,
+así que no es un matiz.
+
+Homogeneizarlo pide una fecha de vencimiento en `alumno_pago`, que es un
+cambio de Basketball y no de Insights. Queda anotado.
+
+### Transacciones
+
+El último salto del drill-down (§7). Paginación **del servidor**: son 5.499
+filas y volcarlas al navegador es lo que prohíbe el §51. Por eso tampoco lleva
+el buscador de DataTables — buscaría sólo dentro de la página visible y daría
+la impresión de haber mirado en todas.
+
+Con el filtro de módulo puesto, la UNION se arma con una sola rama en vez de
+tres. Medido: 649 transacciones del mes en 67 ms; el año entero, 5.499 en 110
+páginas, 132 ms.
+
+Es la única pantalla del módulo que muestra pagos de personas identificadas,
+así que registra en la bitácora quién la consultó y con qué periodo. Del
+alumno va el nombre corto y nada más.
+
+### Indicadores
+
+«Requiere tu atención» avisaba con la condición más simple que existe: mayor
+que cero. Con 266 alumnos eso significa que avisa **siempre**, y un panel que
+avisa siempre no avisa de nada.
+
+Los umbrales viven en `insights_umbral` (migración 054) y se siembran con
+valor 1, que reproduce exactamente el comportamiento anterior: primero se hace
+configurable, después la escuela decide sus números.
+
+Escribir aquí no contradice «Insights sólo lee»: es tabla propia, el candado
+de `InsightsConexion` la admite, y guardar exige `permiso_editar`, CSRF y deja
+registro de quién y cuándo.
+
+Si un código de umbral desaparece de la tabla, el aviso **vuelve a avisar
+siempre** en vez de callarse. Un umbral borrado por error no puede tener el
+efecto de silenciar algo en silencio.
+
+### Un tropiezo que conviene recordar
+
+La migración 054 se aplicó con `mysql.exe` sin declarar el juego de
+caracteres, y «pensión» se guardó como «pensi├│n». Lo peor no fue el fallo
+sino la comprobación: `mb_check_encoding($texto, 'UTF-8')` devolvió **true**,
+porque esos bytes son UTF-8 perfectamente válido — sólo que dicen otra cosa.
+La función mira que los bytes estén bien formados, no que signifiquen lo que
+deben.
+
+Se vio en una captura de pantalla, no en una prueba. Las migraciones desde la
+017 ya declaraban `SET NAMES utf8mb4`; la 054 no seguía esa convención y ahora
+sí. Un barrido de las 93 tablas con texto confirmó que el daño se limitaba a
+esa fila.
+
+---
 ## 13. Decisiones tomadas
 
 Resueltas el 2026-08-28. Cada una cambia el diseño, no sólo el papeleo.

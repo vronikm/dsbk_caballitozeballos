@@ -57,7 +57,8 @@ $ctrl = (string) file_get_contents(__DIR__ . '/../ds_insights/controllers/insigh
    una sin inventarla. */
 $conSede = ['sujeto_alumno', 'alumno_pago', 'alumno_pago_descuento',
             'dsa_reserva', 'dsa_pago', 'dsa_instalacion', 'dsa_horario',
-            'insights_v_asistencia_dia', 'facturas_electronicas'];
+            'insights_v_asistencia_dia', 'facturas_electronicas',
+            'insights_cartera_snapshot'];
 
 /* Métodos que consultan esas tablas pero NO necesitan acotarse, y por qué.
    La lista es corta a propósito: cada excepción es una puerta. */
@@ -67,6 +68,9 @@ $exentos = [
     'sedeReserva'    => 'es el propio ayudante',
     'sedeAlumno'     => 'es el propio ayudante',
     'sedesDelUsuario' => 'lee el ámbito',
+    'ambitoSedes'    => 'resuelve el ámbito',
+    'sedeSnapshot'   => 'es el propio ayudante',
+    'tramosCartera'  => 'devuelve los tramos de antigüedad, no consulta nada',
     'proximosPartidos' => 'es de League, que no tiene sede (R5); toca dsa_instalacion
                            sólo para poner el nombre del escenario',
 ];
@@ -82,14 +86,29 @@ for ($i = 0; $i < $n; $i++) {
     $fin = $i + 1 < $n ? $m[0][$i + 1][1] : strlen($ctrl);
     $cuerpo = substr($ctrl, $ini, $fin - $ini);
 
-    if (!preg_match('~SELECT~i', $cuerpo)) { continue; }
+    /*
+    | Fuera los comentarios antes de mirar nada.
+    |
+    | El troceo va de una declaracion de metodo a la siguiente, asi que un
+    | bloque de comentario escrito ENTRE dos metodos cae dentro del cuerpo
+    | del anterior. Basto con documentar la cartera —la explicacion nombra
+    | alumno_pago— para que leagueAnomalias saliera roja sin haber cambiado
+    | ni una linea de su codigo.
+    |
+    | Ademas es lo correcto por si solo: una tabla nombrada en una
+    | explicacion no es una consulta, y una llamada comentada no protege
+    | nada.
+    */
+    $limpio = preg_replace(['~/\*.*?\*/~s', '~//[^\n]*~'], '', $cuerpo);
+
+    if (!preg_match('~SELECT~i', $limpio)) { continue; }
     if (isset($exentos[$nombre]))          { continue; }
 
     $toca = false;
-    foreach ($conSede as $t) { if (str_contains($cuerpo, $t)) { $toca = true; break; } }
+    foreach ($conSede as $t) { if (str_contains($limpio, $t)) { $toca = true; break; } }
     if (!$toca) { continue; }
 
-    if (preg_match('~\$this->(sede|sedeReserva|sedeAlumno)\(~', $cuerpo)) {
+    if (preg_match('~\$this->(sede|sedeReserva|sedeAlumno|sedeSnapshot)\(~', $limpio)) {
         $acotados++;
     } else {
         $sinAcotar[] = $nombre;
