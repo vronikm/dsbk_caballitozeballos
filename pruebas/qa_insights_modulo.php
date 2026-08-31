@@ -100,8 +100,21 @@ $af('toda vista declarada tiene su archivo',
     $sinArchivo === [], $sinArchivo ? implode(', ', $sinArchivo) : count($vistas) . ' archivos');
 
 /*==============  3. El código de servidor no se sirve por URL  ==============*/
+/*
+| docs/ entró en la lista después de comprobarlo: MODELO_INSIGHTS.md,
+| ANALISIS_ACTUAL.md e INDICADORES.pdf se servían con HTTP 200.
+|
+| El .htaccess de la raíz bloquea .md, pero mod_rewrite NO hereda: un
+| .htaccess con RewriteEngine propio REEMPLAZA las reglas del padre en vez de
+| sumarse a ellas. Así que cada módulo con su .htaccess se queda sin las
+| protecciones de arriba, y hay que repetirlas.
+|
+| Es un fallo silencioso por definición: nadie prueba una URL que no espera
+| que exista, y el archivo se sirve con 200 durante meses.
+*/
 foreach (['config/app.php', 'config/conexion.php', 'controllers/insightsController.php',
-          'views/dashboard-view.php', 'cli/capturar_cartera.php'] as $ruta) {
+          'views/dashboard-view.php', 'cli/capturar_cartera.php',
+          'docs/MODELO_INSIGHTS.md', 'docs/INDICADORES.pdf'] as $ruta) {
     $af("bloqueado por URL: $ruta", $http($base . $ruta) === 403);
 }
 
